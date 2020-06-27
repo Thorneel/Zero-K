@@ -25,7 +25,8 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-local WINDOW_WIDTH = 600
+local DEFAULT_WINDOW_WIDTH = 800
+local MIN_WINDOW_WIDTH = 400
 local DEFAULT_X_POSITION = 400
 local DEFAULT_Y_POSITION = 100
 local DEFAULT_LINE_NUMBER = 10
@@ -137,6 +138,9 @@ local function InitializeCampaignMessageBox()
 		messageBoxWindow = nil
 	end
   
+  local screenWidth, _ = Spring.GetWindowGeometry()
+  local defaultWindowWidth = math.min(DEFAULT_WINDOW_WIDTH, screenWidth - (DEFAULT_X_POSITION + 100))
+  
 	local defaultWindowHeight = DEFAULT_LINE_NUMBER*(options.text_height.value or DEFAULT_TEXT_HEIGHT)
 	local minWindowHeight = MIN_LINE_NUMBER*(options.text_height.value or DEFAULT_TEXT_HEIGHT)
   local yPosition = DEFAULT_Y_POSITION-- math.floor(screenHeight/4)
@@ -151,9 +155,8 @@ local function InitializeCampaignMessageBox()
 		padding = {0, 0, PADDING, PADDING},
 		x = DEFAULT_X_POSITION,
 		y = yPosition,
-		width = WINDOW_WIDTH,
-		minWidth = WINDOW_WIDTH,
-    maxWidth = WINDOW_WIDTH,
+		width = defaultWindowWidth,
+		minWidth = MIN_WINDOW_WIDTH,
 		height = defaultWindowHeight + PADDING,
 		minHeight = minWindowHeight,
 		draggable = false,
