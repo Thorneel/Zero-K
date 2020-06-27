@@ -168,18 +168,6 @@ local function InitializeCampaignMessageBox()
     RefreshDisplay(false)
   end
   
-  AddMessage("the first")
-  AddMessage("test 2")
-  AddMessage("test 3")
-  AddMessage("test 4")
-  AddMessage("test 5")
-  AddMessage("test 6")
-  AddMessage("test 7")
-  AddMessage("test 8")
-  AddMessage("test 9")
-  AddMessage("test 10")
-  AddMessage("the last")
-  
 end
 
 --------------------------------------------------------------------------------
