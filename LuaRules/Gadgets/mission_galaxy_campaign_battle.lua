@@ -12,6 +12,7 @@ function gadget:GetInfo()
 	}
 end
 
+local Spring = Spring
 local campaignBattleID = Spring.GetModOptions().singleplayercampaignbattleid
 local missionDifficulty = tonumber(Spring.GetModOptions().planetmissiondifficulty) or 2
 if not campaignBattleID then
@@ -770,6 +771,10 @@ local function PlaceUnit(unitData, teamID, doLevelGround, findClearPlacement)
 		local _, maxHealth = Spring.GetUnitHealth(unitID)
 		Spring.SetUnitHealth(unitID, {build = unitData.buildProgress, health = maxHealth*unitData.buildProgress})
 	end
+  
+  if unitData.warningText then
+    SendToUnsynced("DisplayMessage", unitData.warningText)
+  end
 end
 
 local function AddMidgameUnit(unitData, teamID, gameFrame, spawnFrameOverride)
@@ -1633,6 +1638,12 @@ local function RemoveMarker(cmd, markerID)
 	end
 end
 
+local function DisplayMessage(cmd, message)
+	if (Script.LuaUI('DisplayCampaignMessage')) then
+		Script.LuaUI.DisplayCampaignMessage(message)
+	end
+end
+
 function SendAIEvent(_, teamID, msg)
 	local localPlayer = Spring.GetLocalPlayerID();
 	-- Send message only to hosted native AI
@@ -1648,7 +1659,7 @@ function gadget:Initialize()
 	gadgetHandler:AddSyncAction("SendAIEvent", SendAIEvent)
 	gadgetHandler:AddSyncAction("MissionGameOver", MissionGameOver)
 	gadgetHandler:AddSyncAction("AddMarker", AddMarker)
-	gadgetHandler:AddSyncAction("RemoveMarker", RemoveMarker)
+	gadgetHandler:AddSyncAction("DisplayMessage", DisplayMessage)
 end
 
 function gadget:Shutdown()
@@ -1656,6 +1667,7 @@ function gadget:Shutdown()
 	gadgetHandler:RemoveSyncAction("MissionGameOver")
 	gadgetHandler:RemoveSyncAction("AddMarker")
 	gadgetHandler:RemoveSyncAction("RemoveMarker")
+	gadgetHandler:RemoveSyncAction("DisplayMessage")
 end
 
 --------------------------------------------------------------------------------
