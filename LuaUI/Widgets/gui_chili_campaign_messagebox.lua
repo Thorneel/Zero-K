@@ -37,6 +37,8 @@ local messageBoxWindow
 local textBoxLinkedList -- newest element first
 local oldestTextTimer
 
+local soundFile = "sounds/place_beep.wav"
+
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -48,8 +50,6 @@ local function RefreshDisplay(removeLastElement)
 
   local textHeightWithPadding = PADDING + (options.text_height.value or DEFAULT_TEXT_HEIGHT)
   local positionY = messageBoxWindow.height
-  Spring.Echo("refresh display")
-  local i = 0
   local previousL
   local l = textBoxLinkedList
   while l do
@@ -57,10 +57,6 @@ local function RefreshDisplay(removeLastElement)
     
     -- starting with the newest at the bottom of the window, each subsequent textBox is set above the previous one
     positionY = positionY - textHeightWithPadding
-    i = i + 1
-    Spring.Echo("text " .. i .. ": " .. elem.textBox.text)
-    Spring.Echo("old positionY: " .. elem.textBox.y)
-    Spring.Echo("new positionY: " .. positionY)
     elem.textBox.y = positionY
     elem.textBox:Invalidate()
     if removeLastElement then
@@ -128,6 +124,7 @@ local function AddMessage(message)
   textBoxLinkedList = {next = textBoxLinkedList, value = newTextBoxElement}
   
   RefreshDisplay(false)
+  Spring.PlaySoundFile(soundFile, 1, 'ui')
 end
 
 --------------------------------------------------------------------------------
@@ -198,7 +195,6 @@ options = {
 
 function widget:Update(_)
   if oldestTextTimer and Spring.DiffTimers(Spring.GetTimer(), oldestTextTimer) > (options.display_time.value or 15) then
-    Spring.Echo("remove oldest element")
     RefreshDisplay(true)
   end
 end
