@@ -54,9 +54,10 @@ local function RefreshDisplay(removeLastElement)
   local l = textBoxLinkedList
   while l do
     local elem = l.value
+    local lineCount = #elem.textBox.physicalLines
     
     -- starting with the newest at the bottom of the window, each subsequent textBox is set above the previous one
-    positionY = positionY - textHeightWithPadding
+    positionY = positionY - (lineCount * textHeightWithPadding)
     elem.textBox.y = positionY
     elem.textBox:Invalidate()
     if removeLastElement then
