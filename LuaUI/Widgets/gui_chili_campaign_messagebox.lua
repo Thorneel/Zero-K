@@ -49,7 +49,7 @@ local function RefreshDisplay(removeLastElement)
     return
   end
 
-  local textHeightWithPadding = PADDING + (options.text_height.value or DEFAULT_TEXT_HEIGHT)
+  local textHeight = options.text_height.value or DEFAULT_TEXT_HEIGHT
   local positionY = messageBoxWindow.height
   local previousL
   local l = textBoxLinkedList
@@ -58,7 +58,7 @@ local function RefreshDisplay(removeLastElement)
     local lineCount = #elem.textBox.physicalLines
     
     -- starting with the newest at the bottom of the window, each subsequent textBox is set above the previous one
-    positionY = positionY - (lineCount * textHeightWithPadding)
+    positionY = positionY - (lineCount * textHeight) + PADDING
     elem.textBox.y = positionY
     elem.textBox:Invalidate()
     if removeLastElement then
