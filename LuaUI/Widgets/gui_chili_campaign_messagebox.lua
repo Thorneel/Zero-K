@@ -38,7 +38,7 @@ local messageBoxWindow
 local textBoxLinkedList -- newest element first
 local oldestTextTimer
 
-local soundFile = "sounds/message_team.wav"
+local soundFile = "sounds/place_beep.wav"
 
 
 --------------------------------------------------------------------------------
@@ -58,7 +58,7 @@ local function RefreshDisplay(removeLastElement)
     local lineCount = #elem.textBox.physicalLines
     
     -- starting with the newest at the bottom of the window, each subsequent textBox is set above the previous one
-    positionY = positionY - (lineCount * textHeight) - PADDING
+    positionY = positionY - (lineCount * textHeight) + PADDING
     elem.textBox.y = positionY
     elem.textBox:Invalidate()
     if removeLastElement then

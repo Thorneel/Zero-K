@@ -773,7 +773,7 @@ local function PlaceUnit(unitData, teamID, doLevelGround, findClearPlacement)
 		Spring.SetUnitHealth(unitID, {build = unitData.buildProgress, health = maxHealth*unitData.buildProgress})
 	end
   
-  if unitData.warningText and not gameIsOver then
+  if unitData.warningText then
     SendToUnsynced("DisplayMessage", unitData.warningText)
   end
 end
@@ -1498,7 +1498,7 @@ function gadget:GameFrame(n)
 		end
 	end
   
-  if messagesOverTime[n] and not gameIsOver then
+  if messagesOverTime[n] then
     SendToUnsynced("DisplayMessage", messagesOverTime[n])
     messagesOverTime[n] = nil
   end
