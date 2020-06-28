@@ -13,6 +13,8 @@ function gadget:GetInfo()
 end
 
 local Spring = Spring
+local CustomKeyToUsefulTable = Spring.Utilities.CustomKeyToUsefulTable
+
 local campaignBattleID = Spring.GetModOptions().singleplayercampaignbattleid
 local missionDifficulty = tonumber(Spring.GetModOptions().planetmissiondifficulty) or 2
 if not campaignBattleID then
@@ -71,6 +73,7 @@ local victoryAtLocation = {}
 local typeVictoryLocations = {}
 local finishedUnits = {} -- Units that have been non-nanoframes at some point.
 
+local messagesOverTime = CustomKeyToUsefulTable(Spring.GetModOptions().messagesovertime)
 local midgamePlacement = {}
 
 local unlockedUnitsByTeam = {}
@@ -113,8 +116,6 @@ UpdateSaveReferences()
 -- Utility
 
 local BUILD_RESOLUTION = 16
-
-local CustomKeyToUsefulTable = Spring.Utilities.CustomKeyToUsefulTable
 
 local function SumUnits(units, limit)
 	if not units then
@@ -1496,6 +1497,11 @@ function gadget:GameFrame(n)
 			DoInitialTerraform(true)
 		end
 	end
+  
+  if messagesOverTime[n] then
+    SendToUnsynced("DisplayMessage", messagesOverTime[n])
+    messagesOverTime[n] = nil
+  end
 	
 	if midgamePlacement[n] then
 		PlaceMidgameUnits(midgamePlacement[n], n)
