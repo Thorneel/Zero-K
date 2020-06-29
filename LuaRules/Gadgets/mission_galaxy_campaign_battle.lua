@@ -1498,7 +1498,7 @@ function gadget:GameFrame(n)
 		end
 	end
   
-  if messagesOverTime[n] and not gameIsOver then
+  if messagesOverTime and messagesOverTime[n] and not gameIsOver then
     SendToUnsynced("DisplayMessage", messagesOverTime[n])
     messagesOverTime[n] = nil
   end
