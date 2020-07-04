@@ -126,7 +126,9 @@ local function AddMessage(message)
   textBoxLinkedList = {next = textBoxLinkedList, value = newTextBoxElement}
   
   RefreshDisplay(false)
-  Spring.PlaySoundFile(soundFile, 1, 'ui')
+  if options.play_message_sound then
+    Spring.PlaySoundFile(soundFile, 1, 'ui')
+  end
 end
 
 --------------------------------------------------------------------------------
@@ -177,6 +179,12 @@ end
 options_path = 'Settings/HUD Panels/Campaign Messages'
 options_order = {'text_height'}
 options = {
+	play_message_sound = {
+		name = "Message sound",
+		type = 'bool',
+		value = true,
+		noHotkey = true,
+	},
 	text_height = {
 		name = 'Font Size (10-30)',
 		type = 'number',
@@ -185,8 +193,8 @@ options = {
 		OnChange = InitializeCampaignMessageBox,
 		advanced = true
 	},
-	display_time = {
-		name = 'Message Display Time (5-30)',
+	display_duration = {
+		name = 'Message Display Duration (5-30)',
 		type = 'number',
 		value = 15,
 		min = 5, max = 30, step = 5,
@@ -198,7 +206,7 @@ options = {
 --------------------------------------------------------------------------------
 
 function widget:Update(_)
-  if oldestTextTimer and Spring.DiffTimers(Spring.GetTimer(), oldestTextTimer) > (options.display_time.value or 15) then
+  if oldestTextTimer and Spring.DiffTimers(Spring.GetTimer(), oldestTextTimer) > (options.display_duration.value or 15) then
     RefreshDisplay(true)
   end
 end
