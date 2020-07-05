@@ -281,11 +281,14 @@ local function ShutdownZombies()
   local function QueueDestruction(unitID)
   end
   
+  local invincibleUnitList = GG.GetInvincibleUnitList()
   local frame = spGetGameFrame() + 50
   for unitID, _ in pairs(zombies) do
-    local destroyFrame = frame - math.ceil((math.random()*7)^2)
-    toDestroy[destroyFrame] = toDestroy[destroyFrame] or {}
-    toDestroy[destroyFrame][unitID] = true
+    if not invincibleUnitList[unitID] then
+      local destroyFrame = frame - math.ceil((math.random()*7)^2)
+      toDestroy[destroyFrame] = toDestroy[destroyFrame] or {}
+      toDestroy[destroyFrame][unitID] = true
+    end
   end
 end
 GG.ShutdownZombies = ShutdownZombies

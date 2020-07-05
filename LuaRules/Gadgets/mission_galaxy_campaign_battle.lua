@@ -1416,7 +1416,7 @@ local function IsWinner(winners)
 end
 
 local function MissionGameOver(missionWon)
-  if not gameIsOver and missionWon and (tonumber(Spring.GetModOptions().zombies) == 1) then
+  if missionWon and (tonumber(Spring.GetModOptions().zombies) == 1) then
     GG.ShutdownZombies()
   end
 	gameIsOver = true

@@ -26,6 +26,14 @@ local function SetUnitInvincible(unitID, newInvincible)
 	Spring.SetUnitRulesParam(unitID, "invincible", newInvincible and 1 or nil, LOS_ACCESS)
 end
 
+local function GetInvincibleUnitList()
+  copy = {}
+  for orig_key, orig_value in pairs(invincibleUnits) do
+      copy[orig_key] = orig_value
+  end
+  return copy
+end
+
 function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, weaponID, attackerID, attackerDefID, attackerTeam)
 	if invincibleUnits[unitID] then
 		return 0
@@ -41,6 +49,7 @@ end
 
 function gadget:Initialize(unitID)
 	GG.SetUnitInvincible = SetUnitInvincible
+  GG.GetInvincibleUnitList = GetInvincibleUnitList
 	local unitList = Spring.GetAllUnits()
 	for i = 1, #unitList do
 		if Spring.GetUnitRulesParam(unitList[i], "invincible") then
