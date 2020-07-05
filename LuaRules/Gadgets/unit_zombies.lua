@@ -47,6 +47,7 @@ local spGetGameFrame              = Spring.GetGameFrame
 local spGetAllFeatures            = Spring.GetAllFeatures
 local spGiveOrderToUnit           = Spring.GiveOrderToUnit
 local spGetCommandQueue           = Spring.GetCommandQueue
+local spDestroyUnit               = Spring.DestroyUnit
 local spDestroyFeature            = Spring.DestroyFeature
 local spGetFeatureResurrect       = Spring.GetFeatureResurrect
 local spGetUnitIsDead             = Spring.GetUnitIsDead
@@ -55,6 +56,7 @@ local spGetUnitsInCylinder        = Spring.GetUnitsInCylinder
 local spSetTeamResource           = Spring.SetTeamResource
 local spGetUnitHealth             = Spring.GetUnitHealth
 local spSetUnitRulesParam         = Spring.SetUnitRulesParam
+local spValidUnitID               = Spring.ValidUnitID
 
 local GaiaTeamID     = Spring.GetGaiaTeamID()
 local GaiaAllyTeamID = select(6, Spring.GetTeamInfo(GaiaTeamID, false))
@@ -75,6 +77,9 @@ local zombiesToSpawnList = {}
 local zombiesToSpawnMap = {}
 local zombiesToSpawnCount = 0
 local zombies = {}
+
+local isActive = true
+local toDestroy = {}
 
 local ZOMBIE_SOUNDS = {
 	"sounds/misc/zombie_1.wav",
@@ -270,7 +275,34 @@ local function myGetFeatureRessurect(fId)
 	return resName, face
 end
 
+local function ShutdownZombies()
+  isActive = false
+  
+  local function QueueDestruction(unitID)
+  end
+  
+  local frame = spGetGameFrame() + 50
+  for unitID, _ in pairs(zombies) do
+    local destroyFrame = frame - math.ceil((math.random()*7)^2)
+    toDestroy[destroyFrame] = toDestroy[destroyFrame] or {}
+    toDestroy[destroyFrame][unitID] = true
+  end
+end
+GG.ShutdownZombies = ShutdownZombies
+
 function gadget:GameFrame(f)
+	if toDestroy[f] then
+		for unitID in pairs(toDestroy[f]) do
+			if spValidUnitID(unitID) then
+        spDestroyUnit(unitID, true)
+			end
+		end
+		toDestroy[f] = nil
+	end
+  if not isActive then
+    return
+  end
+
 	gameframe = f
 	if (f%32) == 0 then
 		local spSpawnCEG = Spring.SpawnCEG -- putting the localization here because cannot localize in global scope since spring 97
