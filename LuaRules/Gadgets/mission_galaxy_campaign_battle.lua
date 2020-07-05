@@ -61,6 +61,7 @@ include("LuaRules/Configs/customcmds.h.lua")
 -- Variables that require saving for save/load
 local unitLineage = {}
 local initialUnitData = {}
+local midgameUnitDestryedMessage = {}
 local bonusObjectiveList = {}
 
 local commandsToGive = nil -- Give commands just after game start
@@ -545,8 +546,18 @@ local function CheckInitialUnitDestroyed(unitID)
 		SendToUnsynced("RemoveMarker", unitID)
 	end
 	
+	if initialUnitData[unitID].messageWhenDestroyed then
+		SendToUnsynced("DisplayMessage", initialUnitData[unitID].messageWhenDestroyed)
+	end
+  
 	victoryAtLocation[unitID] = nil
 	initialUnitData[unitID] = nil
+end
+
+local function CheckMidgameUnitDestroyed(unitID)
+	if midgameUnitDestryedMessage[unitID] then
+		SendToUnsynced("DisplayMessage", midgameUnitDestryedMessage[unitID])
+	end
 end
 
 local function BonusObjectiveUnitDestroyed(unitID, unitDefID, teamID)
@@ -776,6 +787,8 @@ local function PlaceUnit(unitData, teamID, doLevelGround, findClearPlacement)
   if unitData.warningText and not gameIsOver then
     SendToUnsynced("DisplayMessage", unitData.warningText)
   end
+  
+  return unitID
 end
 
 local function AddMidgameUnit(unitData, teamID, gameFrame, spawnFrameOverride)
@@ -1210,10 +1223,13 @@ end
 local function PlaceMidgameUnits(unitList, gameFrame)
 	for i = 1, #unitList do
 		local data = unitList[i]
-		PlaceUnit(data.unitData, data.teamID, true, true)
+		local unitID = PlaceUnit(data.unitData, data.teamID, true, true)
 		if data.unitData.repeatDelay then
 			AddMidgameUnit(data.unitData, data.teamID, gameFrame, gameFrame + data.unitData.repeatDelay)
 		end
+    if unitID and data.messageWhenDestroyed then
+      midgameUnitDestryedMessage[unitID] = data.messageWhenDestroyed
+    end
 	end
 	
 	if commandsToGive then
@@ -1438,6 +1454,7 @@ function gadget:UnitDestroyed(unitID, unitDefID, teamID)
 	end
 	BonusObjectiveUnitDestroyed(unitID, unitDefID, teamID)
 	CheckInitialUnitDestroyed(unitID)
+	CheckMidgameUnitDestroyed(unitID)
 	if unitLineage[unitID] then
 		unitLineage[unitID] = nil
 	end
