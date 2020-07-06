@@ -89,6 +89,7 @@ local timeLossObjectiveID
 -- Small speedup things.
 local firstGameFrame = true
 local gameIsOver = false
+local missionIsWon = false
 local allyTeamList = Spring.GetAllyTeamList()
 
 local initialUnitDataTable = {}
@@ -1420,6 +1421,7 @@ local function MissionGameOver(missionWon)
     GG.ShutdownZombies()
   end
 	gameIsOver = true
+  missionIsWon = missionWon
 	SetWinBeforeBonusObjective(missionWon)
 	SendToUnsynced("MissionGameOver", missionWon)
 	Spring.SetGameRulesParam("MissionGameOver", (missionWon and 1) or 0)
@@ -1518,9 +1520,11 @@ function gadget:GameFrame(n)
 		end
 	end
   
-  if messagesOverTime and messagesOverTime[n] and not gameIsOver then
-    SendToUnsynced("DisplayMessage", messagesOverTime[n])
-    messagesOverTime[n] = nil
+  if messagesOverTime and messagesOverTime.messages and messagesOverTime.messages[n] then
+    if not gameIsOver or (missionIsWon and messagesOverTime.displayAfterVictory) then
+      SendToUnsynced("DisplayMessage", messagesOverTime.messages[n])
+      messagesOverTime.messages[n] = nil
+    end
   end
 	
 	if midgamePlacement[n] then
