@@ -73,6 +73,7 @@ local defeatConditionConfig
 local victoryAtLocation = {}
 local typeVictoryLocations = {}
 local finishedUnits = {} -- Units that have been non-nanoframes at some point.
+local victoryMessages = {}
 
 local messagesOverTime = CustomKeyToUsefulTable(Spring.GetModOptions().messagesovertime)
 local midgamePlacement = {}
@@ -200,6 +201,40 @@ end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
+-- Messages
+
+local function CheckMessages(gameFrame)
+  
+  -- messages over time stop being displayed after defeat
+  -- they are displayed after victory depending on the option
+  if messagesOverTime and messagesOverTime.messages and messagesOverTime.messages[gameFrame] then
+    if not gameIsOver or (missionIsWon and messagesOverTime.displayAfterVictory) then
+      SendToUnsynced("DisplayMessage", messagesOverTime.messages[gameFrame])
+      messagesOverTime.messages[gameFrame] = nil
+    end
+  end
+	
+  -- victory messages must be set by the victory code at the right frame, using the frame at victory time as starting time
+  if missionIsWon and victoryMessages[gameFrame] then
+      SendToUnsynced("DisplayMessage", victoryMessages[gameFrame])
+      victoryMessages[gameFrame] = nil
+  end
+  
+end
+
+local function addVictoryMessages()
+  if not messagesOverTime.victoryMessages then
+    Spring.Echo("no victory messages")
+    return
+  end
+  local frame = Spring.GetGameFrame()
+  for time, message in pairs(messagesOverTime.victoryMessages) do
+    victoryMessages[frame+time] = message
+  end
+end
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 -- Victory and Defeat functions
 
 local function IsVitalUnitType(unitID, unitDefID)
@@ -288,6 +323,7 @@ local function VictoryAtLocationUpdate()
 					Spring.SetGameRulesParam(objParameter, (Spring.GetGameRulesParam(objParameter) or 0) + ((Spring.GetUnitAllyTeam(unitID) == PLAYER_ALLY_TEAM_ID and 1) or 0))
 				end
 				GG.CauseVictory(data[i].allyTeamID)
+        addVictoryMessages()
 				return
 			end
 		end
@@ -1520,13 +1556,8 @@ function gadget:GameFrame(n)
 		end
 	end
   
-  if messagesOverTime and messagesOverTime.messages and messagesOverTime.messages[n] then
-    if not gameIsOver or (missionIsWon and messagesOverTime.displayAfterVictory) then
-      SendToUnsynced("DisplayMessage", messagesOverTime.messages[n])
-      messagesOverTime.messages[n] = nil
-    end
-  end
-	
+  CheckMessages(n)
+  
 	if midgamePlacement[n] then
 		PlaceMidgameUnits(midgamePlacement[n], n)
 		midgamePlacement[n] = nil
