@@ -73,7 +73,9 @@ local defeatConditionConfig
 local victoryAtLocation = {}
 local typeVictoryLocations = {}
 local finishedUnits = {} -- Units that have been non-nanoframes at some point.
-local victoryMessages = {}
+local gameOverMessages = {}
+local skipVictoryMessage = false
+local bonusObjectiveMessages = {}
 
 local messagesOverTime = CustomKeyToUsefulTable(Spring.GetModOptions().messagesovertime)
 local midgamePlacement = {}
@@ -214,22 +216,43 @@ local function CheckMessages(gameFrame)
     end
   end
 	
-  -- victory messages must be set by the victory code at the right frame, using the frame at victory time as starting time
-  if missionIsWon and victoryMessages[gameFrame] then
-      SendToUnsynced("DisplayMessage", victoryMessages[gameFrame])
-      victoryMessages[gameFrame] = nil
+  if gameOverMessages[gameFrame] then
+    SendToUnsynced("DisplayMessage", gameOverMessages[gameFrame])
+    gameOverMessages[gameFrame] = nil
+  end
+  
+  if bonusObjectiveMessages[gameFrame] then
+    SendToUnsynced("DisplayMessage", bonusObjectiveMessages[gameFrame])
+    bonusObjectiveMessages[gameFrame] = nil
   end
   
 end
 
-local function addVictoryMessages()
-  if not messagesOverTime.victoryMessages then
-    Spring.Echo("no victory messages")
+local function addGameOverMessages(missionWon)
+  if not messagesOverTime then
     return
   end
+  
+  -- if an allyTeam lost after duration, victory messages are not displayed
+  if missionWon and skipVictoryMessage then
+    return
+  end
+  
+  local messageList
+  if missionWon then
+    messageList = messagesOverTime.victoryMessages
+  else
+    messageList = messagesOverTime.defeatMessages
+  end
+  
+  if not messageList then
+    Spring.Echo("no game over messages")
+    return
+  end
+  
   local frame = Spring.GetGameFrame()
-  for time, message in pairs(messagesOverTime.victoryMessages) do
-    victoryMessages[frame+time] = message
+  for time, message in pairs(messageList) do
+    gameOverMessages[frame+time] = message
   end
 end
 
@@ -323,7 +346,6 @@ local function VictoryAtLocationUpdate()
 					Spring.SetGameRulesParam(objParameter, (Spring.GetGameRulesParam(objParameter) or 0) + ((Spring.GetUnitAllyTeam(unitID) == PLAYER_ALLY_TEAM_ID and 1) or 0))
 				end
 				GG.CauseVictory(data[i].allyTeamID)
-        addVictoryMessages()
 				return
 			end
 		end
@@ -366,6 +388,16 @@ local function CompleteBonusObjective(bonusObjectiveID, success)
 	
 	objectiveData.success = success
 	objectiveData.terminated = true
+  
+  local messagesForThisBonusObjective
+  if success then
+    messagesForThisBonusObjective = objectiveData.messagesOnSuccess
+  else
+    messagesForThisBonusObjective = objectiveData.messagesOnFailure
+  end
+  if messagesForThisBonusObjective then
+    for k,v in pairs(messagesForThisBonusObjective) do bonusObjectiveMessages[k] = v end
+  end
 	
 	if completeAllBonusObjectiveID and bonusObjectiveID ~= completeAllBonusObjectiveID then
 		if success then
@@ -1454,10 +1486,11 @@ end
 
 local function MissionGameOver(missionWon)
   if missionWon and (tonumber(Spring.GetModOptions().zombies) == 1) then
-    GG.ShutdownZombies()
+    GG.DestroyZombies()
   end
 	gameIsOver = true
   missionIsWon = missionWon
+  addGameOverMessages(missionWon)
 	SetWinBeforeBonusObjective(missionWon)
 	SendToUnsynced("MissionGameOver", missionWon)
 	Spring.SetGameRulesParam("MissionGameOver", (missionWon and 1) or 0)
@@ -1576,6 +1609,9 @@ function gadget:GameFrame(n)
 						local objParameter = "objectiveSuccess_" .. defeatConfig.timeLossObjectiveID
 						Spring.SetGameRulesParam(objParameter, (Spring.GetGameRulesParam(objParameter) or 0) + ((allyTeamList[i] == PLAYER_ALLY_TEAM_ID and 0) or 1))
 					end
+          if defeatConditionConfig[allyTeamList[i]].skipVictoryMessageIfLostToTime then
+            skipVictoryMessage = true
+          end
 					GG.DestroyAlliance(allyTeamList[i])
 				end
 			end
