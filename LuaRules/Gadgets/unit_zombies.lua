@@ -275,11 +275,8 @@ local function myGetFeatureRessurect(fId)
 	return resName, face
 end
 
-local function ShutdownZombies()
+local function DestroyZombies()
   isActive = false
-  
-  local function QueueDestruction(unitID)
-  end
   
   local invincibleUnitList = GG.GetInvincibleUnitList()
   local frame = spGetGameFrame() + 50
@@ -291,7 +288,7 @@ local function ShutdownZombies()
     end
   end
 end
-GG.ShutdownZombies = ShutdownZombies
+GG.DestroyZombies = DestroyZombies
 
 function gadget:GameFrame(f)
 	if toDestroy[f] then
