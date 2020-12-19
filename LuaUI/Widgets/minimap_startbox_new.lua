@@ -302,7 +302,6 @@ local function ValidStartpos (x, y, z)
 end
 
 function widget:DrawWorld()
-
 	gl.Fog(false)
 
 	gl.CallList(boxList)

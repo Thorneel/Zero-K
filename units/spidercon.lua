@@ -1,7 +1,7 @@
 return { spidercon = {
   unitname               = [[spidercon]],
   name                   = [[Weaver]],
-  description            = [[Construction Spider, Builds at 7.5 m/s]],
+  description            = [[Construction Spider]],
   acceleration           = 0.6,
   activateWhenBuilt      = true,
   brakeRate              = 3.6,
@@ -53,7 +53,7 @@ return { spidercon = {
   trackStretch           = 1,
   trackType              = [[ChickenTrackPointyShort]],
   trackWidth             = 54,
-  turnRate               = 1400,
+  turnRate               = 1680,
   workerTime             = 7.5,
 
   featureDefs            = {

@@ -43,20 +43,8 @@ local SIG_AIM2 = 4
 local SIG_RESTORE = 8
 local SIG_FLOAT = 16
 local SIG_BOB = 32
+local UNDERWATER_DEPTH = -32
 
---------------------------------------------------------------------------------------
---------------------------------------------------------------------------------------
-
-local spGetUnitRulesParam = Spring.GetUnitRulesParam
-local spGetGroundHeight = Spring.GetGroundHeight
-
-local wd = WeaponDefNames["amphimpulse_watercannon"]
-
-local impulse = tonumber(wd.customParams.impulse)
-local maxProjectiles = 8
-
-local impulseMaxDepth = -tonumber(wd.customParams.impulsemaxdepth)
-local impulseDepthMult = -tonumber(wd.customParams.impulsedepthmult)
 --------------------------------------------------------------------------------------
 --------------------------------------------------------------------------------------
 -- Weapon config
@@ -67,6 +55,7 @@ local soundIndex = SOUND_PERIOD
 --------------------------------------------------------------------------------------
 --------------------------------------------------------------------------------------
 local gun_1 = 1
+local aimWeaponLinger = 0
 
 --------------------------------------------------------------------------------------
 --------------------------------------------------------------------------------------
@@ -92,10 +81,10 @@ end
 
 local function FloatBubbles()
 	--[[
-	SetSignalMask(SIG_FLOAT)
+	SetSignalMask(SIG_FLOAT + SIG_WALK)
 	local isSubmerged = true
 	while true do
-		--EmitSfx(vent, SFX.BUBBLE)
+		--EmitSfx(vent, 1025)
 		
 		if isSubmerged then -- water breaking anim - kind of overkill?
 			local x,y,z = Spring.GetUnitPosition(unitID)
@@ -119,7 +108,7 @@ local function riseFloat_thread()
 		return
 	end
 	Signal(SIG_FLOAT)
-	SetSignalMask(SIG_FLOAT)
+	SetSignalMask(SIG_FLOAT + SIG_WALK)
 		--StartThread(FloatBubbles)
 		
 	Turn(lthigh,x_axis, math.rad(30), math.rad(240))
@@ -168,7 +157,7 @@ local function staticFloat_thread()
 		return
 	end
 	Signal(SIG_FLOAT)
-	SetSignalMask(SIG_FLOAT)
+	SetSignalMask(SIG_FLOAT + SIG_WALK)
 		
 	Turn(lcalf,x_axis, math.rad(-25-20), math.rad(50))
 	Turn(lfoot,x_axis, math.rad(10+20), math.rad(50))
@@ -176,10 +165,8 @@ local function staticFloat_thread()
 	Turn(rfoot,x_axis, math.rad(10-20), math.rad(50))
 	
 	while true do
-		
 		Turn(lthigh,x_axis, math.rad(10+25), math.rad(37.5))
 		Turn(rthigh,x_axis, math.rad(10-25), math.rad(37.5))
-		
 		
 		Sleep(400)
 		
@@ -212,7 +199,7 @@ local function sinkFloat_thread()
 	end
 	
 	Signal(SIG_FLOAT)
-	SetSignalMask(SIG_FLOAT)
+	SetSignalMask(SIG_FLOAT + SIG_WALK)
 	
 	Turn(rthigh, x_axis, 0, math.rad(80)*PACE)
 	Turn(rcalf, x_axis, 0, math.rad(120)*PACE)
@@ -228,10 +215,9 @@ local function sinkFloat_thread()
 	Move(base, y_axis, 0, math.rad(math.random(1,2)))
 	
 	while true do --FIXME: not stopped when sinking ends!
-		EmitSfx(torso, SFX.BUBBLE)
+		EmitSfx(torso, 1025)
 		Sleep(66)
 	end
-	
 end
 
 local function dustBottom()
@@ -351,7 +337,6 @@ function script.StartMoving()
 end
 
 function script.StopMoving()
-	Signal(SIG_START_FLOAT)
 	StartThread(Stopping)
 	GG.Floating_StopMoving(unitID)
 end
@@ -365,10 +350,11 @@ end
 local function RestoreAfterDelay()
 	Signal(SIG_RESTORE)
 	SetSignalMask(SIG_RESTORE)
-	Sleep(5000)
+	Sleep(3000)
 	Turn(torso, y_axis, 0, math.rad(65))
 	Turn(lshoulder, x_axis, 0, math.rad(45))
 	Turn(rshoulder, x_axis, 0, math.rad(45))
+	aimWeaponLinger = 0
 end
 
 function script.AimFromWeapon()
@@ -376,20 +362,30 @@ function script.AimFromWeapon()
 end
 
 function script.AimWeapon(num, heading, pitch)
-	if num == 1 then
-		Signal(SIG_AIM1)
-		SetSignalMask(SIG_AIM1)
-		Turn(torso, y_axis, heading, math.rad(480))
-		Turn(lshoulder, x_axis, -pitch, math.rad(200))
-		Turn(rshoulder, x_axis, -pitch, math.rad(200))
-		WaitForTurn(torso, y_axis)
-		WaitForTurn(lshoulder, x_axis)
-		StartThread(RestoreAfterDelay)
-		return true
-	elseif num == 2 then
+	if aimWeaponLinger > 0 then
 		GG.Floating_AimWeapon(unitID)
-		return false
+		aimWeaponLinger = aimWeaponLinger - 1
 	end
+	Signal(SIG_AIM1)
+	SetSignalMask(SIG_AIM1)
+	Turn(torso, y_axis, heading, math.rad(480))
+	Turn(lshoulder, x_axis, -pitch, math.rad(200))
+	Turn(rshoulder, x_axis, -pitch, math.rad(200))
+	WaitForTurn(torso, y_axis)
+	WaitForTurn(lshoulder, x_axis)
+	StartThread(RestoreAfterDelay)
+	return true
+end
+
+function script.BlockShot(num, targetID)
+	local x,y,z = Spring.GetUnitPosition(unitID)
+	GG.Floating_AimWeapon(unitID)
+	aimWeaponLinger = 5
+	if y < UNDERWATER_DEPTH then
+		return true
+	end
+	-- Lower than real damage (155) to help against Duck regen case.
+	return (targetID and GG.OverkillPrevention_CheckBlock(unitID, targetID, 142, 10)) and true or false
 end
 
 function script.QueryWeapon(num)
@@ -398,7 +394,13 @@ end
 
 function script.Shot(num)
 	GG.Floating_AimWeapon(unitID)
+	Move(firepoints[gun_1], z_axis, 4)
 	EmitSfx(firepoints[gun_1], 1024)
+	Move(firepoints[gun_1], z_axis, 0)
+end
+
+-- EndBurst so that the projectile fires from the correct gun
+function script.EndBurst()
 	gun_1 = 1 - gun_1
 end
 

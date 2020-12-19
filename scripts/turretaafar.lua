@@ -3,11 +3,12 @@ include 'constants.lua'
 --------------------------------------------------------------------------------
 -- pieces
 --------------------------------------------------------------------------------
-local anteny = piece 'anteny'
+
+-- unused pieces: anteny, ozdoba
+
 local cervena = piece 'cervena'
 local modra = piece 'modra'
 local zelena = piece 'zelena'
-local ozdoba = piece 'ozdoba'
 local spodni_zebra = piece 'spodni_zebra'
 local vrchni_zebra = piece 'vrchni_zebra'
 local trubky = piece 'trubky'
@@ -408,11 +409,7 @@ function script.AimFromWeapon()
 end
 
 function script.BlockShot(num, targetID)
-	if Spring.ValidUnitID(targetID) then
-		local distMult = (Spring.GetUnitSeparation(unitID, targetID) or 0)/1800
-		return GG.OverkillPrevention_CheckBlock(unitID, targetID, 225.01, 70 * distMult)
-	end
-	return false
+	return GG.Script.OverkillPreventionCheck(unitID, targetID, 200.1, 1800, 70, 0.1, true)
 end
 
 function script.Killed(recentDamage, maxHealth)

@@ -22,6 +22,7 @@ local spInsertUnitCmdDesc = Spring.InsertUnitCmdDesc
 local spMoveCtrlGetTag    = Spring.MoveCtrl.GetTag
 local spGetCommandQueue   = Spring.GetCommandQueue
 local spGiveOrderToUnit   = Spring.GiveOrderToUnit
+local spGetUnitCurrentCommand = Spring.GetUnitCurrentCommand
 
 local mapSizeX = Game.mapSizeX
 local mapSizeZ = Game.mapSizeZ
@@ -37,40 +38,7 @@ local CMD_OPT_ALT = CMD.OPT_ALT
 
 local MAX_UNITS = Game.maxUnits
 
-local rawBuildUpdateIgnore = {
-	[CMD.ONOFF] = true,
-	[CMD.FIRE_STATE] = true,
-	[CMD.MOVE_STATE] = true,
-	[CMD.REPEAT] = true,
-	[CMD.CLOAK] = true,
-	[CMD.STOCKPILE] = true,
-	[CMD.TRAJECTORY] = true,
-	[CMD.IDLEMODE] = true,
-	[CMD_GLOBAL_BUILD] = true,
-	[CMD_STEALTH] = true,
-	[CMD_CLOAK_SHIELD] = true,
-	[CMD_UNIT_FLOAT_STATE] = true,
-	[CMD_PRIORITY] = true,
-	[CMD_MISC_PRIORITY] = true,
-	[CMD_RETREAT] = true,
-	[CMD_UNIT_BOMBER_DIVE_STATE] = true,
-	[CMD_AP_FLY_STATE] = true,
-	[CMD_AP_AUTOREPAIRLEVEL] = true,
-	[CMD_UNIT_SET_TARGET] = true,
-	[CMD_UNIT_CANCEL_TARGET] = true,
-	[CMD_UNIT_SET_TARGET_CIRCLE] = true,
-	[CMD_ABANDON_PW] = true,
-	[CMD_RECALL_DRONES] = true,
-	[CMD_UNIT_KILL_SUBORDINATES] = true,
-	[CMD_GOO_GATHER] = true,
-	[CMD_PUSH_PULL] = true,
-	[CMD_UNIT_AI] = true,
-	[CMD_WANT_CLOAK] = true,
-	[CMD_DONT_FIRE_AT_RADAR] = true,
-	[CMD_AIR_STRAFE] = true,
-	[CMD_PREVENT_OVERKILL] = true,
-	[CMD_SELECTION_RANK] = true,
-}
+local rawBuildUpdateIgnore = include("LuaRules/Configs/state_commands.lua")
 
 local stopCommand = {
 	[CMD.GUARD] = true,
@@ -172,7 +140,7 @@ local moveRawCmdDesc = {
 	name    = 'Move',
 	cursor  = 'Move', -- add with LuaUI?
 	action  = 'rawmove',
-	tooltip = 'Move: Order the unit to move to a position.',
+	tooltip = 'Move: Move to a position. Click and drag to line move.',
 }
 
 local TEST_MOVE_SPACING = 16
@@ -490,7 +458,7 @@ end
 
 local function CheckUnitQueues()
 	for unitID,_ in pairs(unitQueuesToCheck) do
-		if Spring.GetUnitCurrentCommand(unitID) ~= CMD_RAW_MOVE then
+		if spGetUnitCurrentCommand(unitID) ~= CMD_RAW_MOVE then
 			StopRawMoveUnit(unitID)
 		end
 		unitQueuesToCheck[unitID] = nil
@@ -543,7 +511,7 @@ end
 local function GetConstructorCommandPos(cmdID, cp_1, cp_2, cp_3, cp_4, cp_5, cp_6, unitID)
 	local _
 	if cmdID == CMD_RAW_BUILD then
-		cmdID, _, _, cp_1, cp_2, cp_3, cp_4, cp_5, cp_6 = Spring.GetUnitCurrentCommand(unitID, 2)
+		cmdID, _, _, cp_1, cp_2, cp_3, cp_4, cp_5, cp_6 = spGetUnitCurrentCommand(unitID, 2)
 	end
 	if not cmdID then
 		return false
@@ -585,7 +553,7 @@ local function CheckConstructorBuild(unitID)
 		return
 	end
 	
-	local cmdID, _, cmdTag, cp_1, cp_2, cp_3, cp_4, cp_5, cp_6 = Spring.GetUnitCurrentCommand(unitID)
+	local cmdID, _, cmdTag, cp_1, cp_2, cp_3, cp_4, cp_5, cp_6 = spGetUnitCurrentCommand(unitID)
 	local cx, cy, cz = GetConstructorCommandPos(cmdID, cp_1, cp_2, cp_3, cp_4, cp_5, cp_6, unitID)
 
 	if cmdID == CMD_RAW_BUILD and cp_3 then
@@ -696,7 +664,7 @@ end
 -- Move replacement
 
 local function ReplaceMoveCommand(unitID)
-	local cmdID, _, cmdTag, cmdParam_1, cmdParam_2, cmdParam_3 = Spring.GetUnitCurrentCommand(unitID)
+	local cmdID, _, cmdTag, cmdParam_1, cmdParam_2, cmdParam_3 = spGetUnitCurrentCommand(unitID)
 	if cmdID == CMD_MOVE and cmdParam_3 then
 		if fromFactory[unitID] then
 			fromFactory[unitID] = nil

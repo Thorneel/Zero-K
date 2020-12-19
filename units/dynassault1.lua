@@ -27,6 +27,8 @@ return { dynassault1 = {
     statsname = [[dynassault1]],
     soundok = [[heavy_bot_move]],
     soundselect = [[bot_select]],
+    soundok_vol = [[0.58]],
+    soundselect_vol = [[0.5]],
     soundbuild = [[builder_start]],
     commtype = [[5]],
     modelradius    = [[27]],
@@ -77,7 +79,7 @@ return { dynassault1 = {
   trackStretch        = 1,
   trackType           = [[ComTrack]],
   trackWidth          = 22,
-  turnRate            = 1148,
+  turnRate            = 1377,
   upright             = true,
   workerTime          = 10,
 

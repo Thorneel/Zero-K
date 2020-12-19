@@ -3,9 +3,9 @@ return { shipaa = {
 
   name                   = [[Zephyr]],
   description            = [[Anti-Air Frigate]],
-  acceleration           = 0.249,
+  acceleration           = 0.3,
   activateWhenBuilt   = true,
-  brakeRate              = 0.808,
+  brakeRate              = 1.0,
 
   buildCostMetal         = 400,
   builder                = false,
@@ -48,7 +48,7 @@ return { shipaa = {
   sightDistance          = 660,
   sonarDistance          = 660,
   turninplace            = 0,
-  turnRate               = 486,
+  turnRate               = 777,
   waterline              = 4,
   workerTime             = 0,
 
@@ -72,7 +72,7 @@ return { shipaa = {
 
     AALASER       = {
       name                    = [[Anti-Air Laser]],
-      accuracy                = 128,
+      accuracy                = 50,
       areaOfEffect            = 8,
       canattackground         = false,
       collideFriendly         = false,

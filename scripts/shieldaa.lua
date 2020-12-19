@@ -153,11 +153,15 @@ local function RestoreAfterDelay()
 end
 
 ----[[
-function script.QueryWeapon1() return points[missile].missile end
+function script.QueryWeapon()
+	return points[missile].missile
+end
 
-function script.AimFromWeapon1() return pod end
+function script.AimFromWeapon()
+	return pod
+end
 
-function script.AimWeapon1(heading, pitch)
+function script.AimWeapon(num, heading, pitch)
 	Signal(SIG_Aim)
 	SetSignalMask(SIG_Aim)
 	pitch = math.max(pitch, math.rad(20))	-- results in a minimum pod angle of 20° above horizontal
@@ -170,41 +174,15 @@ function script.AimWeapon1(heading, pitch)
 	return true
 end
 
-function script.FireWeapon1()
+function script.FireWeapon()
 	EmitSfx(points[missile].exhaust, smokeblast)
 	missile = missile + 1
 	if missile > 3 then missile = 1 end
 end
 
 function script.BlockShot(num, targetID)
-	if Spring.ValidUnitID(targetID) then
-		local distMult = (Spring.GetUnitSeparation(unitID, targetID) or 0)/880
-		return GG.OverkillPrevention_CheckBlock(unitID, targetID, 71, 30 * distMult)
-	end
-	return false
+	return GG.Script.OverkillPreventionCheck(unitID, targetID, 70.1, 880, 30, 0.05, true)
 end
-
---]]
-
---[[ why are there two weapons???
-function script.QueryWeapon2() return pod end
-
-function script.AimFromWeapon2() return pod end
-
-function script.AimWeapon2(heading, pitch)
-	Signal(SIG_Aim)
-	SetSignalMask(SIG_Aim)
-	Turn(head, y_axis, heading, 5)
-	Turn(pod, x_axis, -pitch, 5)
-	--WaitForTurn(head, y_axis)
-	--WaitForTurn(pod, x_axis)
-	return true
-end
-
-function script.FireWeapon2()
-	--effects
-end
---]]
 
 function script.Killed(recentDamage, maxHealth)
 	local severity = recentDamage / maxHealth

@@ -12,16 +12,16 @@ return { turretgauss = {
   buildPic                      = [[turretgauss.png]],
   canMove                       = false,
   category                      = [[SINK TURRET]],
-  collisionVolumeOffsets        = [[0 5 0]],
-  collisionVolumeScales         = [[28 40 28]],
-  collisionVolumeType           = [[CylY]],
+  collisionVolumeOffsets        = [[0 -5 0]],
+  collisionVolumeScales         = [[38 58 38]],
+  collisionVolumeType           = [[ellipsoid]],
   corpse                        = [[DEAD]],
 
   customParams                  = {
     modelradius    = [[15]],
     midposoffset   = [[0 15 0]],
-    aimposoffset   = [[0 25 0]],
-    armored_regen  = [[20]],
+    aimposoffset   = [[0 22 0]],
+    armored_regen  = [[10]],
   },
 
   damageModifier                = 0.25,

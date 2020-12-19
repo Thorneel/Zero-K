@@ -120,7 +120,12 @@ function script.AimWeapon(num, heading, pitch)
 	return true
 end
 
-function script.FireWeapon(num)
+function script.FireWeapon()
+	EmitSfx(flare, GG.Script.UNIT_SFX1)
+	EmitSfx(flare, GG.Script.UNIT_SFX2)
+end
+
+function script.EndBurst()
 	Turn (torso, y_axis, math.rad(20))
 	Move (barrel, z_axis, -6.25)
 	WaitForTurn (torso, y_axis)
@@ -133,7 +138,7 @@ end
 function script.BlockShot(num, targetID)
 	if Spring.ValidUnitID(targetID) then
 		local distMult = (Spring.GetUnitSeparation(unitID, targetID) or 0)/860
-		return GG.OverkillPrevention_CheckBlock(unitID, targetID, 150.1, 120 * distMult, false, false, true)
+		return GG.OverkillPrevention_CheckBlock(unitID, targetID, 135.1, 120 * distMult, false, false, true)
 	end
 	return false
 end

@@ -24,7 +24,7 @@ return { jumpraid = {
     jump_from_midair   = 1,
     fireproof          = [[1]],
     stats_show_death_explosion = 1,
-    aim_lookahead      = 100,
+    aim_lookahead      = 80,
   },
 
   explodeAs             = [[PYRO_DEATH]],
@@ -34,7 +34,7 @@ return { jumpraid = {
   idleAutoHeal          = 5,
   idleTime              = 1800,
   leaveTracks           = true,
-  maxDamage             = 700,
+  maxDamage             = 670,
   maxSlope              = 36,
   maxVelocity           = 3,
   maxWaterDepth         = 22,
@@ -64,7 +64,7 @@ return { jumpraid = {
   trackStretch          = 1,
   trackType             = [[ComTrack]],
   trackWidth            = 22,
-  turnRate              = 1800,
+  turnRate              = 2160,
   upright               = true,
   workerTime            = 0,
 
@@ -111,7 +111,7 @@ return { jumpraid = {
       },
     
       damage                  = {
-        default = 9.2,
+        default = 8.9,
         subs    = 0.01,
       },
 
@@ -124,7 +124,7 @@ return { jumpraid = {
       impulseFactor           = 0,
       intensity               = 0.3,
       interceptedByShieldType = 1,
-      leadLimit               = 10,
+      leadLimit               = 2,
       noExplode               = true,
       noSelfDamage            = true,
       range                   = 260,

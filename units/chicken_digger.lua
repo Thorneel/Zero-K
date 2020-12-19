@@ -37,6 +37,7 @@ return { chicken_digger = {
   objectName          = [[chicken_digger.s3o]],
   onoffable           = true,
   power               = 40,
+  reclaimable         = false,
   selfDestructAs      = [[SMALL_UNITEX]],
 
   sfxtypes            = {
@@ -54,7 +55,7 @@ return { chicken_digger = {
   trackStretch        = 1,
   trackType           = [[ChickenTrack]],
   trackWidth          = 10,
-  turnRate            = 806,
+  turnRate            = 967,
   upright             = false,
   waterline           = 8,
   workerTime          = 0,

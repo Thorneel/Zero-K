@@ -1,3 +1,7 @@
+--[[ NB: this is a legacy def without any purpose in ZK itself,
+     but is kept for compatibility because some mods (specifically
+     Zero Wars, possibly others) have already started using it ]]
+
 return { chicken_drone_starter = {
   unitname            = [[chicken_drone_starter]],
   name                = [[Drone]],
@@ -42,6 +46,7 @@ return { chicken_drone_starter = {
   objectName          = [[chicken_drone.s3o]],
   onoffable           = true,
   power               = 60,
+  reclaimable         = false,
   selfDestructAs      = [[SMALL_UNITEX]],
 
   sfxtypes            = {
@@ -59,7 +64,7 @@ return { chicken_drone_starter = {
   trackStretch        = 1,
   trackType           = [[ChickenTrack]],
   trackWidth          = 10,
-  turnRate            = 806,
+  turnRate            = 967,
   upright             = false,
   waterline           = 8,
   workerTime          = 0,

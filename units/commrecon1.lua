@@ -1,7 +1,7 @@
 return { commrecon1 = {
   unitname            = [[commrecon1]],
   name                = [[Recon Commander]],
-  description         = [[High Mobility Commander, Builds at 10 m/s]],
+  description         = [[High Mobility Commander]],
   acceleration        = 0.75,
   activateWhenBuilt   = true,
   autoHeal            = 5,
@@ -33,6 +33,8 @@ return { commrecon1 = {
     statsname = [[dynrecon1]],
     soundok = [[heavy_bot_move]],
     soundselect = [[bot_select]],
+    soundok_vol = [[0.58]],
+    soundselect_vol = [[0.5]],
     soundbuild = [[builder_start]],
     commtype = [[3]],
     aimposoffset   = [[0 10 0]],
@@ -84,7 +86,7 @@ return { commrecon1 = {
   trackStretch        = 1,
   trackType           = [[ComTrack]],
   trackWidth          = 22,
-  turnRate            = 1350,
+  turnRate            = 1620,
   upright             = true,
   workerTime          = 10,
 

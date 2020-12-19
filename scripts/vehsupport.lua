@@ -35,6 +35,7 @@ local spGetUnitPiecePosDir = Spring.GetUnitPiecePosDir
 local SIG_AIM = 1
 local SIG_DEPLOY = 2
 local SIG_RESTORE = 4
+local SIG_ANIM = 8
 
 local SUSPENSION_BOUND = 6
 
@@ -209,28 +210,34 @@ function Suspension()
 	local ztilt, ztiltv, ztilta = 0, 0, 0
 	local ya, yv, yp = 0, 0, 0
 	local speed = 0
+	local prevSpeed = 0
 	
 	while true do
 		speed = select(4,spGetUnitVelocity(unitID))
+		if speed > prevSpeed then
+			speed, prevSpeed = prevSpeed, speed
+		else
+			prevSpeed = speed
+		end
 		wheelTurnSpeed = speed*WHEEL_TURN_MULT
 		
 		if moving then
-			if speed <= 0.05 then
+			if speed <= 0.1 then
 				StopMoving()
 			end
 		else
-			if speed > 0.05 then
+			if speed > 0.1 then
 				StartMoving()
 			end
 		end
 
-		if speed > 0.05 then
+		if speed > 0.1 then
 			settleTimer = 0
 		elseif settleTimer < SETTLE_PERIODS then
 			settleTimer = settleTimer + 1
 		end
 		
-		if speed > 0.05 or (settleTimer < SETTLE_PERIODS) then
+		if speed > 0.1 or (settleTimer < SETTLE_PERIODS) then
 			x,y,z = spGetUnitPosition(unitID)
 			height = spGetGroundHeight(x,z)
 			
@@ -327,11 +334,7 @@ function script.Shot()
 end
 
 function script.BlockShot(num, targetID)
-	if Spring.ValidUnitID(targetID) then
-		local distMult = (Spring.GetUnitSeparation(unitID, targetID) or 0)/600
-		return GG.OverkillPrevention_CheckBlock(unitID, targetID, 38, 25 * distMult)
-	end
-	return false
+	return GG.Script.OverkillPreventionCheck(unitID, targetID, 35, 600, 30, 0.05, true)
 end
 
 function script.Killed(recentDamage, maxHealth)

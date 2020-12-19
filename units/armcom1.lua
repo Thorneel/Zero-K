@@ -1,7 +1,7 @@
 return { armcom1 = {
   unitname               = [[armcom1]],
   name                   = [[Strike Commander]],
-  description            = [[Mobile Assault Commander, Builds at 10 m/s]],
+  description            = [[Mobile Assault Commander]],
   acceleration           = 0.54,
   activateWhenBuilt      = true,
   autoHeal               = 5,
@@ -28,6 +28,8 @@ return { armcom1 = {
     statsname = [[dynstrike1]],
     soundok = [[heavy_bot_move]],
     soundselect = [[bot_select]],
+    soundok_vol = [[0.58]],
+    soundselect_vol = [[0.5]],
     soundbuild = [[builder_start]],
     commtype = [[1]],
     --decorationicons = {chest = "friendly", shoulders = "arrows-dot"},
@@ -76,7 +78,7 @@ return { armcom1 = {
   trackStretch           = 1,
   trackType              = [[ComTrack]],
   trackWidth             = 26,
-  turnRate               = 1148,
+  turnRate               = 1377,
   upright                = true,
   workerTime             = 10,
 

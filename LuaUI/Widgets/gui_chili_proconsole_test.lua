@@ -1185,15 +1185,15 @@ local function MakeMessageStack(margin)
 		itemMargin  = { margin, margin, margin, margin },
 		autosize = true,
 		preserveChildrenOrder = true,
+		useRTT = false,
 	}
 end
 
 local function MakeMessageWindow(name, enabled, ParentFunc)
 
 	local x,y,bottom,width,height
-	local screenWidth, screenHeight = Spring.GetWindowGeometry()
+	local screenWidth, screenHeight = Spring.GetViewGeometry()
 	if name == "ProChat" then
-		local screenWidth, screenHeight = Spring.GetWindowGeometry()
 		local integralWidth = math.max(350, math.min(450, screenWidth*screenHeight*0.0004))
 		local integralHeight = math.min(screenHeight/4.5, 200*integralWidth/450)
 		width = 450
@@ -1394,16 +1394,22 @@ end
 
 -- new callin! will remain in widget
 function widget:AddConsoleMessage(msg)
-	if options.error_opengl_source.value and msg.msgtype == 'other' and (msg.argument):find('Error: OpenGL: source') then
-		return
-	end
-	
-	if msg.msgtype == 'other' and (msg.argument):find('added point') then
-		return
-	end
-	
-	if msg.msgtype == 'other' and (msg.argument):find("LuaMenuServerMessage") then
-		return
+	if msg.msgtype == 'other' then
+		if options.error_opengl_source.value and (msg.argument):find('Error: OpenGL: source') then
+			return
+		end
+		
+		if (msg.argument):find('added point') then
+			return
+		end
+		
+		if (msg.argument):find("LuaMenuServerMessage") then
+			return
+		end
+		
+		if (msg.argument):find("GroundDetail set to") then
+			return
+		end
 	end
 	
 	local isChat = isChat(msg)

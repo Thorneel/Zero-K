@@ -23,11 +23,12 @@ return { chickenlandqueen = {
   collisionVolumeType    = [[box]],
 
   customParams           = {
+    selection_scale       = 2,
   },
 
   explodeAs              = [[SMALL_UNITEX]],
-  footprintX             = 8,
-  footprintZ             = 8,
+  footprintX             = 4,
+  footprintZ             = 4,
   iconType               = [[chickenq]],
   idleAutoHeal           = 5,
   idleTime               = 1800,
@@ -35,11 +36,12 @@ return { chickenlandqueen = {
   maxDamage              = 200000,
   maxVelocity            = 2.5,
   minCloakDistance       = 250,
-  movementClass          = [[AKBOT6]],
+  movementClass          = [[AKBOT4]],
   noAutoFire             = false,
   noChaseCategory        = [[TERRAFORM SATELLITE FIXEDWING GUNSHIP STUPIDTARGET MINE]],
   objectName             = [[chickenflyerqueen.s3o]],
   power                  = 65536,
+  reclaimable            = false,
   script                 = [[chickenlandqueen.lua]],
   selfDestructAs         = [[SMALL_UNITEX]],
 
@@ -59,7 +61,7 @@ return { chickenlandqueen = {
   trackStretch           = 1,
   trackType              = [[ChickenTrack]],
   trackWidth             = 100,
-  turnRate               = 399,
+  turnRate               = 480,
   upright                = true,
   workerTime             = 0,
 

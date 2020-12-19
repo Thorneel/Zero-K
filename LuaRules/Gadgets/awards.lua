@@ -115,6 +115,9 @@ local kamikaze = {
 	jumpbomb=1,
 	gunshipbomb=1,
 	jumpscout=1,
+	amphbomb=1,
+	subscout=1,
+	chicken_dodo=1,
 }
 
 local flamerWeaponDefs = {}
@@ -526,6 +529,10 @@ function gadget:UnitDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, weap
 	local hp, maxHP = spGetUnitHealth(unitID)
 	if (hp < 0) then
 		damage = damage + hp
+	end
+	if damage < 0 then
+		-- can happen with the EMP component of mixed weapons, when last-hitting
+		return
 	end
 	AddAwardPoints( 'ouch', unitTeam, damage )
 

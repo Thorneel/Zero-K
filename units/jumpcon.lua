@@ -1,7 +1,7 @@
 return { jumpcon = {
   unitname            = [[jumpcon]],
   name                = [[Constable]],
-  description         = [[Jumpjet Constructor, Builds at 4 m/s]],
+  description         = [[Jumpjet Constructor]],
   acceleration        = 0.78,
   brakeRate           = 4.68,
   buildCostMetal      = 140,
@@ -65,7 +65,7 @@ return { jumpcon = {
   trackStretch        = 1,
   trackType           = [[ComTrack]],
   trackWidth          = 22,
-  turnRate            = 1400,
+  turnRate            = 1680,
   upright             = true,
   workerTime          = 5,
  

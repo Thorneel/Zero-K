@@ -46,6 +46,7 @@ return { amphaa = {
     explosiongenerators = {
       [[custom:STORMMUZZLE]],
       [[custom:STORMBACK]],
+      [[custom:bubbles_small]],
     },
   },
 
@@ -56,7 +57,7 @@ return { amphaa = {
   trackStretch           = 1,
   trackType              = [[ComTrack]],
   trackWidth             = 30,
-  turnRate               = 1000,
+  turnRate               = 1200,
   upright                = true,
 
   weapons                = {

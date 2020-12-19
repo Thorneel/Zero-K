@@ -1,7 +1,7 @@
 return { corcom1 = {
   unitname            = [[corcom1]],
   name                = [[Battle Commander]],
-  description         = [[Heavy Combat Commander, Builds at 10 m/s]],
+  description         = [[Heavy Combat Commander]],
   acceleration        = 0.54,
   activateWhenBuilt   = true,
   autoHeal            = 5,
@@ -28,6 +28,8 @@ return { corcom1 = {
     statsname = [[dynassault1]],
     soundok = [[heavy_bot_move]],
     soundselect = [[bot_select]],
+    soundok_vol = [[0.58]],
+    soundselect_vol = [[0.5]],
     soundbuild = [[builder_start]],
     commtype = [[2]],
     aimposoffset   = [[0 5 0]],
@@ -76,7 +78,7 @@ return { corcom1 = {
   trackStretch        = 1,
   trackType           = [[ComTrack]],
   trackWidth          = 22,
-  turnRate            = 1148,
+  turnRate            = 1377,
   upright             = true,
   workerTime          = 10,
 

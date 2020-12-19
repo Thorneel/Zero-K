@@ -57,7 +57,7 @@ return { cloakassault = {
   trackStretch           = 0.8,
   trackType              = [[ComTrack]],
   trackWidth             = 24,
-  turnRate               = 1400,
+  turnRate               = 1680,
   upright                = true,
 
   weapons                = {
@@ -101,7 +101,7 @@ return { cloakassault = {
       intensity               = 12,
       interceptedByShieldType = 1,
       paralyzeTime            = 1,
-      range                   = 350,
+      range                   = 340,
       reloadtime              = 2.2,
       rgbColor                = [[0.5 0.5 1]],
       soundStart              = [[weapon/more_lightning_fast]],

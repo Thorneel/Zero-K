@@ -28,7 +28,11 @@ local BUTTON_SIZE = 25
 local BONUS_TOGGLE_IMAGE = 'LuaUI/images/plus_green.png'
 local BRIEFING_IMAGE = LUAUI_DIRNAME .. "images/advplayerslist/random.png"
 
+local spGetDescription = Spring.Utilities.GetDescription
+local spGetHumanName = Spring.Utilities.GetHumanName
+local spGetModKeyState = Spring.GetModKeyState
 local spGetMouseState = Spring.GetMouseState
+local spGetUnitDefID = Spring.GetUnitDefID
 
 local max, min = math.max, math.min
 
@@ -134,7 +138,7 @@ local function TakeMouseOffEdge()
 		return
 	end
 	
-	local screenWidth, screenHeight = Spring.GetWindowGeometry()
+	local screenWidth, screenHeight = Spring.GetViewGeometry()
 	local changed = false
 	
 	if mx < SCREEN_EDGE then
@@ -186,6 +190,23 @@ local function InitializeNewtonFirezones()
 	end
 end
 
+local function GetUnitDefFromIconFilename(filename)
+-- 	Spring.Echo('Searching for unit in filename: ' .. filename)
+	local name = string.match(filename, "unitpics/(%w+).png")
+	if name then
+-- 		Spring.Echo('Found unitname: ' .. name)
+		local udef = UnitDefNames[name]
+		if udef then
+			return udef
+		end
+	end
+	return
+end
+
+local function GetUnitTooltip(udef)
+	return spGetHumanName(udef) .. " - " .. spGetDescription(udef) .. "\n\255\1\255\1" .. WG.Translate("interface", "space_click_show_stats")
+end
+
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 -- Briefing Window
@@ -209,7 +230,7 @@ local function GetNewTextHandler(parentControl, paragraphSpacing, imageSize)
 		if imageFile then
 			textPos = imageSize + 10
 			
-			Chili.Image:New{
+			local image = Chili.Image:New{
 				x = 4,
 				y = offset,
 				width = imageSize,
@@ -218,6 +239,21 @@ local function GetNewTextHandler(parentControl, paragraphSpacing, imageSize)
 				file = imageFile,
 				parent = holder
 			}
+			local udef = GetUnitDefFromIconFilename(imageFile)
+			if udef then
+				image.tooltip = GetUnitTooltip(udef)
+				image.OnClick = {
+						function(_, _, _, button)
+							local _, _, meta, _ = spGetModKeyState()
+							if meta and (button == 1) and WG.MakeStatsWindow then  -- Space+Click - show unit stats
+								local x, y = spGetMouseState()
+								WG.MakeStatsWindow(udef, x, y)
+								return true
+							end
+							return false
+						end
+				}
+			end
 		end
 		
 		local label = Chili.TextBox:New{
@@ -254,9 +290,11 @@ local function InitializeBriefingWindow()
 	local SCROLL_POS = 70
 	local SCROLL_HEIGHT = 170
 	
+	local wantUnpause = true
+	
 	local externalFunctions = {}
 	
-	local screenWidth, screenHeight = Spring.GetWindowGeometry()
+	local screenWidth, screenHeight = Spring.GetViewGeometry()
 	
 	local briefingWindow = Chili.Window:New{
 		classname = "main_window",
@@ -358,9 +396,13 @@ local function InitializeBriefingWindow()
 		if not withoutPause then
 			if gameNotStarted then
 				wantPause = true
+				wantUnpause = true
 			else
 				local paused = select(3, Spring.GetGameSpeed())
-				if not paused then
+				if paused then
+					wantUnpause = false
+				else
+					wantUnpause = true
 					Spring.SendCommands("pause")
 				end
 			end
@@ -374,10 +416,12 @@ local function InitializeBriefingWindow()
 		if WG.PauseScreen_SetEnabled then
 			WG.PauseScreen_SetEnabled(true)
 		end
-		wantPause = false
-		local paused = select(3, Spring.GetGameSpeed())
-		if paused then
-			Spring.SendCommands("pause")
+		if wantUnpause then
+			wantPause = false
+			local paused = select(3, Spring.GetGameSpeed())
+			if paused then
+				Spring.SendCommands("pause")
+			end
 		end
 		briefingWindow:SetVisibility(false)
 	end
@@ -437,6 +481,21 @@ local function GetObjectivesBlock(holderWindow, position, items, gameRulesParam,
 			file = OBJECTIVE_ICON,
 			parent = holderControl,
 		}
+		local udef = GetUnitDefFromIconFilename(OBJECTIVE_ICON)
+		if udef then
+			image.tooltip = GetUnitTooltip(udef)
+			image.OnClick = {
+					function(_, _, _, button)
+						local _, _, meta, _ = spGetModKeyState()
+						if meta and (button == 1) and WG.MakeStatsWindow then  -- Space+Click - show unit stats
+							local x, y = spGetMouseState()
+							WG.MakeStatsWindow(udef, x, y)
+							return true
+						end
+						return false
+					end
+			}
+		end
 		objectives[i] = {
 			offset = offset,
 			label = label,

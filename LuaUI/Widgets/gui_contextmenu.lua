@@ -6,7 +6,6 @@ function widget:GetInfo()
     date      = "2009-06-02",
     license   = "GNU GPL, v2 or later",
     layer     = 0,
-    experimental = false,
     enabled   = true,
   }
 end
@@ -86,6 +85,7 @@ local color2incolor
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
+local WINDOW_WIDTH  = 450
 local B_HEIGHT 		= 30
 local icon_size 	= 18
 
@@ -124,6 +124,9 @@ local function AddFactoryOfUnits(defName)
 	local name = string.gsub(ud.humanName, "/", "-")
 	local path = BEHAVIOUR_PATH .. name
 	behaviourPath[ud.id] = path
+	if ud.customParams.parent_of_plate then
+		behaviourPath[UnitDefNames[ud.customParams.parent_of_plate].id] = path
+	end
 	for i = 1, #ud.buildOptions do
 		behaviourPath[ud.buildOptions[i]] = path
 	end
@@ -144,7 +147,7 @@ AddFactoryOfUnits("striderhub")
 AddFactoryOfUnits("staticmissilesilo")
 
 local buildOpts = VFS.Include("gamedata/buildoptions.lua")
-local factory_commands, econ_commands, defense_commands, special_commands = include("Configs/integral_menu_commands.lua")
+local factory_commands, econ_commands, defense_commands, special_commands = include("Configs/integral_menu_commands_processed.lua", nil, VFS.RAW_FIRST)
 
 for i = 1, #buildOpts do
 	local name = buildOpts[i]
@@ -166,16 +169,47 @@ end
 local function MakeStatsWindow()
 end
 
-options_order = {'shortNotation', 'text_hotkey'}
+options_order = {'shortNotation', 'window_height', 'window_to_cursor', 'window_pos_x', 'window_pos_y', 'text_hotkey'}
 options_path = 'Help/Unit List'
 options = {
-		
 	shortNotation = {
 		name = "Short Number Notation",
 		type = 'bool',
 		value = false,
 		noHotkey = true,
 		desc = 'Shows short number notation for HP and other values.',
+		path = 'Settings/HUD Panels/Unit Stats Help Window'
+	},
+	window_height = {
+		name = "Window Height",
+		type = 'number',
+		value = 450,
+		min = 450,
+		max = 1000,
+		desc = 'Set default window height.',
+		path = 'Settings/HUD Panels/Unit Stats Help Window'
+	},
+	window_to_cursor = {
+		name = "Create window under cursor",
+		type = 'bool',
+		value = true,
+		desc = 'Creates the window under the mouse cursor, otherwise uses the values below for position.',
+		path = 'Settings/HUD Panels/Unit Stats Help Window'
+	},
+	window_pos_x = {
+		name = "Window Default X",
+		type = 'number',
+		value = 150,
+		min = 0,
+		max = 2000,
+		path = 'Settings/HUD Panels/Unit Stats Help Window'
+	},
+	window_pos_y = {
+		name = "Window Default Y",
+		type = 'number',
+		value = 150,
+		min = 0,
+		max = 2000,
 		path = 'Settings/HUD Panels/Unit Stats Help Window'
 	},
 	
@@ -245,7 +279,7 @@ AddFactoryOfUnits("striderhub")
 AddFactoryOfUnits("staticmissilesilo")
 
 local buildOpts = VFS.Include("gamedata/buildoptions.lua")
-local factory_commands, econ_commands, defense_commands, special_commands = include("Configs/integral_menu_commands.lua")
+local factory_commands, econ_commands, defense_commands, special_commands = include("Configs/integral_menu_commands_processed.lua", nil, VFS.RAW_FIRST)
 
 for i = 1, #buildOpts do
 	local udid = UnitDefNames[buildOpts[i]].id
@@ -814,7 +848,7 @@ local function weapons2Table(cells, ws, unitID)
 		if wd.noExplode then
 			cells[#cells+1] = ' - Piercing '
 			cells[#cells+1] = ''
-			if not cp.single_hit then
+			if not (cp.single_hit or cp.single_hit_multi) then
 				cells[#cells+1] = ' - Damage increase vs large units'
 				cells[#cells+1] = ''
 			end
@@ -1629,10 +1663,9 @@ local function tooltipBreakdown(tooltip)
 		local ud = name and UnitDefNames[name]
 		return ud or false
 	elseif tooltip:find('Morph', 1, true) == 1 then
-		local unitHumanName = tooltip:gsub('Morph into a (.*)(time).*', '%1'):gsub('[^%a \\-]', '')
-		local udef = GetUnitDefByHumanName(unitHumanName)
+		local unitDefID = tooltip:match('(%d+)')
+		local udef = UnitDefs[tonumber(unitDefID)]
 		return udef or false
-			
 	elseif tooltip:find('Selected', 1, true) == 1 then
 		local start,fin = tooltip:find([[ - ]], 1, true)
 		if start and fin then
@@ -1676,11 +1709,13 @@ MakeStatsWindow = function(ud, x,y, unitID)
 		y = scrH / 3
 	end
 	
-	local window_width = 450
-	local window_height = 450
+	
+	if not options.window_to_cursor.value then
+		x = options.window_pos_x.value
+		y = options.window_pos_y.value
+	end
 
 	local num = #statswindows+1
-	
 	local children = {
 		ScrollPanel:New{
 			--horizontalScrollbar = false,
@@ -1708,8 +1743,8 @@ MakeStatsWindow = function(ud, x,y, unitID)
 	statswindows[num] = Window:New{
 		x = x,
 		y = y,
-		width  = window_width,
-		height = window_height,
+		width  = WINDOW_WIDTH,
+		height = options.window_height.value,
 		resizable = true,
 		parent = screen0,
 		backgroundColor = color.stats_bg,
@@ -1948,6 +1983,11 @@ function widget:MousePress(x,y,button)
 		if cmd_id then
 			return false
 		end
+
+		if ud then
+			MakeStatsWindow(ud,x,y)
+			return true
+		end
 		
 		local type, data = spTraceScreenRay(x, y, false, false, false, true)
 		if (type == 'unit') then
@@ -1984,11 +2024,6 @@ function widget:MousePress(x,y,button)
 					return true
 				end
 			end
-		end
-
-		if ud then
-			MakeStatsWindow(ud,x,y)
-			return true
 		end
 	end
 
@@ -2028,6 +2063,7 @@ function widget:Initialize()
 
 	widget:ViewResize(Spring.GetViewGeometry())
 	
+	WG.MakeStatsWindow = MakeStatsWindow
 end
 
 function widget:Shutdown()

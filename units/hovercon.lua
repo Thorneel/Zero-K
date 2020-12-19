@@ -1,10 +1,10 @@
 return { hovercon = {
   unitname            = [[hovercon]],
   name                = [[Quill]],
-  description         = [[Construction Hovercraft, Builds at 5 m/s]],
-  acceleration        = 0.33,
+  description         = [[Construction Hovercraft]],
+  acceleration        = 0.4,
   activateWhenBuilt   = true,
-  brakeRate           = 15.0,
+  brakeRate           = 18.0,
   buildCostMetal      = 130,
   buildDistance       = 160,
   builder             = true,
@@ -57,7 +57,7 @@ return { hovercon = {
   sightDistance       = 300,
   sonarDistance       = 300,
   turninplace         = 0,
-  turnRate            = 550,
+  turnRate            = 880,
   workerTime          = 5,
 
   featureDefs         = {

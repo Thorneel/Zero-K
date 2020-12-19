@@ -2,9 +2,9 @@ return { hoverraid = {
   unitname            = [[hoverraid]],
   name                = [[Dagger]],
   description         = [[Fast Attack Hovercraft]],
-  acceleration        = 0.32,
+  acceleration        = 0.384,
   activateWhenBuilt   = true,
-  brakeRate           = 0.835,
+  brakeRate           = 1.0,
   buildCostMetal      = 80,
   builder             = false,
   buildPic            = [[hoverraid.png]],
@@ -18,7 +18,8 @@ return { hoverraid = {
   corpse              = [[DEAD]],
 
   customParams        = {
-    modelradius    = [[25]],
+    modelradius        = [[25]],
+    aim_lookahead      = 120,
   },
 
   explodeAs           = [[SMALL_UNITEX]],
@@ -50,7 +51,7 @@ return { hoverraid = {
   sightDistance       = 640,
   sonarDistance       = 640,
   turninplace         = 0,
-  turnRate            = 540,
+  turnRate            = 864,
   workerTime          = 0,
   
   weapons             = {
@@ -79,12 +80,10 @@ return { hoverraid = {
       craterMult              = 0,
 
       customParams = {
-        burst = Shared.BURST_RELIABLE,
-
-        single_hit = true,
-        
+        burst               = Shared.BURST_RELIABLE,
+        single_hit          = true,
         light_camera_height = 1200,
-        light_radius = 180,
+        light_radius        = 180,
       },
       
       damage                  = {

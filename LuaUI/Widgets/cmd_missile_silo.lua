@@ -18,14 +18,6 @@ end
 VFS.Include("LuaRules/Configs/customcmds.h.lua")
 
 local siloDefID = UnitDefNames.staticmissilesilo.id
-local missileDefIDs = {}
-local missileNames = {"tacnuke", "seismic", "empmissile", "napalmmissile"}
-
-for i=1,#missileNames do
-  if UnitDefNames[missileNames[i]] then
-	missileDefIDs[UnitDefNames[missileNames[i]].id] = true
-  end
-end
 
 local selectMissilesCmdDesc = {
 	id      = CMD_SELECT_MISSILES,
@@ -38,13 +30,15 @@ local selectMissilesCmdDesc = {
 }
 
 local SEARCH_RANGE = 48
---local FIRE_INTERVAL = 90	-- gameframes
+--local FIRE_INTERVAL = 90 -- gameframes
 local UPDATE_INTERVAL = 10
 local EMPTY_TABLE = {}
+local CMD_OPT_SHIFT = CMD.OPT_SHIFT
+local CMD_OPT_CTRL = CMD.OPT_CTRL
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
-local silos = {}	-- [unitID] = frames before next shot allowed
+local silos = {} -- [unitID] = frames before next shot allowed
 
 local function GetMissiles(siloID, justOne)
 	local missiles = {}
@@ -80,19 +74,19 @@ end
 
 local orderParamsTable = {1, 2, 3}
 local function RemoveAttackCommandIfFirst(unitID)
-	local rpt = Spring.Utilities.GetUnitRepeat(unitID)
 	
-	local cmdID, _, cmdTag, cmdX, cmdY, cmdZ = Spring.GetUnitCurrentCommand(unitID)
+	local cmdID, cmdOpt, cmdTag, cmdX, cmdY, cmdZ = Spring.GetUnitCurrentCommand(unitID)
 	if cmdID ~= CMD.ATTACK then
 		return
 	end
-	
 	Spring.GiveOrderToUnit(unitID, CMD.REMOVE, {cmdTag}, 0)
+	
+	local rpt = Spring.Utilities.IsBitSet(cmdOpt, CMD_OPT_CTRL) --Spring.Utilities.GetUnitRepeat(unitID)
 	if rpt then
 		orderParamsTable[1] = cmdX
 		orderParamsTable[2] = cmdY
 		orderParamsTable[3] = cmdZ
-		Spring.GiveOrderToUnit(unitID, CMD.ATTACK, orderParamsTable, CMD.OPT_SHIFT)
+		Spring.GiveOrderToUnit(unitID, CMD.ATTACK, orderParamsTable, CMD_OPT_SHIFT + CMD_OPT_CTRL)
 	end
 end
 
@@ -136,7 +130,7 @@ end
 --------------------------------------------------------------------------------
 function widget:UnitFromFactory(unitID, unitDefID, unitTeam, factID, factDefID, userOrders)
 	if silos[factID] then
-		RemoveAttackCommandIfFirst(factID)	-- missile launched fresh from silo
+		RemoveAttackCommandIfFirst(factID) -- missile launched fresh from silo
 	end
 end
 

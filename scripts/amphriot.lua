@@ -117,10 +117,12 @@ local function WeaponRangeUpdate()
 		if height < -35 then
 			if not longRange then
 				Spring.SetUnitWeaponState(unitID, 1, {range = torpRange})
+				Spring.SetUnitMaxRange(unitID, torpRange)
 				longRange = true
 			end
 		elseif longRange then
 			Spring.SetUnitWeaponState(unitID, 1, {range = shotRange})
+			Spring.SetUnitMaxRange(unitID, shotRange)
 			longRange = false
 		end
 		Sleep(200)
@@ -156,7 +158,7 @@ local function riseFloat_thread()
 		return
 	end
 	Signal(SIG_FLOAT)
-	SetSignalMask(SIG_FLOAT)
+	SetSignalMask(SIG_FLOAT + SIG_WALK)
 
 	Turn(lfleg, x_axis, 0, math.rad(800))
 	Turn(lffoot, x_axis, 0, math.rad(800))
@@ -205,7 +207,7 @@ local function staticFloat_thread()
 		return
 	end
 	Signal(SIG_FLOAT)
-	SetSignalMask(SIG_FLOAT)
+	SetSignalMask(SIG_FLOAT + SIG_WALK)
 	
 	Turn(lfleg,x_axis, math.rad(55-15), math.rad(60))
 	Turn(rfleg,x_axis, math.rad(55+15), math.rad(60))
@@ -258,7 +260,7 @@ local function sinkFloat_thread()
 	end
 
 	Signal(SIG_FLOAT)
-	SetSignalMask(SIG_FLOAT)
+	SetSignalMask(SIG_FLOAT + SIG_WALK)
 	Signal(SIG_BOB)
 
 	Turn(lfleg, x_axis, 0, math.rad(80))
@@ -275,13 +277,13 @@ local function sinkFloat_thread()
 	Move(base, y_axis, 0, math.rad(math.random()))
 
 	while true do
-		EmitSfx(lfleg, SFX.BUBBLE)
+		EmitSfx(lfleg, 1026)
 		Sleep(66)
-		EmitSfx(rfleg, SFX.BUBBLE)
+		EmitSfx(rfleg, 1026)
 		Sleep(66)
-		EmitSfx(lbleg, SFX.BUBBLE)
+		EmitSfx(lbleg, 1026)
 		Sleep(66)
-		EmitSfx(rbleg, SFX.BUBBLE)
+		EmitSfx(rbleg, 1026)
 		Sleep(66)
 	end
 
@@ -338,16 +340,16 @@ function script.Create()
 	--StartThread(Walk)
 	StartThread(GG.Script.SmokeUnit, unitID, smokePiece)
 	--StartThread(WeaponRangeUpdate) -- Equal range so not required
-	local height = select(2, Spring.GetUnitPosition(unitID))
-	if height < -20 then
-		if not longRange then
-			Spring.SetUnitWeaponState(unitID, 1, {range = torpRange})
-			longRange = true
-		end
-	elseif longRange then
-		Spring.SetUnitWeaponState(unitID, 1, {range = shotRange})
-		longRange = false
-	end
+	--local height = select(2, Spring.GetUnitPosition(unitID))
+	--if height < -20 then
+	--	if not longRange then
+	--		Spring.SetUnitWeaponState(unitID, 1, {range = torpRange})
+	--		longRange = true
+	--	end
+	--elseif longRange then
+	--	Spring.SetUnitWeaponState(unitID, 1, {range = shotRange})
+	--	longRange = false
+	--end
 end
 
 function script.StartMoving()
@@ -431,10 +433,9 @@ function script.Shot(num)
 end
 
 function script.BlockShot(num, targetID)
-	if num == 2 then -- torpedoes
-		local x,y,z = Spring.GetUnitPosition(unitID)
-		-- Lower than real damage (180) to help against Duck regen case.
-		return y < -22 or GG.OverkillPrevention_CheckBlock(unitID, targetID, 172, 40)
+	if num == 2 and targetID then -- torpedoes
+		-- Lower than real damage (104) to help against Duck regen case.
+		return GG.OverkillPrevention_CheckBlock(unitID, targetID, 92, 40)
 	end
 	return false
 end

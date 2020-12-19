@@ -1,7 +1,7 @@
 return { amphcon = {
   unitname            = [[amphcon]],
   name                = [[Conch]],
-  description         = [[Amphibious Construction Bot, Builds at 7.5 m/s - Armored When Idle]],
+  description         = [[Amphibious Construction Bot - Armored When Idle]],
   acceleration        = 1.2,
   activateWhenBuilt   = true,
   brakeRate           = 1.5,
@@ -19,6 +19,8 @@ return { amphcon = {
   corpse              = [[DEAD]],
 
   customParams        = {
+    morphto        = [[amphtele]],
+    morphtime      = 20,
     amph_regen = 10,
     amph_submerged_at = 40,
   },
@@ -47,7 +49,7 @@ return { amphcon = {
   trackStretch        = 1,
   trackType           = [[ChickenTrackPointy]],
   trackWidth          = 22,
-  turnRate            = 1000,
+  turnRate            = 1200,
   upright             = false,
   workerTime          = 7.5,
 

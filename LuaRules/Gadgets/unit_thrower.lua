@@ -373,6 +373,7 @@ local function UpdateTrajectory(unitID, data)
 end
 
 local function ReinstatePhysics(unitID, data)
+	GG.PokeDecloakUnit(unitID, data.unitDefID)
 	if data.drag then
 		SetUnitDrag(unitID, math.max(0, math.min(1, data.drag)))
 		data.drag = data.drag + 0.05
@@ -477,7 +478,7 @@ local function DrawWire(emitUnitID, recUnitID, spec, myAllyTeam, x, y, z)
 			point[4] = {rX, rY, rZ}
 			gl.PushAttrib(GL.LINE_BITS)
 			gl.DepthTest(true)
-			gl.Color (0, 1, 0.5, math.random()*0.05 + 0.15)
+			gl.Color (0, 1, 0.5, math.random()*0.1 + 0.18)
 			gl.LineWidth(3)
 			gl.BeginEnd(GL.LINE_STRIP, DrawBezierCurve, point[1], point[2], point[3], point[4], 10)
 			gl.DepthTest(false)

@@ -34,6 +34,7 @@ return { chicken = {
   noChaseCategory     = [[SHIP FLOAT SWIM TERRAFORM FIXEDWING SATELLITE GUNSHIP]],
   objectName          = [[chicken.s3o]],
   power               = 100,
+  reclaimable         = false,
   selfDestructAs      = [[NOWEAPON]],
 
   sfxtypes            = {
@@ -52,7 +53,7 @@ return { chicken = {
   trackStretch        = 1,
   trackType           = [[ChickenTrack]],
   trackWidth          = 18,
-  turnRate            = 806,
+  turnRate            = 967,
   upright             = false,
   workerTime          = 0,
 

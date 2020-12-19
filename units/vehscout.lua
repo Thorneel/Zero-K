@@ -2,8 +2,8 @@ return { vehscout = {
   unitname               = [[vehscout]],
   name                   = [[Dart]],
   description            = [[Disruptor Raider/Scout Rover]],
-  acceleration           = 0.7,
-  brakeRate              = 1.555,
+  acceleration           = 0.84,
+  brakeRate              = 1.866,
   buildCostMetal         = 40,
   builder                = false,
   buildPic               = [[vehscout.png]],
@@ -21,7 +21,7 @@ return { vehscout = {
 
   customParams           = {
     modelradius    = [[7]],
-    aim_lookahead  = 50,
+    aim_lookahead  = 80,
   },
 
   explodeAs              = [[SMALL_UNITEX]],
@@ -50,7 +50,7 @@ return { vehscout = {
   trackType              = [[Motorbike]],
   trackWidth             = 24,
   turninplace            = 0,
-  turnRate               = 1097,
+  turnRate               = 1755,
   workerTime             = 0,
 
   weapons                = {

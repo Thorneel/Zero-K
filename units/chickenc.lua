@@ -35,6 +35,7 @@ return { chickenc = {
   noChaseCategory     = [[TERRAFORM FIXEDWING SATELLITE GUNSHIP STUPIDTARGET]],
   objectName          = [[chickenc.s3o]],
   power               = 520,
+  reclaimable         = false,
   selfDestructAs      = [[NOWEAPON]],
 
   sfxtypes            = {
@@ -54,7 +55,7 @@ return { chickenc = {
   trackType           = [[ChickenTrackPointy]],
   trackWidth          = 70,
   turninplace         = 0,
-  turnRate            = 806,
+  turnRate            = 967,
   upright             = false,
   workerTime          = 0,
 

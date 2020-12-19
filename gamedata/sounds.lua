@@ -29,6 +29,13 @@ local Sounds = {
 			MapEntryValExtract(items, "rolloff", rolloff);
 		},
 		--]]
+		PulseLaser = {
+			file = "sounds/weapon/laser/pulse_laser_start.wav",
+			pitchmod = 0.15,
+			gainmod = 0.1,
+			pitch = 1,
+			gain = 1.5,
+		},
 		BladeSwing = {
 			file = "sounds/weapon/blade/blade_swing.wav",
 			pitchmod = 0.1,
@@ -59,6 +66,11 @@ local Sounds = {
 			priority = 0,
 			maxconcurrent = 4, --- some reasonable limits
 			maxdist = nil, --- no cutoff at all (engine defaults to FLT_MAX)
+		},
+		DetrimentJump = {
+			file = "sounds/detriment_jump.wav",
+			pitchmod = 0.1,
+			gainmod = 0.05,
 		},
 		Sparks = {
 			file = "sounds/sparks.wav",

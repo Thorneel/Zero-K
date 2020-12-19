@@ -5,7 +5,7 @@ return { amphriot = {
   acceleration           = 0.54,
   activateWhenBuilt      = true,
   brakeRate              = 2.25,
-  buildCostMetal         = 280,
+  buildCostMetal         = 260,
   buildPic               = [[amphriot.png]],
   canGuard               = true,
   canMove                = true,
@@ -44,6 +44,7 @@ return { amphriot = {
     explosiongenerators = {
       [[custom:HEAVY_CANNON_MUZZLE]],
       [[custom:RIOT_SHELL_L]],
+      [[custom:bubbles_small]],
     },
   },
 
@@ -54,7 +55,7 @@ return { amphriot = {
   trackStretch           = 1,
   trackType              = [[ChickenTrackPointy]],
   trackWidth             = 28,
-  turnRate               = 1000,
+  turnRate               = 1200,
   upright                = false,
 
   weapons                = {
@@ -77,9 +78,9 @@ return { amphriot = {
 
     TORPEDO = {
       name                    = [[Undersea Charge Launcher]],
-      areaOfEffect            = 128,
+      areaOfEffect            = 48,
       burst                   = 2,
-      burstRate               = 0.2,
+      burstRate               = 0.3,
       avoidFriendly           = false,
       bouncerebound           = 0.7,
       bounceslip              = 1,
@@ -91,11 +92,11 @@ return { amphriot = {
       cegTag                  = [[torpedo_trail]],
    
       damage                  = {
-        default = 90.1,
+        default = 48.01,
       },
 
       edgeEffectiveness       = 0.6,
-      explosionGenerator      = [[custom:TORPEDO_HIT_LARGE_WEAK]],
+      explosionGenerator      = [[custom:TORPEDO_HIT_SMALL_WEAK]],
       flightTime              = 1.5,
       groundbounce            = 1,
       impactOnly              = false,
@@ -107,7 +108,7 @@ return { amphriot = {
       model                   = [[diskball.s3o]],
       numBounce               = 4,
       range                   = 270,
-      reloadtime              = 1.4,
+      reloadtime              = 2,
       soundHit                = [[TorpedoHitVariable]],
       soundHitVolume          = 2.6,
       --soundStart            = [[weapon/torpedo]],

@@ -1,7 +1,7 @@
 return { shieldcon = {
   unitname            = [[shieldcon]],
   name                = [[Convict]],
-  description         = [[Shielded Construction Bot, Builds at 5 m/s]],
+  description         = [[Shielded Construction Bot]],
   acceleration        = 1.5,
   activateWhenBuilt   = true,
   brakeRate           = 1.8,
@@ -49,7 +49,7 @@ return { shieldcon = {
   trackStretch        = 1,
   trackType           = [[ComTrack]],
   trackWidth          = 22,
-  turnRate            = 2200,
+  turnRate            = 2640,
   upright             = true,
   workerTime          = 5,
 

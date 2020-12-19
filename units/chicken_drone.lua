@@ -42,6 +42,7 @@ return { chicken_drone = {
   onoffable           = true,
   power               = 60,
   pushResistant       = 0,
+  reclaimable         = false,
   selfDestructAs      = [[SMALL_UNITEX]],
 
   sfxtypes            = {
@@ -59,7 +60,7 @@ return { chicken_drone = {
   trackStretch        = 1,
   trackType           = [[ChickenTrack]],
   trackWidth          = 10,
-  turnRate            = 806,
+  turnRate            = 967,
   upright             = false,
   waterline           = 8,
   workerTime          = 0,

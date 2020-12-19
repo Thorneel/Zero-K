@@ -1,7 +1,7 @@
 return { cloakcon = {
   unitname               = [[cloakcon]],
   name                   = [[Conjurer]],
-  description            = [[Cloaked Construction Bot, Builds at 5 m/s]],
+  description            = [[Cloaked Construction Bot]],
   acceleration           = 1.5,
   activateWhenBuilt      = true,
   brakeRate              = 9.0,
@@ -65,7 +65,7 @@ return { cloakcon = {
   trackStretch           = 1,
   trackType              = [[ComTrack]],
   trackWidth             = 18,
-  turnRate               = 2200,
+  turnRate               = 2640,
   upright                = true,
   workerTime             = 5,
 

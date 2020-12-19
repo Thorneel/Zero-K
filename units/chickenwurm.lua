@@ -36,6 +36,7 @@ return { chickenwurm = {
   noChaseCategory     = [[SHIP FLOAT SWIM TERRAFORM FIXEDWING GUNSHIP SATELLITE STUPIDTARGET MINE]],
   objectName          = [[chickenwurm.s3o]],
   power               = 350,
+  reclaimable         = false,
   script              = [[chickenwurm.lua]],
   selfDestructAs      = [[jumpraid_PYRO_DEATH]],
 
@@ -51,7 +52,7 @@ return { chickenwurm = {
   sightDistance       = 384,
   sonarDistance       = 384,
   stealth             = true,
-  turnRate            = 806,
+  turnRate            = 967,
   upright             = false,
   workerTime          = 0,
 

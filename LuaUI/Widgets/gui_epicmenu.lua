@@ -7,7 +7,6 @@ function widget:GetInfo()
 		license   = "GNU GPL, v2 or later",
 		layer     = -100001,
 		handler   = true,
-		experimental = false,
 		enabled   = true,
 		alwaysStart = true,
 	}
@@ -47,7 +46,7 @@ do
 	confdata = VFS.Include(file, nil, VFS.RAW_FIRST)
 	--assign keybind file:
 	keybind_dir = LUAUI_DIRNAME .. 'Configs/'
-	keybind_file = Game.modShortName:lower() .. '_keys.lua' --example: zk_keys.lua
+	keybind_file = 'zk_keys.lua'
 	if isMission then
 		--FIXME: find modname instead of using hardcoded mission_keybinds_file name
 		keybind_file = (confdata.mission_keybinds_file and confdata.mission_keybinds_file) or keybind_file --example: singleplayer_keys.lua
@@ -184,6 +183,12 @@ local kb_path, kb_button, kb_control, kb_option, kb_action
 local transkey = include("Configs/transkey.lua")
 
 local wantToReapplyBinding = false
+
+local hackyOptionMemory = {}
+local hackyOptionMemoryWhitelist = {
+	['Master Volume'] = true,
+	['Music Volume'] = true,
+}
 
 --------------------------------------------------------------------------------
 -- Widget globals
@@ -396,6 +401,40 @@ local function otvalidate(t)
 end
 --end cool new framework
 
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+
+local musicTrackbar, masterVolumeTrackbar
+
+WG.crude.SetMasterVolume = function (newVolume, viaTrackbar)
+	spSendCommands{"set snd_volmaster " .. newVolume}
+	if viaTrackbar then
+		if hackyOptionMemory['Master Volume'] then
+			hackyOptionMemory['Master Volume'].value = newVolume
+		end
+	elseif masterVolumeTrackbar then
+		masterVolumeTrackbar:SetValue(newVolume)
+	end
+end
+
+WG.crude.SetMusicVolume = function (newVolume, viaTrackbar)
+	if (WG.music_start_volume or 0 > 0) then
+		Spring.SetSoundStreamVolume(newVolume / WG.music_start_volume)
+	else
+		Spring.SetSoundStreamVolume(newVolume)
+	end
+	settings.config["epic_Settings/Audio_Music_Volume"] = newVolume
+	WG.music_volume = newVolume
+	if viaTrackbar then
+		if hackyOptionMemory['Music Volume'] then
+			hackyOptionMemory['Music Volume'].value = newVolume
+		end
+	elseif musicTrackbar then
+		musicTrackbar:SetValue(newVolume)
+	end
+end
+
+--------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
 WG.crude.SetSkin = function(Skin)
@@ -1179,6 +1218,10 @@ local function AddOption(path, option, wname ) --Note: this is used when loading
 	
 	otset( pathoptions[path], wname..option.key, option )--is used for remake epicMenu's button(s)
 	
+	-- hax
+	if hackyOptionMemoryWhitelist[option.name] then
+		hackyOptionMemory[option.name] = option
+	end
 end
 
 local function RemOption(path, option, wname )
@@ -1520,7 +1563,7 @@ local unresetableSettings = {button = true, label = true, menu = true}
 local function ResetWinSettings(path)
 	for _, elem in ipairs(pathoptions[path]) do
 		local option = elem[2]
-		if not (unresetableSettings[option.type] or option.developmentOnly) then
+		if not (unresetableSettings[option.type]) then
 			if option.default ~= nil then --fixme : need default
 				if option.type == 'bool' or option.type == 'number' then
 					option.value = option.valuelist and GetIndex(option.valuelist, option.default) or option.default
@@ -2147,7 +2190,7 @@ end
 WG.crude.UnpauseFromExitConfirmWindow = UnpauseFromExitConfirmWindow
 
 local function MakeExitConfirmWindow(text, action, height, unpauseOnYes, unpauseOnNo)
-	local screen_width, screen_height = Spring.GetWindowGeometry()
+	local screen_width, screen_height = Spring.GetViewGeometry()
 	local menu_width = 320
 	local menu_height = height or 64
 
@@ -2294,7 +2337,7 @@ local function GetMainPanel(parent, width, height)
 					value = spGetConfigInt("snd_volmaster", 50),
 					OnChange = {
 						function(self)
-							spSendCommands{"set snd_volmaster " .. self.value}
+							WG.crude.SetMasterVolume(self.value, true)
 							if WG.ttsNotify then
 								WG.ttsNotify()
 							end
@@ -2310,33 +2353,19 @@ local function GetMainPanel(parent, width, height)
 					max = 1,
 					step = 0.01,
 					trackColor = color.main_fg,
-					value = settings.music_volume or 0.5,
-					prevValue = settings.music_volume or 0.5,
+					value = settings.config["epic_Settings/Audio_Music_Volume"] or 0.5,
 					OnChange = {
 						function(self)
-							if ((WG.music_start_volume or 0) > 0) then
-								Spring.SetSoundStreamVolume(self.value / WG.music_start_volume)
-							else
-								Spring.SetSoundStreamVolume(self.value)
+							if WG.crude and WG.crude.SetMusicVolume then
+								WG.crude.SetMusicVolume(self.value, true)
 							end
-							settings.music_volume = self.value
-							WG.music_volume = self.value
-							if (self.prevValue > 0 and self.value <= 0) then
-								widgetHandler:DisableWidget("Music Player")
-							end
-							if (self.prevValue <= 0 and self.value > 0) then
-								-- Disable first in case widget is already enabled.
-								-- This is required for it to notice the volume
-								-- change from 0 in some cases.
-								widgetHandler:DisableWidget("Music Player")
-								widgetHandler:EnableWidget("Music Player")
-							end
-							self.prevValue = self.value
 						end
 					},
 				},
 			},
 		}
+		masterVolumeTrackbar = stackChildren[#stackChildren].children[1]
+		musicTrackbar = stackChildren[#stackChildren].children[2]
 		--stackChildren[#stackChildren + 1] = Trackbar:New{
 		--    tooltip = 'Volume',
 		--    height = 15,
@@ -2425,7 +2454,7 @@ local function GetMainPanel(parent, width, height)
 					value = spGetConfigInt("snd_volmaster", 50),
 					OnChange = {
 						function(self)
-							spSendCommands{"set snd_volmaster " .. self.value}
+							WG.crude.SetMasterVolume(self.value, true)
 							if WG.ttsNotify then
 								WG.ttsNotify()
 							end
@@ -2442,33 +2471,19 @@ local function GetMainPanel(parent, width, height)
 					max = 1,
 					step = 0.01,
 					trackColor = color.main_fg,
-					value = settings.music_volume or 0.5,
-					prevValue = settings.music_volume or 0.5,
+					value = settings.config["epic_Settings/Audio_Music_Volume"] or 0.5,
 					OnChange = {
 						function(self)
-							if ((WG.music_start_volume or 0) > 0) then
-								Spring.SetSoundStreamVolume(self.value / WG.music_start_volume)
-							else
-								Spring.SetSoundStreamVolume(self.value)
+							if WG.crude and WG.crude.SetMusicVolume then
+								WG.crude.SetMusicVolume(self.value, true)
 							end
-							settings.music_volume = self.value
-							WG.music_volume = self.value
-							if (self.prevValue > 0 and self.value <= 0) then
-								widgetHandler:DisableWidget("Music Player")
-							end
-							if (self.prevValue <= 0 and self.value > 0) then
-								-- Disable first in case widget is already enabled.
-								-- This is required for it to notice the volume
-								-- change from 0 in some cases.
-								widgetHandler:DisableWidget("Music Player")
-								widgetHandler:EnableWidget("Music Player")
-							end
-							self.prevValue = self.value
 						end
 					},
 				},
 			},
 		}
+		masterVolumeTrackbar = stackChildren[#stackChildren].children[2]
+		musicTrackbar = stackChildren[#stackChildren].children[4]
 		
 		holderWidth = holderWidth + sliderWidth + 2
 	end
@@ -3207,7 +3222,12 @@ function widget:SetConfigData(data)
 
 	WG.lang(settings.lang)
 
-	WG.music_volume = settings.music_volume or 0.5
+	if settings.music_volume then
+		settings.config["epic_Settings/Audio_Music_Volume"] = settings.music_volume
+		settings.music_volume = nil
+	end
+
+	WG.crude.SetMusicVolume(settings.config["epic_Settings/Audio_Music_Volume"] or 0.5)
 	LoadKeybinds()
 end
 
@@ -3268,7 +3288,7 @@ function widget:GameFrame(n)
 	end
 end
 
-function widget:KeyPress(key, modifier, isRepeat)
+function widget:KeyPress(key, modifier, isRepeat, label)
 	if not get_key_bind_mod then
 		if key == KEYSYMS.LCTRL
 			or key == KEYSYMS.RCTRL
@@ -3307,9 +3327,14 @@ function widget:KeyPress(key, modifier, isRepeat)
 			get_key_bind_without_mod = false
 			get_key_bind_with_any = false
 		end
-		translatedkey = transkey[ keysyms[''..key]:lower() ] or keysyms[''..key]:lower()
-		--local hotkey = {key = translatedkey, mod = modstring}
-		translatedkey = translatedkey:gsub("n_", "") -- Remove 'n_' prefix from number keys.
+
+		if key == 0 and label:sub(0, 2) == '0x' then
+			translatedkey = label
+		else
+			translatedkey = transkey[ keysyms[''..key]:lower() ] or keysyms[''..key]:lower()
+			--local hotkey = {key = translatedkey, mod = modstring}
+			translatedkey = translatedkey:gsub("n_", "") -- Remove 'n_' prefix from number keys.
+		end
 		local hotkey = modstring .. translatedkey
 		
 		Spring.Echo("Binding key code", key, "Translated", translatedkey, "Modifer", modstring)
@@ -3335,6 +3360,10 @@ function widget:KeyPress(key, modifier, isRepeat)
 		if get_key_bind_notify_function then
 			get_key_bind_notify_function()
 			get_key_bind_notify_function = false
+		end
+		
+		if WG.COFC_HotkeyChangeNotification then
+			WG.COFC_HotkeyChangeNotification()
 		end
 		
 		return true

@@ -1,9 +1,10 @@
 return { factoryamph = {
-  unitname         = [[factoryamph]],
-  name             = [[Amphbot Factory]],
-  description      = [[Produces Amphibious Bots, Builds at 10 m/s]],
-  buildCostMetal   = Shared.FACTORY_COST,
-  builder          = true,
+  unitname                      = [[factoryamph]],
+  name                          = [[Amphbot Factory]],
+  description                   = [[Produces Amphibious Bots]],
+  buildCostMetal                = Shared.FACTORY_COST,
+  buildDistance                 = Shared.FACTORY_PLATE_RANGE,
+  builder                       = true,
   buildingGroundDecalDecaySpeed = 30,
   buildingGroundDecalSizeX      = 10,
   buildingGroundDecalSizeY      = 10,
@@ -15,6 +16,7 @@ return { factoryamph = {
     [[amphimpulse]],
     [[amphfloater]],
     [[amphriot]],
+    [[amphsupport]],
     [[amphassault]],
     [[amphlaunch]],
     [[amphaa]],
@@ -35,7 +37,7 @@ return { factoryamph = {
   corpse           = [[DEAD]],
 
   customParams     = {
-    modelradius    = [[100]],
+    modelradius    = [[60]],
     aimposoffset   = [[0 0 -26]],
     midposoffset   = [[0 0 -10]],
     sortName = [[8]],
@@ -46,6 +48,7 @@ return { factoryamph = {
     factorytab       = 1,
     shared_energy_gen = 1,
     cus_noflashlight = 1,
+    parent_of_plate   = [[plateamph]],
   },
 
   energyUse        = 0,

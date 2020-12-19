@@ -1,7 +1,7 @@
 return { commsupport1 = {
   unitname            = [[commsupport1]],
   name                = [[Support Commander]],
-  description         = [[Econ/Support Commander, Builds at 12 m/s]],
+  description         = [[Econ/Support Commander]],
   acceleration        = 0.75,
   activateWhenBuilt   = true,
   autoHeal            = 5,
@@ -28,6 +28,8 @@ return { commsupport1 = {
     statsname = [[dynsupport1]],
     soundok = [[heavy_bot_move]],
     soundselect = [[bot_select]],
+    soundok_vol = [[0.58]],
+    soundselect_vol = [[0.5]],
     soundbuild = [[builder_start]],
     commtype = [[4]],
     aimposoffset   = [[0 15 0]],
@@ -75,7 +77,7 @@ return { commsupport1 = {
   trackStretch        = 1,
   trackType           = [[ComTrack]],
   trackWidth          = 22,
-  turnRate            = 1350,
+  turnRate            = 1620,
   upright             = true,
   workerTime          = 12,
 

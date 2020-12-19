@@ -1,10 +1,10 @@
 return { shipcon = {
   unitname               = [[shipcon]],
   name                   = [[Mariner]],
-  description            = [[Construction Ship, Builds at 7.5 m/s]],
-  acceleration           = 0.256,
+  description            = [[Construction Ship]],
+  acceleration           = 0.307,
   activateWhenBuilt      = true,
-  brakeRate              = 0.61,
+  brakeRate              = 0.732,
   buildCostMetal         = 200,
   buildDistance          = 330,
   builder                = true,
@@ -51,7 +51,7 @@ return { shipcon = {
   sightDistance          = 375,
   sonarDistance          = 375,
   turninplace            = 0,
-  turnRate               = 508,
+  turnRate               = 813,
   workerTime             = 7.5,
 
   featureDefs            = {

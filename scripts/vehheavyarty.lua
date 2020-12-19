@@ -14,7 +14,7 @@ local SIG_AIM = 2
 local SIG_MOVE = 1
 
 local RESTORE_DELAY = 5000
-local LOAD_DELAY = 500
+local LOAD_DELAY = 4800
 local TRACK_PERIOD = 50
 
 local BAY_DISTANCE = -10
@@ -142,7 +142,7 @@ function script.BlockShot(num, targetID)
 	end
 	-- Seperation check is not required as the physics of the missile seems to result in a
 	-- time to impact of between 140 and 150 frames in almost all cases.
-	if GG.OverkillPrevention_CheckBlock(unitID, targetID, 800.1, 150, false, false, true) then
+	if GG.OverkillPrevention_CheckBlock(unitID, targetID, GG.OverkillPrevention_GetHealthThreshold(targetID, 800.1, 720.1), 150, false, false, true) then
 		return true
 	end
 	return false

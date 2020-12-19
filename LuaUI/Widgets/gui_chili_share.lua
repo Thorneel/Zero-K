@@ -2,9 +2,9 @@ function widget:GetInfo()
 	return {
 		name    = "Chili Share menu v1.24",
 		desc    = "Press H to bring up the chili share menu.",
-		author  = "Commshare by _Shaman, Playerlist by DeinFreund",
+		author  = "Commshare by Shaman, Playerlist by DeinFreund",
 		date    = "12-3-2016",
-		license = "Do whatever with it (cuz a license isn't going to stop you ;) )",
+		license = "PD",
 		layer   = 2000,
 		enabled = true,
 	}
@@ -47,6 +47,7 @@ local images = {
 	pending = 'LuaUI/Images/epicmenu/questionmark.png',
 	leave = 'LuaUI/Images/epicmenu/exit.png',
 	kick = 'LuaUI/Images/advplayerslist/cross.png', -- REPLACE ME
+	report = 'LuaUI/Images/Crystal_Clear_app_error.png', -- REPLACE ME
 	merge = 'LuaUI/Images/Commshare_Merge.png',
 	give = 'LuaUI/Images/gift2.png',
 	giftmetal = 'LuaUI/Images/ibeam.png',
@@ -56,6 +57,8 @@ local defaultamount = 100
 
 local UpdateListFunction
 local wantRebuild = false
+
+local KICK_USER = "StartKickPoll_"
 
 local pingCpuColors = {
 	'\255\0\255\0',
@@ -88,12 +91,6 @@ options = {
 		type = 'bool',
 		value = false,
 		noHotkey = true,
-	},
-	remerge = {
-		name = 'Manual Remerge',
-		desc = 'Use this in case you weren\'t remerged automatically.',
-		type = 'button',
-		OnChange = function() Spring.SendLuaRulesMsg("sharemode remerge") end,
 	},
 	fixHotkeys = {
 		name  = "Fix hotkeys on start",
@@ -572,6 +569,34 @@ local function BattleKickPlayer(subject)
 	Spring.SendCommands("say !poll kick " .. subject.name)
 end
 
+local function HandleKickMessage(msg)
+	if string.find(msg, KICK_USER) ~= 1 then
+		return
+	end
+	local data = msg:split("_")
+	if not (data and data[2]) then
+		return
+	end
+	
+	Spring.SendCommands("say !poll kick " .. data[2])
+	return true
+end
+
+local function ReportPlayer(subject)
+	local extraText = ""
+	local isSpec = select(3, Spring.GetPlayerInfo(subject.id, false))
+	extraText = extraText .. ((isSpec and "Spectator, ") or "Player, ")
+	
+	local teamCountFirst = #(Spring.GetTeamList(0) or {})
+	local teamCountSecond = #(Spring.GetTeamList(1) or {})
+	extraText = extraText .. teamCountFirst .. "v" .. teamCountSecond .. " on " .. Game.mapName
+	
+	local seconds = math.floor(Spring.GetGameFrame()/30)
+	local minutes = math.floor(seconds/60)
+	extraText = extraText .. " at " .. string.format("%d:%02d", minutes, seconds - 60*minutes)
+	Spring.SendLuaMenuMsg("reportUser_" .. subject.name .. "_" .. extraText)
+end
+
 local function GiveUnit(target)
 	local num = Spring.GetSelectedUnitsCount()
 	if num == 0 then
@@ -932,18 +957,36 @@ local function InitName(subject, playerPanel)
 				width = buttonsize,
 				x= givemebuttons[subject.id]["text"].x  + givemebuttons[subject.id]["text"].width,
 				y= givemebuttons[subject.id]["text"].y - 6,
-				OnClick = {function () BattleKickPlayer(subject) end},
-				padding={1,1,1,1},
-				tooltip = "Kick this player from the battle.",
+				OnClick = {function () ReportPlayer(subject) end},
+				padding={2,2,2,2},
+				tooltip = "Report this player to moderators.",
 				children={
 					chili.Image:New{
-						file=images.kick,
+						file=images.report,
 						width='100%',
 						height='100%'
 					}
 				},
 				caption=" "
 			}
+			--givemebuttons[subject.id]["battlekick"] = chili.Button:New{
+			--	parent = playerPanel,
+			--	height = buttonsize,
+			--	width = buttonsize,
+			--	x= givemebuttons[subject.id]["text"].x  + givemebuttons[subject.id]["text"].width,
+			--	y= givemebuttons[subject.id]["text"].y - 6,
+			--	OnClick = {function () BattleKickPlayer(subject) end},
+			--	padding={1,1,1,1},
+			--	tooltip = "Kick this player from the battle.",
+			--	children={
+			--		chili.Image:New{
+			--			file=images.kick,
+			--			width='100%',
+			--			height='100%'
+			--		}
+			--	},
+			--	caption=" "
+			--}
 		end
 	else
 		givemebuttons[subject.id]["leave"] = chili.Button:New{
@@ -962,6 +1005,24 @@ local function InitName(subject, playerPanel)
 					height='100%',
 					x='0%',
 					y=0
+				}
+			},
+			caption=" "
+		}
+		givemebuttons[subject.id]["battlekick"] = chili.Button:New{
+			parent = playerPanel,
+			height = buttonsize,
+			width = buttonsize,
+			x= givemebuttons[subject.id]["text"].x  + givemebuttons[subject.id]["text"].width,
+			y= givemebuttons[subject.id]["text"].y - 6,
+			OnClick = {function () ReportPlayer(subject) end},
+			padding={2,2,2,2},
+			tooltip = "Report this player to moderators.",
+			children={
+				chili.Image:New{
+					file=images.report,
+					width='100%',
+					height='100%'
 				}
 			},
 			caption=" "
@@ -1033,28 +1094,28 @@ local function InitName(subject, playerPanel)
 		}
 	end
 	if (adminImg) then
-		if givemebuttons[subject.id]["battlekick"] then
-			givemebuttons[subject.id]["battlekick"]:Dispose()
-		end
-		givemebuttons[subject.id]["admin"] = chili.Button:New{
-			parent = playerPanel,
-			height = buttonsize,
-			width = buttonsize,
-			x= bottomRowStartX + givemebuttons[subject.id]["text"].width + 2 * buttonsize,
-			y= givemebuttons[subject.id]["text"].y - 4,
-			padding={1,1,1,1},
-			tooltip = "Zero-K Administrator",
-			children={
-				chili.Image:New{
-					file=adminImg,
-					width=16,
-					height=16,
-					x = 2,
-					y = 2
-				}
-			},
-			caption=" "
-		}
+		--if givemebuttons[subject.id]["battlekick"] then
+		--	givemebuttons[subject.id]["battlekick"]:Dispose()
+		--end
+		--givemebuttons[subject.id]["admin"] = chili.Button:New{
+		--	parent = playerPanel,
+		--	height = buttonsize,
+		--	width = buttonsize,
+		--	x= bottomRowStartX + givemebuttons[subject.id]["text"].width + 2 * buttonsize,
+		--	y= givemebuttons[subject.id]["text"].y - 4,
+		--	padding={1,1,1,1},
+		--	tooltip = "Zero-K Administrator",
+		--	children={
+		--		chili.Image:New{
+		--			file=adminImg,
+		--			width=16,
+		--			height=16,
+		--			x = 2,
+		--			y = 2
+		--		}
+		--	},
+		--	caption=" "
+		--}
 	end
 	--if (countryImg) then
 	--	chili.Image:New{parent=playerPanel,
@@ -1332,8 +1393,8 @@ local function EloComparator(subject1, subject2)
 	if (not subject2.player and not subject1.player) then return subject1.id > subject2.id end
 	if (not subject2.player) then return true end
 	if (not subject1.player) then return false end
-	local elo1 = select(10,Spring.GetPlayerInfo(subject1.player)).elo
-	local elo2 = select(10,Spring.GetPlayerInfo(subject2.player)).elo
+	local elo1 = tonumber(select(10,Spring.GetPlayerInfo(subject1.player)).elo)
+	local elo2 = tonumber(select(10,Spring.GetPlayerInfo(subject2.player)).elo)
 	if (not elo2 and not elo1) then return subject1.id > subject2.id end
 	if (not elo2) then return true end
 	if (not elo1) then return false end
@@ -1492,6 +1553,10 @@ function widget:Update(dt)
 		end
 		UpdatePlayers()
 	end
+end
+
+function widget:RecvLuaMsg(msg)
+	HandleKickMessage(msg)
 end
 
 function widget:Initialize()

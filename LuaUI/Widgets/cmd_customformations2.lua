@@ -450,6 +450,9 @@ local function SendSetWantedMaxSpeed(alt, ctrl, meta, shift)
 		for i = 1, #selUnits do
 			local ud = UnitDefs[spGetUnitDefID(selUnits[i])]
 			local uSpeed = ud and ud.speed
+			if ud and (ud.customParams.level or ud.customParams.dynamic_comm) then
+				uSpeed = uSpeed * (Spring.GetUnitRulesParam(selUnits[i], "upgradesSpeedMult") or 1)
+			end
 			if uSpeed and uSpeed > 0 and uSpeed < wantedSpeed then
 				wantedSpeed = uSpeed
 			end
@@ -829,6 +832,7 @@ local function DrawFilledCircleOutFading(pos, size, cornerCount)
 end
 
 local function DrawFormationDots(vertFunction, zoomY, unitCount)
+	gl.PushAttrib( GL.ALL_ATTRIB_BITS )
 	local currentLength = 0
 	local lengthPerUnit = lineLength / (unitCount-1)
 	local lengthUnitNext = lengthPerUnit
@@ -859,10 +863,11 @@ local function DrawFormationDots(vertFunction, zoomY, unitCount)
 		end
 		DrawFilledCircleOutFading(fNodes[#fNodes], dotSize, 8)
 	end
+	gl.PopAttrib( GL.ALL_ATTRIB_BITS )
+
 end
 
-local function DrawFormationLines(vertFunction, lineStipple)
-	
+local function DrawFormationLines(vertFunction, lineStipple)	
 	glLineStipple(lineStipple, 4095)
 	glLineWidth(options.linewidth.value)
 	

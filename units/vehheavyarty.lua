@@ -2,8 +2,8 @@ return { vehheavyarty = {
   unitname            = [[vehheavyarty]],
   name                = [[Impaler]],
   description         = [[Precision Artillery Rover]],
-  acceleration        = 0.21,
-  brakeRate           = 0.8,
+  acceleration        = 0.252,
+  brakeRate           = 0.96,
   buildCostMetal      = 700,
   builder             = false,
   buildPic            = [[vehheavyarty.png]],
@@ -51,7 +51,7 @@ return { vehheavyarty = {
   trackType           = [[StdTank]],
   trackWidth          = 44,
   turninplace         = 0,
-  turnRate            = 460,
+  turnRate            = 736,
 
   weapons             = {
 

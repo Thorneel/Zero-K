@@ -23,6 +23,7 @@ return { staticmex = {
     midposoffset       = [[0 -10 0]],
     modelradius        = [[15]],
     removewait         = 1,
+    removestop     = 1,
     selectionscalemult = 1.4,
   },
 
@@ -35,7 +36,7 @@ return { staticmex = {
   idleAutoHeal           = 5,
   idleTime               = 1800,
   levelGround            = false,
-  maxDamage              = 700,
+  maxDamage              = 640,
   maxSlope               = 28,
   maxVelocity            = 0,
   maxWaterDepth          = 5000,

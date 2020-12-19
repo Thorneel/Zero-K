@@ -48,6 +48,7 @@ return { amphassault = {
 
     explosiongenerators = {
       [[custom:watercannon_muzzle]],
+      [[custom:bubbles_small]],
     },
 
   },
@@ -59,7 +60,7 @@ return { amphassault = {
   trackStretch        = 1,
   trackType           = [[ComTrack]],
   trackWidth          = 66,
-  turnRate            = 500,
+  turnRate            = 600,
   upright             = false,
 
   weapons                       = {
@@ -160,7 +161,7 @@ return { amphassault = {
       laserFlareSize          = 10.4,
       minIntensity            = 1,
       noSelfDamage            = true,
-      range                   = 550,
+      range                   = 600,
       reloadtime              = 6,
       rgbColor                = [[0 0 1]],
       scrollSpeed             = 5,

@@ -1,7 +1,8 @@
 include "constants.lua"
 include "utility.lua"
 
-local beacon, holder, sphere = piece('beacon', 'holder', 'sphere')
+local holder, sphere = piece('holder', 'sphere')
+-- unused piece: 'beacon'
 
 local SIG_CEG_EFFECTS = 1
 
@@ -54,7 +55,7 @@ function startTeleOutLoop_Thread(teleportiee, teleporter)
 		if teleporterValid then
 			GG.PokeDecloakUnit(teleporter)
 		end
-		GG.PokeDecloakUnit(unitID)
+		GG.PokeDecloakUnit(unitID, unitDefID)
 		soundIndex = soundIndex + 1
 		if soundIndex > 8 then
 			if teleportieeValid then

@@ -40,7 +40,7 @@ return { spideraa = {
   trackStretch           = 1,
   trackType              = [[ChickenTrackPointyShort]],
   trackWidth             = 55,
-  turnRate               = 1700,
+  turnRate               = 2040,
 
   weapons                = {
 
@@ -94,7 +94,7 @@ return { spideraa = {
       texture2                = [[AAsmoketrail]],
       tolerance               = 9000,
       tracks                  = true,
-      turnRate                = 70000,
+      turnRate                = 82000,
       turret                  = true,
       weaponAcceleration      = 200,
       weaponType              = [[MissileLauncher]],

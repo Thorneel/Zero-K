@@ -38,6 +38,7 @@ return { chicken_dodo = {
   objectName            = [[chicken_dodo.s3o]],
   onoffable             = true,
   power                 = 170,
+  reclaimable           = false,
   selfDestructAs        = [[DODO_DEATH]],
   selfDestructCountdown = 0,
 
@@ -57,7 +58,7 @@ return { chicken_dodo = {
   trackStretch          = 1,
   trackType             = [[ChickenTrack]],
   trackWidth            = 10,
-  turnRate              = 2000,
+  turnRate              = 2400,
   upright               = false,
   waterline             = 4,
   workerTime            = 0,

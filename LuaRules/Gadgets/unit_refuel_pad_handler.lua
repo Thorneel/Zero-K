@@ -65,6 +65,8 @@ local DEFAULT_REAMMO_TIME = 5
 local DEFAULT_REAMMO_DRAIN = 10
 local DEFAULT_REPAIR_BP = 2.5
 
+local REPAIR_COST_FACTOR = Game.repairEnergyCostFactor
+
 local padSnapRangeSqr = 80^2
 local resTable = {e = 0, m = 0}
 
@@ -160,7 +162,7 @@ local function SitOnPad(unitID)
 	local ud               = UnitDefs[unitDefID]
 	local cost             = ud.metalCost
 	local maxHP            = ud.health
-	local healPerFrame     = 2*landData.repairBp*maxHP/(30*cost)
+	local healPerFrame     = landData.repairBp*maxHP/(REPAIR_COST_FACTOR*30*cost)
 	local repairFrameDrain = landData.repairBp/30
 	local reammoMaxTime     = reammoFrames[unitDefID]
 	
@@ -223,23 +225,20 @@ local function SitOnPad(unitID)
 			end
 			
 			buildRate = GetBuildRate(landData.padID)
-			updateCost = ((reammoProgress and (reammoDrain[unitDefID] or 0)) or repairFrameDrain)*GG.REPAIR_RESOURCE_MULT
+			updateCost = ((reammoProgress and (reammoDrain[unitDefID] or 0)) or repairFrameDrain)
 			if updateCost ~= oldUpdateCost or oldBuildRate ~= buildRate then
 				oldBuildRate = buildRate
 				oldUpdateCost = updateCost
 				if updateCost > 0 then
-					GG.StartMiscPriorityResourcing(landData.padID, buildRate*updateCost*30, not GG.REPAIR_COSTS_METAL, miscPriorityKey)
+					GG.StartMiscPriorityResourcing(landData.padID, buildRate*updateCost*30, true, miscPriorityKey)
 				else
 					GG.StopMiscPriorityResourcing(landData.padID, miscPriorityKey)
 				end
 			end
 			
 			if (updateCost > 0) then
-				updateRate = GG.GetMiscPrioritySpendScale(landData.padID, padTeamID, not GG.REPAIR_COSTS_METAL)
+				updateRate = GG.GetMiscPrioritySpendScale(landData.padID, padTeamID, true)
 				resTable.e = updateCost*updateRate
-				if GG.REPAIR_COSTS_METAL then
-					resTable.m = resTable.e
-				end
 			else
 				updateRate = 1
 			end

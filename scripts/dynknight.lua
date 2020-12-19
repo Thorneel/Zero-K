@@ -114,7 +114,6 @@ for index, weapon in pairs(wepTable) do
 		--Spring.Echo("sbl found")
 	end
 end
-wepTable = nil
 
 --local hasFlamer = (GG.LUPS and GG.LUPS.FlameShot) and GetFlamer()
 
@@ -192,12 +191,12 @@ function script.StopMoving()
 end
 
 function beginJump()
-	script.StopMoving()
-	GG.PokeDecloakUnit(unitID, 50)
+	GG.PokeDecloakUnit(unitID, unitDefID)
+	GG.PokeDecloakUnit(unitID)
 end
 
 function jumping()
-	GG.PokeDecloakUnit(unitID, 50)
+	GG.PokeDecloakUnit(unitID, unitDefID)
 	for i=1,4 do
 		EmitSfx(jets[i], 1028)
 	end

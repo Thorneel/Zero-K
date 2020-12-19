@@ -32,11 +32,12 @@ return { chicken_shield = {
   maxVelocity         = 1.8,
   maxWaterDepth       = 5000,
   minCloakDistance    = 75,
-  movementClass       = [[AKBOT6]],
+  movementClass       = [[AKBOT4]],
   noAutoFire          = false,
   noChaseCategory     = [[TERRAFORM FIXEDWING SATELLITE GUNSHIP SUB]],
   objectName          = [[chicken_shield.s3o]],
   power               = 350,
+  reclaimable         = false,
   selfDestructAs      = [[NOWEAPON]],
 
   sfxtypes            = {
@@ -55,7 +56,7 @@ return { chicken_shield = {
   trackStretch        = 1,
   trackType           = [[ChickenTrack]],
   trackWidth          = 34,
-  turnRate            = 806,
+  turnRate            = 967,
   upright             = false,
   workerTime          = 0,
 

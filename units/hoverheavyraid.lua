@@ -2,8 +2,8 @@ return { hoverheavyraid = {
   unitname            = [[hoverheavyraid]],
   name                = [[Bolas]],
   description         = [[Disruptor Hovercraft]],
-  acceleration        = 0.15,
-  brakeRate           = 0.43,
+  acceleration        = 0.18,
+  brakeRate           = 0.516,
   buildCostMetal      = 190,
   builder             = false,
   buildPic            = [[hoverheavyraid.png]],
@@ -19,6 +19,7 @@ return { hoverheavyraid = {
   customParams        = {
     modelradius       = [[25]],
     selection_scale   = 0.85,
+    aim_lookahead     = 120,
   },
 
   explodeAs           = [[BIG_UNITEX]],
@@ -50,7 +51,7 @@ return { hoverheavyraid = {
   sightDistance       = 560,
   sonarDistance       = 560,
   turninplace         = 0,
-  turnRate            = 560,
+  turnRate            = 896,
 
   weapons             = {
 
@@ -76,11 +77,10 @@ return { hoverheavyraid = {
       craterMult              = 0,
   
       customParams            = {
-        timeslow_damagefactor = 3,
-        
-        light_camera_height = 2000,
-        light_color = [[0.85 0.33 1]],
-        light_radius = 120,
+        timeslow_damagefactor = 2,
+        light_camera_height   = 2000,
+        light_color           = [[0.85 0.33 1]],
+        light_radius          = 120,
       },
       
       damage                  = {
@@ -97,7 +97,7 @@ return { hoverheavyraid = {
       laserFlareSize          = 4.33,
       minIntensity            = 1,
       noSelfDamage            = true,
-      range                   = 225,
+      range                   = 230,
       reloadtime              = 0.3 + 1/30,
       rgbColor                = [[0.3 0 0.4]],
       soundStart              = [[weapon/laser/heavy_laser5]],

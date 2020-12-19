@@ -35,6 +35,7 @@ return { chicken_sporeshooter = {
   noChaseCategory     = [[TERRAFORM LAND SINK TURRET SHIP SATELLITE SWIM FLOAT SUB HOVER STUPIDTARGET]],
   objectName          = [[chicken_sporeshooter.s3o]],
   power               = 400,
+  reclaimable         = false,
   selfDestructAs      = [[NOWEAPON]],
 
   sfxtypes            = {
@@ -53,7 +54,7 @@ return { chicken_sporeshooter = {
   trackStretch        = 1,
   trackType           = [[ChickenTrackPointy]],
   trackWidth          = 70,
-  turnRate            = 1200,
+  turnRate            = 1440,
   upright             = false,
   workerTime          = 0,
 

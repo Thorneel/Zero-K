@@ -556,14 +556,13 @@ end
 
 local function UpdateMorph(unitID, morphData)
 	local transportID = Spring.GetUnitTransporter(unitID)
-	local transportUnitDefID = 0
 	if transportID then
 		if not morphData.combatMorph then
 			StopMorph(unitID, morphUnits[unitID])
 			morphUnits[unitID] = nil
 			return true
 		end
-		transportUnitDefID = Spring.GetUnitDefID(transportID)
+		local transportUnitDefID = Spring.GetUnitDefID(transportID)
 		if not UnitDefs[transportUnitDefID].isFirePlatform then
 			return true
 		end
@@ -598,6 +597,10 @@ local function UpdateMorph(unitID, morphData)
 	if (morphData.progress >= 1.0 and Spring.GetUnitRulesParam(unitID, "is_jumping") ~= 1 and not transportID) then
 		FinishMorph(unitID, morphData)
 		return false -- remove from the list, all done
+	end
+	if not morphData.combatMorph then
+		local unitDefID = Spring.GetUnitDefID(unitID)
+		GG.PokeDecloakUnit(unitID, unitDefID)
 	end
 	return true
 end
@@ -989,7 +992,8 @@ local function SelectSwap(cmd, oldID, newID)
 
 	if (Script.LuaUI('MorphFinished')) then
 		if useLuaUI then
-			local readTeam, spec, specFullView = nil,GetSpectatingState()
+			local readTeam
+			local spec, specFullView = GetSpectatingState()
 			if specFullView then
 				readTeam = Script.ALL_ACCESS_TEAM
 			else
@@ -1010,7 +1014,8 @@ end
 local function StartMorph(cmd, unitID, unitDefID, morphID)
 	if (Script.LuaUI('MorphStart')) then
 		if useLuaUI then
-			local readTeam, spec, specFullView = nil, GetSpectatingState()
+			local readTeam
+			local spec, specFullView = GetSpectatingState()
 			if specFullView then
 				readTeam = Script.ALL_ACCESS_TEAM
 			else
@@ -1031,7 +1036,8 @@ end
 local function StopMorph(cmd, unitID)
 	if (Script.LuaUI('MorphStop')) then
 		if useLuaUI then
-			local readTeam, spec, specFullView = nil, GetSpectatingState()
+			local readTeam
+			local spec, specFullView = GetSpectatingState()
 			if specFullView then
 				readTeam = Script.ALL_ACCESS_TEAM
 			else
@@ -1078,7 +1084,8 @@ function gadget:Update()
 
 			if useLuaUI then
 				local morphTable = {}
-				local readTeam, spec, specFullView = nil,GetSpectatingState()
+				local readTeam
+				local spec, specFullView = GetSpectatingState()
 				if specFullView then
 					readTeam = Script.ALL_ACCESS_TEAM
 				else
@@ -1239,6 +1246,7 @@ local function DrawWorldFunc()
 	)
 	glDepthTest(false)
 	glBlending(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
+	glCulling(false)
 	phase = phase + .06
 end
 
@@ -1258,42 +1266,6 @@ local function split(msg,sep)
 	end
 	return t
 end
-
--- Exemple of AI messages:
--- "aiShortName|morph|762" -- morph the unit of unitId 762
--- "aiShortName|morph|861|12" -- morph the unit of unitId 861 into an unit of unitDefId 12
---
--- Does not work because apparently Spring.GiveOrderToUnit from unsynced gadgets are ignored.
---
-function gadget:AICallIn(data)
-	if type(data) == "string" then
-		local message = split(data)
-		if message[1] == "Shard" or true then-- Because other AI shall be allowed to send such morph command without having to pretend to be Shard
-			if message[2] == "morph" and message[3] then
-				local unitID = tonumber(message[3])
-				if unitID and Spring.ValidUnitID(unitID) then
-					if message[4] then
-						local destDefId=tonumber(message[4])
-						--Spring.Echo("Morph AICallIn: Morphing Unit["..unitID.."] into "..UnitDefs[destDefId].name)
-						Spring.GiveOrderToUnit(unitID,CMD_MORPH,{destDefId}, 0)
-					else
-						--Spring.Echo("Morph AICallIn: Morphing Unit["..unitID.."] to auto")
-						Spring.GiveOrderToUnit(unitID,CMD_MORPH,{}, 0)
-					end
-				else
-					Spring.Echo("Not a valid unitID in AICallIn morph request: \""..data.."\"")
-				end
-			end
-		end
-	end
-end
-
--- Just something to test the above AICallIn
---function gadget:KeyPress(key)
---	if key == 32 then--space key
---	gadget:AICallIn("asn|morph|762")
---	end
---end
 
 function gadget:Save(zip)
 	if not GG.SaveLoad then

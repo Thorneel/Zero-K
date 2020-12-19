@@ -37,6 +37,7 @@ return { chicken_listener = {
   objectName          = [[chicken_listener.s3o]],
   onoffable           = true,
   power               = 300,
+  reclaimable         = false,
   seismicDistance     = 1000,
   selfDestructAs      = [[SMALL_UNITEX]],
 
@@ -55,7 +56,7 @@ return { chicken_listener = {
   trackStretch        = 1,
   trackType           = [[ChickenTrack]],
   trackWidth          = 50,
-  turnRate            = 632,
+  turnRate            = 758,
   upright             = false,
   waterline           = 8,
   workerTime          = 0,

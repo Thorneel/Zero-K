@@ -7,7 +7,7 @@ function widget:GetInfo()
 		version   = "v1",
 		date      = "22 April, 2012", --2 April 2013
 		license   = "GNU GPL, v2 or later",
-		layer     = 0,
+		layer     = 1001, -- Under Chili
 		enabled   = true,
 		alwaysStart = true,
 		handler   = true
@@ -15,6 +15,7 @@ function widget:GetInfo()
 end
 
 VFS.Include("LuaRules/Configs/customcmds.h.lua")
+local _, _, GetAllyTeamOctant = VFS.Include("LuaUI/Headers/startbox_utilities.lua")
 
 ------------------------------------------------------------
 -- Speedups
@@ -145,6 +146,10 @@ options = {
 	},
 }
 
+local centerX
+local centerZ
+local extraction = 0
+
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
 -- Mexes and builders
@@ -172,11 +177,58 @@ for udid, ud in ipairs(UnitDefs) do
 	end
 end
 
-local addons = { -- coordinates of solars for the Alt modifier key
-	{ 16, -64 },
-	{ 64,  16 },
-	{-16,  64 },
-	{-64, -16 },
+local addons = { -- coordinates of solars for the Ctrl Alt modifier key, indexed by allyTeam start position
+                 -- The first two solars are in front, this is partially to make use of solar tankiness,
+                 -- but also because cons typically approach from the back so would otherwise be standing
+                 -- on the buildspot and have to waste time moving away
+	{ -- North East East
+		{-64, -16 },
+		{-16,  64 },
+		{ 64,  16 },
+		{ 16, -64 },
+	},
+	{ -- North North East
+		{ 16,  64 },
+		{-64,  16 },
+		{-16, -64 },
+		{ 64, -16 },
+	},
+	{ -- North North West
+		{-16,  64 },
+		{ 64,  16 },
+		{ 16, -64 },
+		{-64, -16 },
+	},
+	{ -- Nort West West
+		{ 64, -16 },
+		{ 16,  64 },
+		{-64,  16 },
+		{-16, -64 },
+	},
+	{ -- South West West
+		{ 64,  16 },
+		{ 16, -64 },
+		{-64, -16 },
+		{-16,  64 },
+	},
+	{ -- South South West
+		{-16, -64 },
+		{ 64, -16 },
+		{ 16,  64 },
+		{-64,  16 },
+	},
+	{ -- South South East
+		{ 16, -64 },
+		{-64, -16 },
+		{-16,  64 },
+		{ 64,  16 },
+	},
+	{ -- South East East
+		{-64,  16 },
+		{-16, -64 },
+		{ 64, -16 },
+		{ 16,  64 },
+	},
 }
 
 --------------------------------------------------------------------------------
@@ -197,9 +249,14 @@ local metalSpotsNil = true
 local metalmult = tonumber(Spring.GetModOptions().metalmult) or 1
 local metalmultInv = metalmult > 0 and (1/metalmult) or 1
 
+local myPlayerID = Spring.GetMyPlayerID()
+local myOctant = 1
+local pregame = true
+
 ------------------------------------------------------------
 -- Functions
 ------------------------------------------------------------
+
 local function GetClosestMetalSpot(x, z) --is used by single mex placement, not used by areamex
 	local bestSpot
 	local bestDist = math.huge
@@ -293,6 +350,81 @@ end
 -- Command Handling
 ------------------------------------------------------------
 
+local function MakeOptions()
+	local a, c, m, s = Spring.GetModKeyState()
+	local coded = (a and CMD.OPT_ALT or 0) +
+	              (c and CMD.OPT_CTRL or 0) +
+	              (m and CMD.OPT_META or 0) +
+	              (s and CMD.OPT_SHIFT or 0)
+	
+	return {
+		alt   = a and true or false,
+		ctrl  = c and true or false,
+		meta  = m and true or false,
+		shift = s and true or false,
+		coded = coded,
+		internal = false,
+		right = false,
+	}
+end
+
+local function PlaceSingleMex(bx, bz, facing, options)
+	facing = facing or Spring.GetBuildFacing() or 0
+	options = options or MakeOptions()
+
+	local closestSpot = GetClosestMetalSpot(bx, bz)
+	if closestSpot then
+		local units = spGetUnitsInRectangle(closestSpot.x-1, closestSpot.z-1, closestSpot.x+1, closestSpot.z+1)
+		local foundUnit = false
+		local foundEnemy = false
+		for i = 1, #units do
+			local unitID = units[i]
+			local unitDefID = Spring.GetUnitDefID(unitID)
+			if unitDefID and mexDefID == unitDefID then
+				if spGetUnitAllyTeam(unitID) == spGetMyAllyTeamID() then
+					foundUnit = unitID
+				else
+					foundEnemy = true
+				end
+				break
+			end
+		end
+
+		if foundEnemy then
+			return true, true
+		elseif foundUnit then
+			local build = select(5, spGetUnitHealth(foundUnit))
+			if build ~= 1 then
+				if options.meta then
+					WG.CommandInsert(CMD.REPAIR, {foundUnit}, options)
+				else
+					spGiveOrder(CMD.REPAIR, {foundUnit}, options)
+				end
+				WG.noises.PlayResponse(false, CMD.REPAIR)
+				return true, options.shift
+			end
+			return true, true
+		else
+			-- check if some other widget wants to handle the command before sending it to units.
+			local commandHeight = math.max(0, Spring.GetGroundHeight(closestSpot.x, closestSpot.z))
+			if Spring.TestBuildOrder(mexDefID, closestSpot.x, commandHeight, closestSpot.z, facing) == 0 then
+				return true, true
+			end
+			local GBC_processed = WG.GlobalBuildCommand and WG.GlobalBuildCommand.CommandNotifyMex(-mexDefID, {closestSpot.x, commandHeight, closestSpot.z, facing}, options, false)
+			if not GBC_processed then
+				if options.meta then
+					WG.CommandInsert(-mexDefID, {closestSpot.x, commandHeight, closestSpot.z, facing}, options)
+				else
+					spGiveOrder(-mexDefID, {closestSpot.x, commandHeight, closestSpot.z, facing}, options)
+				end
+				WG.noises.PlayResponse(false, -mexDefID)
+			end
+			return true, options.shift
+		end
+	end
+	return false, options.shift
+end
+
 function widget:CommandNotify(cmdID, params, options)
 	if (cmdID == CMD_AREA_MEX and WG.metalSpots) then
 		local cx, cy, cz, cr = params[1], params[2], params[3], math.max((params[4] or 60),60)
@@ -332,7 +464,15 @@ function widget:CommandNotify(cmdID, params, options)
 			aveZ = uz/us
 		end
 		
-		local makeMexEnergy = options.alt
+		local makeMexEnergy = options.alt or options.ctrl
+		local energyToMake = 2 -- Just Alt
+		if options.ctrl then
+			if options.alt then
+				energyToMake = 4
+			else
+				energyToMake = 1
+			end
+		end
 
 		for i = 1, #WG.metalSpots do
 			local mex = WG.metalSpots[i]
@@ -344,7 +484,6 @@ function widget:CommandNotify(cmdID, params, options)
 
 		local noCommands = #commands
 		while noCommands > 0 do
-
 			tasort(commands, function(a,b) return a.d < b.d end)
 			orderedCommands[#orderedCommands+1] = commands[1]
 			aveX = commands[1].x
@@ -367,6 +506,14 @@ function widget:CommandNotify(cmdID, params, options)
 					unitArrayToReceive[#unitArrayToReceive+1] = unitID
 				end
 			end
+			
+			-- If ctrl or alt is held and the first metal spot is blocked by a mex, then the mex command is blocked
+			-- and the remaining commands are issused with shift. This causes the area mex command to act as if shift
+			-- where hold even when it is not. I do not know why this issue is absent when no modkey are held.
+			if makeMexEnergy and not (options.shift or options.meta) then
+				commandArrayToIssue[#commandArrayToIssue+1] = {CMD.STOP, {} }
+			end
+			
 			--prepare command list
 			for i, command in ipairs(orderedCommands) do
 				local x = command.x
@@ -379,8 +526,8 @@ function widget:CommandNotify(cmdID, params, options)
 				end
 
 				if makeMexEnergy then
-					for i = 1, #addons do
-						local addon = addons[i]
+					for i = 1, energyToMake do
+						local addon = addons[myOctant][i]
 						local xx = x+addon[1]
 						local zz = z+addon[2]
 						local yy = math.max(0, Spring.GetGroundHeight(xx, zz))
@@ -404,48 +551,10 @@ function widget:CommandNotify(cmdID, params, options)
 	end
 
 	if -mexDefID == cmdID and WG.metalSpots then
-
+		-- This will probably never be called now that this is handled by widget:MousePress
 		local bx, bz = params[1], params[3]
-		local closestSpot = GetClosestMetalSpot(bx, bz)
-		if closestSpot then
-			local units = spGetUnitsInRectangle(closestSpot.x-1, closestSpot.z-1, closestSpot.x+1, closestSpot.z+1)
-			local foundUnit = false
-			local myAlly = spGetMyAllyTeamID()
-			for i = 1, #units do
-				local unitID = units[i]
-				local unitDefID = Spring.GetUnitDefID(unitID)
-				if unitDefID and mexDefID == unitDefID and spGetUnitAllyTeam(unitID) == myAlly then
-					foundUnit = unitID
-					break
-				end
-			end
-
-			if foundUnit then
-				local build = select(5, spGetUnitHealth(foundUnit))
-				if build ~= 1 then
-					if options.meta then
-						WG.CommandInsert(CMD.REPAIR, {foundUnit}, options)
-					else
-						spGiveOrder(CMD.REPAIR, {foundUnit}, options)
-					end
-				end
-				return true
-			else
-				-- check if some other widget wants to handle the command before sending it to units.
-				local commandHeight = math.max(0, Spring.GetGroundHeight(closestSpot.x, closestSpot.z))
-				local GBC_processed = WG.GlobalBuildCommand and WG.GlobalBuildCommand.CommandNotifyMex(cmdID, {closestSpot.x, commandHeight, closestSpot.z, params[4]}, options, false)
-				if not GBC_processed then
-					if options.meta then
-						WG.CommandInsert(cmdID, {closestSpot.x, commandHeight, closestSpot.z, params[4]}, options)
-					else
-						spGiveOrder(cmdID, {closestSpot.x, commandHeight, closestSpot.z, params[4]}, options)
-					end
-				end
-				return true
-			end
-		end
+		return PlaceSingleMex(bx, bz, params[4], options)
 	end
-
 end
 
 
@@ -471,7 +580,6 @@ function widget:UnitEnteredLos(unitID, teamID)
 end
 
 local function DidMexDie(unitID, expectedSpotID) --> dead, idReusedForAnotherMex
-
 	local unitDefID = Spring.GetUnitDefID(unitID)
 	if unitDefID ~= mexDefID then -- not just a nil check, the unitID could have gotten recycled for another unit
 		return true, false
@@ -535,7 +643,40 @@ local function CheckAllTerrainChanges()
 	end
 end
 
+------------------------------------------------------------
+-- Callins
+------------------------------------------------------------
+
+function widget:MousePress(x, y, button)
+	if pregame then
+		-- Let initial queue handle mex placement
+		return false
+	end
+	local _, cmdID = spGetActiveCommand()
+	if (-mexDefID == cmdID and WG.metalSpots) then
+		return true
+	end
+	return false
+end
+
+function widget:MouseRelease(x, y, button)
+	if button ~= 1 then
+		Spring.SetActiveCommand(-1)
+		return false
+	end
+	local mx, my = spGetMouseState()
+	local _, coords = spTraceScreenRay(mx, my, true, true)
+	if coords then
+		local _, retain = PlaceSingleMex(coords[1], coords[3])
+		if not retain then
+			Spring.SetActiveCommand(-1)
+		end
+	end
+	return true
+end
+
 function widget:GameFrame(n)
+	pregame = false
 	if not WG.metalSpots or (n % 5) ~= 0 then
 		return
 	end
@@ -605,6 +746,7 @@ local function Initialize()
 		widget:UnitCreated(unitID, unitDefID, teamID)
 	end
 
+	pregame = (Spring.GetGameFrame() < 1)
 	updateMexDrawList()
 
 	WG.GetClosestMetalSpot = GetClosestMetalSpot
@@ -616,16 +758,56 @@ end
 local mexSpotToDraw = false
 local drawMexSpots = false
 
+local function UpdateOctant()
+	myOctant = GetAllyTeamOctant(Spring.GetMyAllyTeamID()) or myOctant
+	--Spring.Echo("myOctant", myOctant, GetAllyTeamOctant(Spring.GetMyAllyTeamID()))
+end
+
+function widget:PlayerChanged(playerID)
+	if myPlayerID ~= playerID then
+		return
+	end
+	UpdateOctant()
+end
+
 function widget:Initialize()
 	if metalSpotsNil and WG.metalSpots ~= nil then
 		Initialize()
+		UpdateOctant()
 		metalSpotsNil = false
 	end
 end
 
+local wasFullView
+
+local function CheckNeedsRecalculating()
+	if not WG.metalSpots then
+		return false
+	end
+
+	local isSpectating, isFullView = spGetSpectatingState()
+
+	if wasSpectating ~= isSpectating then
+		wasSpectating = isSpectating
+		wasFullView = isFullView
+		return true
+	end
+	if isSpectating and isFullView ~= wasFullView then
+		wasFullView = isFullView
+		return true
+	end
+	return false
+end
+
 local firstUpdate = true
-function widget:Update()
+local cumDt = 0
+local camDir
+local debounceCamUpdate
+local incomeLabelList
+local DrawIncomeLabels
+function widget:Update(dt)
 	widget:Initialize()
+	cumDt = cumDt + dt
 	
 	if firstUpdate then
 		if Spring.GetGameRulesParam("waterLevelModifier") or Spring.GetGameRulesParam("mapgen_enabled") then
@@ -635,11 +817,9 @@ function widget:Update()
 		firstUpdate = false
 	end
 
-	local isSpectating = spGetSpectatingState()
-	if WG.metalSpots and (wasSpectating ~= isSpectating) then
+	if CheckNeedsRecalculating() then
 		spotByID = {}
 		spotData = {}
-		wasSpectating = isSpectating
 		local units = spGetAllUnits()
 		for i, unitID in ipairs(units) do
 			local unitDefID = spGetUnitDefID(unitID)
@@ -647,6 +827,27 @@ function widget:Update()
 			if unitDefID == mexDefID then
 				widget:UnitCreated(unitID, unitDefID, teamID)
 			end
+		end
+	end
+
+	if debounceCamUpdate then
+		debounceCamUpdate = debounceCamUpdate - dt
+		if debounceCamUpdate < 0 then
+			debounceCamUpdate = nil
+		end
+	else
+		local cx, cy, cz = Spring.GetCameraDirection()
+		local newCamDir = ((math.atan2(cx, cz) / math.pi) + 1) * 180
+		if newCamDir ~= camDir then
+			camDir = newCamDir
+			if WG.metalSpots then
+				gl.DeleteList(incomeLabelList)
+				incomeLabelList = glCreateList(DrawIncomeLabels)
+			end
+			debounceCamUpdate = 0.1
+		else
+			-- this is really expensive, and *almost* never changes - cutscenes, cofc, or fps can change rotation. A slower initial recheck seems like an okay tradeoff.
+			debounceCamUpdate = 1
 		end
 	end
 
@@ -674,10 +875,6 @@ end
 -- Drawing
 ------------------------------------------------------------
 
-local centerX
-local centerZ
-local extraction = 0
-
 local circleOnlyMexDrawList = 0
 local minimapDrawList = 0
 
@@ -686,7 +883,7 @@ local function getSpotColor(id)
 	return Spring.GetTeamColor(teamID)
 end
 
-function calcMainMexDrawList()
+local function calcMainMexDrawList()
 	if not WG.metalSpots then
 		return
 	end
@@ -718,7 +915,7 @@ function calcMainMexDrawList()
 	glColor(1,1,1,1)
 end
 
-function calcMinimapMexDrawList()
+local function calcMinimapMexDrawList()
 	if not WG.metalSpots then
 		return
 	end
@@ -747,13 +944,10 @@ function calcMinimapMexDrawList()
 	glColor(1,1,1,1)
 end
 
-local function DrawIncomeLabels()
+DrawIncomeLabels = function()
 	glTexture("LuaUI/Images/ibeam.png")
 	glDepthTest(false)
 	glColor(1,1,1)
-
-	local cx, cy, cz = Spring.GetCameraDirection()
-	local dir = ((math.atan2(cx, cz) / math.pi) + 1) * 180
 
 	for i = 1, #WG.metalSpots do
 		local spot = WG.metalSpots[i]
@@ -763,7 +957,7 @@ local function DrawIncomeLabels()
 		glPushMatrix()
 		glTranslate(x,y+5,z)
 		glRotate(90,1,0,0)
-		glRotate(-dir, 0, 0, 1)
+		glRotate(-camDir, 0, 0, 1)
 
 		if options.drawicons.value then
 			local metal = spot.metal
@@ -799,7 +993,7 @@ local function DrawIncomeLabels()
 
 			glTranslate(x, y, z)
 			glRotate(-90, 1, 0, 0)
-			glRotate(dir, 0, 0, 1)
+			glRotate(camDir, 0, 0, 1)
 			glTranslate(0, -40 - options.size.value, 0)
 			glText("+" .. ("%."..options.rounding.value.."f"):format(metal), 0.0, 0.0, options.size.value , "cno")
 
@@ -836,6 +1030,10 @@ function widget:Shutdown()
 		gl.DeleteList(minimapDrawList)
 	end
 	minimapDrawList = nil
+	if incomeLabelList then
+		gl.DeleteList(incomeLabelList)
+	end
+	incomeLabelList = nil
 end
 
 local function DoLine(x1, y1, z1, x2, y2, z2)
@@ -859,8 +1057,8 @@ function widget:DrawWorldPreUnit()
 		gl.DepthTest(true)
 		gl.DepthMask(true)
 
-		if drawMexSpots then
-			DrawIncomeLabels() -- ideally this would also be a call list but I don't know how to do rotation that way. Each mex its own call list I guess?
+		if drawMexSpots and incomeLabelList then
+			glCallList(incomeLabelList)
 		end
 		glCallList(circleOnlyMexDrawList)
 
@@ -876,27 +1074,28 @@ function widget:DrawWorld()
 
 	-- Check command is to build a mex
 	local _, cmdID = spGetActiveCommand()
-	local showecoMode = WG.showeco or WG.showeco_always_mexes
-	local pregame = (spGetGameFrame() < 1)
-	local peruse = pregame or showecoMode or spGetMapDrawMode() == 'metal'
+	local isMexCmd = -mexDefID == cmdID
 
-
-	local mx, my = spGetMouseState()
-	local _, pos = spTraceScreenRay(mx, my, true)
 
 	mexSpotToDraw = false
+	local pregame = (spGetGameFrame() < 1)
 
-	if WG.metalSpots and pos and (-mexDefID == cmdID or ((pregame or WG.selectionEntirelyCons) and (peruse or CMD_AREA_MEX == cmdID))) then
+	if WG.metalSpots and (pregame or WG.selectionEntirelyCons) and 
+			(isMexCmd or (pregame or (WG.showeco or WG.showeco_always_mexes)) or CMD_AREA_MEX == cmdID) then
+		local mx, my = spGetMouseState()
+		local _, pos = spTraceScreenRay(mx, my, true)
+
+		if not pos then return end
 
 		-- Find build position and check if it is valid (Would get 100% metal)
 		local bx, by, bz = Spring.Pos2BuildPos(mexDefID, pos[1], pos[2], pos[3])
-		local bface = Spring.GetBuildFacing()
 		local closestSpot, distance, index = GetClosestMetalSpot(bx, bz)
-		if -mexDefID ~= cmdID then
-			bx, by, bz = pos[1], pos[2], pos[3]
-		end
 
-		if closestSpot and (-mexDefID == cmdID or not ((CMD_AREA_MEX == cmdID or peruse) and distance > 60)) and IsSpotBuildable(index) then
+		if closestSpot and (isMexCmd or distance <= 60) and IsSpotBuildable(index) then
+			local bface = Spring.GetBuildFacing()
+			if not isMexCmd then
+				bx, by, bz = pos[1], pos[2], pos[3]
+			end
 
 			mexSpotToDraw = closestSpot
 
@@ -922,10 +1121,10 @@ function widget:DrawWorld()
 
 			gl.DepthTest(false)
 			gl.DepthMask(false)
+			gl.Color(1, 1, 1, 1)
 		end
 	end
 
-	gl.Color(1, 1, 1, 1)
 end
 
 function widget:DefaultCommand(type, id)
@@ -951,4 +1150,3 @@ function widget:DrawInMiniMap(minimapX, minimapY)
 		glPopMatrix()
 	end
 end
-

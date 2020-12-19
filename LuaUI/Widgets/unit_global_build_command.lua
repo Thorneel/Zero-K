@@ -282,6 +282,7 @@ local myTeamID = spGetMyTeamID()
 local statusColor = {1.0, 1.0, 1.0, 0.85}
 local queueColor = {1.0, 1.0, 1.0, 0.9}
 local textSize = 12.0
+local terraunitDefID = UnitDefNames.terraunit.id
 
 -- Zero-K specific icons for drawing repair/reclaim/resurrect, customize if porting!
 local rec_icon = "LuaUI/Images/commands/Bold/reclaim.png"
@@ -791,7 +792,7 @@ HOW THIS WORKS:
 --  Detect when player enters spectator mode (thanks to SeanHeron).
 function widget:PlayerChanged(playerID)
 	if spGetSpectatingState() then
-		Echo( "<Global Build Command> Spectator mode. Widget removed." )
+		Echo( "<Global Build Command> Spectator mode or commshare detected. Widget removed." )
 		widgetHandler:RemoveWidget(widget)
 		return
 	end
@@ -1258,6 +1259,35 @@ function widget:CommandNotify(id, params, options, isZkMex, isAreaMex)
 						myCmd = {id=id, target=target, x=x, y=y, z=z, assignedUnits={}}
 					else -- if the target is a unit
 						myCmd = {id=id, target=target, assignedUnits={}}
+
+						-- Cancel inverse jobs
+						if id == CMD_RECLAIM then
+							-- A reclaim command on a target cancels jobs to repair, resurect, or build that target.
+							local inverseHash = BuildHash({id=CMD_REPAIR, target=target})
+							if buildQueue[inverseHash] then
+								StopAnyWorker(inverseHash)
+								buildQueue[inverseHash] = nil
+							end
+							inverseHash = BuildHash({id=CMD_RESURRECT, target=target})
+							if buildQueue[inverseHash] then
+								StopAnyWorker(inverseHash)
+								buildQueue[inverseHash] = nil
+							end
+							local ux,_,uz = spGetUnitPosition(target)
+							local udID = spGetUnitDefID(target)
+							inverseHash = BuildHash({id=-udID, x=ux, z=uz})
+							if buildQueue[inverseHash] then
+								StopAnyWorker(inverseHash)
+								buildQueue[inverseHash] = nil
+							end
+						elseif id == CMD_RESURRECT or id == CMD_REPAIR then
+							-- A resurect or repair command cancels jobs to reclaim that target.
+							local inverseHash = BuildHash({id=CMD_RECLAIM, target=target})
+							if buildQueue[inverseHash] then
+								StopAnyWorker(inverseHash)
+								buildQueue[inverseHash] = nil
+							end
+						end
 					end
 					
 					local hash = BuildHash(myCmd)
@@ -1440,8 +1470,8 @@ function GiveWorkToUnit(unitID)
 			for i=1, #localUnits do -- locate the 'terraunit' if it still exists, and give a repair order for it
 				local target = localUnits[i]
 				local udid = spGetUnitDefID(target)
-				local unitDef = UnitDefs[udid]
-				if string.match(unitDef.humanName, "erraform") and spGetUnitTeam(target) == myTeamID then
+				-- Note: This can be nil if eg. it's a radar dot we don't know the unit type for
+				if terraunitDefID == udid and spGetUnitTeam(target) == myTeamID then
 					spGiveOrderToUnit(unitID, CMD_REPAIR, {target}, 0)
 					break
 				end

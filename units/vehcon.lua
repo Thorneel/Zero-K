@@ -1,9 +1,9 @@
 return { vehcon = {
   unitname               = [[vehcon]],
   name                   = [[Mason]],
-  description            = [[Construction Rover, Builds at 5 m/s]],
-  acceleration           = 0.33,
-  brakeRate              = 15.0,
+  description            = [[Construction Rover]],
+  acceleration           = 0.4,
+  brakeRate              = 18.0,
   buildCostMetal         = 120,
   buildDistance          = 180,
   builder                = true,
@@ -54,7 +54,7 @@ return { vehcon = {
   trackType              = [[StdTank]],
   trackWidth             = 32,
   turninplace            = 0,
-  turnRate               = 625,
+  turnRate               = 1000,
   workerTime             = 5,
 
   featureDefs            = {

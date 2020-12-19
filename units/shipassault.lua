@@ -2,9 +2,9 @@ return { shipassault = {
   unitname               = [[shipassault]],
   name                   = [[Siren]],
   description            = [[Destroyer (Riot/Assault)]],
-  acceleration           = 0.384,
+  acceleration           = 0.46,
   activateWhenBuilt      = true,
-  brakeRate              = 0.5,
+  brakeRate              = 0.6,
   buildCostMetal         = 600,
   builder                = false,
   buildPic               = [[shipassault.png]],
@@ -31,7 +31,7 @@ return { shipassault = {
   idleAutoHeal           = 5,
   idleTime               = 1800,
   losEmitHeight          = 25,
-  maxDamage              = 4000,
+  maxDamage              = 5200,
   maxVelocity            = 2.0,
   minCloakDistance       = 75,
   minWaterDepth          = 5,
@@ -45,7 +45,7 @@ return { shipassault = {
   sfxtypes               = {
 
     explosiongenerators = {
-      [[custom:brawlermuzzle]],
+      [[custom:sonicfire_80]],
       [[custom:emg_shells_l]],
     },
 
@@ -54,7 +54,7 @@ return { shipassault = {
   sightDistance          = 440,
   sonarDistance          = 440,
   turninplace            = 0,
-  turnRate               = 320,
+  turnRate               = 384,
   workerTime             = 0,
 
   weapons                = {
@@ -97,7 +97,7 @@ return { shipassault = {
         },
 
         damage                  = {
-            default = 260.01,
+            default = 280.01,
         },
         
         cegTag                  = [[sonictrail]],
@@ -110,8 +110,8 @@ return { shipassault = {
         interceptedByShieldType = 1,
         myGravity               = 0.01,
         noSelfDamage            = true,
-        range                   = 360,
-        reloadtime              = 3,
+        range                   = 270,
+        reloadtime              = 1.7,
         size                    = 64,
         sizeDecay               = 0.2,
         soundStart              = [[weapon/sonicgun2]],

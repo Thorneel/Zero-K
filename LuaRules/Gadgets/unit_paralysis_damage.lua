@@ -30,6 +30,8 @@ local normalDamageMult = {}
 local wantedWeaponList = {}
 local paraTime = {}
 local overstunDamageMult = {}
+-- Note that having EMP damage decay N times faster when above 100% is mathematically
+-- equivalent multiplying all incoming EMP damage above 100% by of 1/N.
 
 for wdid = 1, #WeaponDefs do
 	local wd = WeaponDefs[wdid]
@@ -60,7 +62,7 @@ function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer,
                                weaponDefID, attackerID, attackerDefID, attackerTeam)
 	if paralyzer then -- the weapon deals paralysis damage
 		local health, maxHealth, paralyzeDamage = spGetUnitHealth(unitID)
-		if health and maxHealth and health ~= 0 then -- taking no chances.
+		if health and maxHealth and health > 0 then -- taking no chances.
 			if not (weaponDefID and overstunDamageMult[weaponDefID]) then
 				return damage*maxHealth/health
 			end

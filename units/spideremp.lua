@@ -55,7 +55,7 @@ return { spideremp = {
   trackStretch           = 1,
   trackType              = [[ChickenTrackPointyShort]],
   trackWidth             = 54,
-  turnRate               = 1600,
+  turnRate               = 1920,
 
   weapons                = {
 
@@ -76,14 +76,14 @@ return { spideremp = {
       craterMult              = 0,
       
       customParams            = {
-        extra_damage = 450,
+        extra_damage = 400,
         
         light_color = [[0.75 0.75 0.56]],
         light_radius = 190,
       },
 
       damage                  = {
-        default        = 40.01,
+        default        = 65.01,
       },
 
       duration                = 8,
@@ -95,9 +95,9 @@ return { spideremp = {
       intensity               = 12,
       interceptedByShieldType = 1,
       noSelfDamage            = true,
-      paralyzeTime            = 3,
-      range                   = 240,
-      reloadtime              = 1.5,
+      paralyzeTime            = 1,
+      range                   = 245,
+      reloadtime              = 33/30,
       rgbColor                = [[1 1 0.7]],
       soundStart              = [[weapon/lightning_fire]],
       soundTrigger            = true,

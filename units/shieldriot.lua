@@ -5,7 +5,7 @@ return { shieldriot = {
   acceleration           = 0.75,
   activateWhenBuilt      = true,
   brakeRate              = 4.5,
-  buildCostMetal         = 250,
+  buildCostMetal         = 260,
   buildPic               = [[shieldriot.png]],
   canGuard               = true,
   canMove                = true,
@@ -17,6 +17,7 @@ return { shieldriot = {
   selectionVolumeType    = [[ellipsoid]],
 
   customParams           = {
+    selection_scale   = 0.85,
   },
 
   explodeAs              = [[BIG_UNITEX]],
@@ -56,7 +57,7 @@ return { shieldriot = {
   trackStretch           = 1,
   trackType              = [[ComTrack]],
   trackWidth             = 22,
-  turnRate               = 2000,
+  turnRate               = 2400,
   upright                = true,
 
   weapons                = {
@@ -90,8 +91,8 @@ return { shieldriot = {
       craterMult              = 0,
 
       damage                  = {
-        default = 25,
-        planes  = 25,
+        default = 23,
+        planes  = 23,
         subs    = 0.1,
       },
 
@@ -103,7 +104,7 @@ return { shieldriot = {
         timeslow_damagefactor = 3,
       },
 
-      edgeeffectiveness       = 1,
+      edgeeffectiveness       = 0.6,
       explosionGenerator      = [[custom:NONE]],
       explosionSpeed          = 12,
       impulseBoost            = 0,

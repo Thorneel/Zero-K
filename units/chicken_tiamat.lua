@@ -39,6 +39,7 @@ return { chicken_tiamat = {
   noChaseCategory     = [[TERRAFORM FIXEDWING SATELLITE GUNSHIP STUPIDTARGET MINE]],
   objectName          = [[chickenbroodqueen.s3o]],
   power               = 350,
+  reclaimable         = false,
   selfDestructAs      = [[NOWEAPON]],
 
   sfxtypes            = {
@@ -59,7 +60,7 @@ return { chicken_tiamat = {
   trackType           = [[ChickenTrack]],
   trackWidth          = 34,
   turninplace         = 0,
-  turnRate            = 806,
+  turnRate            = 967,
   upright             = false,
   workerTime          = 0,
 

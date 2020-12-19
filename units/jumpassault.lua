@@ -54,7 +54,7 @@ return { jumpassault = {
   trackStretch        = 1,
   trackType           = [[ComTrack]],
   trackWidth          = 22,
-  turnRate            = 1200,
+  turnRate            = 1440,
   upright             = true,
   workerTime          = 0,
 
@@ -101,6 +101,7 @@ return { jumpassault = {
       impulseFactor           = 0.4,
       interceptedByShieldType = 0,
       lodDistance             = 10000,
+      minIntensity            = 1,
       noSelfDamage            = true,
       range                   = 125,
       reloadtime              = 1,

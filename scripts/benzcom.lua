@@ -32,7 +32,7 @@ local nanoPieces = {lnanoflare}
 --------------------------------------------------------------------------------
 -- constants
 --------------------------------------------------------------------------------
-local SIG_MOVE = 1
+local SIG_WALK = 1
 local SIG_LASER = 2
 local SIG_DGUN = 4
 local SIG_RESTORE_LASER = 8
@@ -88,7 +88,6 @@ for index, weapon in pairs(wepTable) do
 		starBLaunchers[index] = true
 	end
 end
-wepTable = nil
 
 --------------------------------------------------------------------------------
 -- funcs
