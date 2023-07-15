@@ -1,10 +1,8 @@
 return { starlight_satellite = {
-  unitname               = [[starlight_satellite]],
   name                   = [[Glint]],
   description            = [[Starlight relay satellite]],
   acceleration           = 0.456,
   brakeRate              = 2.736,
-  buildCostMetal         = 300,
   builder                = false,
   buildPic               = [[satellite.png]],
   canFly                 = false,
@@ -20,11 +18,9 @@ return { starlight_satellite = {
   footprintZ             = 0,
   hoverAttack            = true,
   iconType               = [[satellite]],
-  idleAutoHeal           = 5,
-  idleTime               = 1800,
   maxDamage              = 1500,
   maxVelocity            = 0.001,
-  minCloakDistance       = 75,
+  metalCost              = 300,
   movementClass          = [[KBOT2]],
   noChaseCategory        = [[TERRAFORM SATELLITE FIXEDWING GUNSHIP HOVER SHIP SWIM SUB LAND FLOAT SINK TURRET]],
   objectName             = [[starlight_satellite.dae]],
@@ -33,6 +29,11 @@ return { starlight_satellite = {
   
   customParams           = {
     dontcount = [[1]],
+    has_parent_unit = 1,
+
+    outline_x = 100,
+    outline_y = 100,
+    outline_yoff = 0,
   },
 
   sfxtypes               = {

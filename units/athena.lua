@@ -1,12 +1,10 @@
 return { athena = {
-  unitname            = [[athena]],
   name                = [[Athena]],
   description         = [[Airborne SpecOps Engineer]],
   acceleration        = 0.1,
   airStrafe           = 0,
   autoHeal            = 20,
   brakeRate           = 0.08,
-  buildCostMetal      = 600,
   buildDistance       = 180,
   builder             = true,
 
@@ -57,9 +55,14 @@ return { athena = {
     modelradius    = [[15]],
     isfakefactory = 1,
     notreallyafactory = 1,
+    select_show_eco = 1,
+    sonar_can_be_disabled = 1,
+
+    outline_x = 90,
+    outline_y = 90,
+    outline_yoff = 12,
   },
 
-  energyUse           = 0,
   explodeAs           = [[GUNSHIPEX]],
   floater             = true,
   footprintX          = 2,
@@ -70,6 +73,7 @@ return { athena = {
   maxDamage           = 750,
   maxSlope            = 36,
   maxVelocity         = 7,
+  metalCost           = 600,
   minCloakDistance    = 125,
   noAutoFire          = false,
   noChaseCategory     = [[TERRAFORM SATELLITE FIXEDWING GUNSHIP HOVER SHIP SWIM SUB LAND FLOAT SINK TURRET]],

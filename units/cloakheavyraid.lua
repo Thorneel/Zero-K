@@ -1,10 +1,8 @@
 return { cloakheavyraid = {
-  unitname               = [[cloakheavyraid]],
   name                   = [[Scythe]],
   description            = [[Cloaked Raider Bot]],
   acceleration           = 1.5,
   brakeRate              = 1.8,
-  buildCostMetal         = 250,
   buildPic               = [[cloakheavyraid.png]],
   canGuard               = true,
   canMove                = true,
@@ -14,7 +12,7 @@ return { cloakheavyraid = {
   collisionVolumeScales  = [[28 36 28]],
   collisionVolumeType    = [[cylY]],
   selectionVolumeOffsets = [[0 0 0]],
-  selectionVolumeScales  = [[32 32 32]],
+  selectionVolumeScales  = [[48 48 48]],
   selectionVolumeType    = [[ellipsoid]],
   cloakCost              = 0.2,
   cloakCostMoving        = 1,
@@ -37,6 +35,7 @@ return { cloakheavyraid = {
   maxSlope               = 36,
   maxVelocity            = 3,
   maxWaterDepth          = 22,
+  metalCost              = 250,
   minCloakDistance       = 75,
   movementClass          = [[KBOT2]],
   moveState              = 0,
@@ -96,7 +95,6 @@ return { cloakheavyraid = {
       damage                  = {
         default = 200.1,
         planes  = 200,
-        subs    = 15,
       },
 
       explosionGenerator      = [[custom:BEAMWEAPON_HIT_ORANGE]],

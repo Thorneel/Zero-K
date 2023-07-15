@@ -1,12 +1,10 @@
 return { armcom1 = {
-  unitname               = [[armcom1]],
   name                   = [[Strike Commander]],
   description            = [[Mobile Assault Commander]],
   acceleration           = 0.54,
   activateWhenBuilt      = true,
   autoHeal               = 5,
   brakeRate              = 2.25,
-  buildCostMetal         = 1200,
   buildDistance          = 128,
   builder                = true,
 
@@ -38,25 +36,22 @@ return { armcom1 = {
 
   energyMake             = 6,
   energyStorage          = 500,
-  energyUse              = 0,
   explodeAs              = [[ESTOR_BUILDINGEX]],
   footprintX             = 2,
   footprintZ             = 2,
   iconType               = [[commander1]],
-  idleAutoHeal           = 5,
-  idleTime               = 1800,
   leaveTracks            = true,
   losEmitHeight          = 40,
   maxDamage              = 2500,
   maxSlope               = 36,
   maxVelocity            = 1.35,
   maxWaterDepth          = 5000,
+  metalCost              = 1200,
   metalMake              = 4,
   metalStorage           = 500,
-  minCloakDistance       = 75,
   movementClass          = [[AKBOT2]],
   noChaseCategory        = [[TERRAFORM SATELLITE FIXEDWING GUNSHIP HOVER SHIP SWIM SUB LAND FLOAT SINK TURRET]],
-  objectName             = [[ARMCOM]],
+  objectName             = [[armcom.s3o]],
   script                 = [[armcom.lua]],
   selfDestructAs         = [[ESTOR_BUILDINGEX]],
 
@@ -116,7 +111,6 @@ return { armcom1 = {
 
       damage                  = {
         default = 0,
-        subs    = 0,
       },
 
       duration                = 0.1,
@@ -158,7 +152,6 @@ return { armcom1 = {
 
       damage                  = {
         default = 15.06,
-        subs    = 0.8,
       },
 
       duration                = 0.1,

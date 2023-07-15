@@ -1,15 +1,11 @@
 return { chicken_blimpy = {
-  unitname            = [[chicken_blimpy]],
   name                = [[Blimpy]],
   description         = [[Dodo Bomber]],
   airHoverFactor      = 0,
   activateWhenBuilt   = true,
   brakerate           = 0.4,
-  buildCostEnergy     = 0,
-  buildCostMetal      = 0,
   builder             = false,
   buildPic            = [[chicken_blimpy.png]],
-  buildTime           = 750,
   canFly              = true,
   canGuard            = true,
   canLand             = true,
@@ -35,7 +31,9 @@ return { chicken_blimpy = {
   maxDamage           = 1850,
   maxSlope            = 18,
   maxVelocity         = 5,
-  minCloakDistance    = 75,
+  metalCost           = 0,
+  energyCost          = 0,
+  buildTime           = 750,
   noAutoFire          = false,
   noChaseCategory     = [[TERRAFORM FIXEDWING SATELLITE GUNSHIP STUPIDTARGET]],
   objectName          = [[chicken_blimpy.s3o]],
@@ -129,7 +127,6 @@ return { chicken_blimpy = {
       damage                  = {
         default = 1,
         planes  = 1,
-        subs    = 1,
       },
 
       explosionGenerator      = [[custom:none]],
@@ -172,7 +169,6 @@ return { chicken_blimpy = {
       damage                  = {
         default = 1,
         planes  = 1,
-        subs    = 1,
       },
 
       explosionGenerator      = [[custom:none]],

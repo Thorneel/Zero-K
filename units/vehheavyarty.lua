@@ -1,10 +1,8 @@
 return { vehheavyarty = {
-  unitname            = [[vehheavyarty]],
   name                = [[Impaler]],
   description         = [[Precision Artillery Rover]],
   acceleration        = 0.252,
   brakeRate           = 0.96,
-  buildCostMetal      = 700,
   builder             = false,
   buildPic            = [[vehheavyarty.png]],
   canMove             = true,
@@ -15,7 +13,10 @@ return { vehheavyarty = {
   corpse              = [[DEAD]],
 
   customParams        = {
+    chase_everything = 1, -- don't ignore solars. Doesn't chase mobiles anyway
+    target_stupid_targets = 1, -- ditto, don't deprioritize solars (mobile stupid targets already deprioritized)
 
+    bait_level_default = 2,
     dontfireatradarcommand = '0',
   },
 
@@ -23,15 +24,13 @@ return { vehheavyarty = {
   footprintX          = 3,
   footprintZ          = 3,
   iconType            = [[vehiclelrarty]],
-  idleAutoHeal        = 5,
-  idleTime            = 1800,
   leaveTracks         = true,
   maxDamage           = 1100,
   maxSlope            = 18,
   maxVelocity         = 2.0,
-  minCloakDistance    = 75,
+  metalCost           = 700,
   movementClass       = [[TANK3]],
-  noChaseCategory     = [[TERRAFORM FIXEDWING GUNSHIP]],
+  noChaseCategory     = [[TERRAFORM FIXEDWING GUNSHIP MOBILE]],
   objectName          = [[core_diplomat.s3o]],
   script              = [[vehheavyarty.lua]],
   selfDestructAs      = [[BIG_UNITEX_MERL]],
@@ -57,7 +56,7 @@ return { vehheavyarty = {
 
     {
       def                = [[CORTRUCK_ROCKET]],
-      badTargetCategory  = [[SWIM LAND SHIP HOVER]],
+      badTargetCategory  = [[MOBILE]],
       onlyTargetCategory = [[SWIM LAND SINK TURRET FLOAT SHIP HOVER]],
     },
 
@@ -82,7 +81,6 @@ return { vehheavyarty = {
 
       damage         = {
         default = 800.1,
-        subs    = 4,
       },
 
       texture1=[[null]], --flare, reference: http://springrts.com/wiki/Weapon_Variables#Texture_Tags
@@ -104,11 +102,13 @@ return { vehheavyarty = {
       reloadtime              = 10,
       smokeTrail              = false,
       soundHit                = [[weapon/missile/vlaunch_hit]],
-      soundStart              = [[weapon/missile/missile_launch]],
+      soundStart              = [[weapon/missile/missile_launch_short]],
+      soundStartVolume        = 10,
+      soundHitVolume          = 10,
       tolerance               = 4000,
-      turnrate                = 18000,
-      weaponAcceleration      = 315,
-      weaponTimer             = 2,
+      turnrate                = 16000,
+      weaponAcceleration      = 280,
+      weaponTimer             = 2.1,
       weaponType              = [[StarburstLauncher]],
       weaponVelocity          = 8000,
     },
@@ -119,6 +119,8 @@ return { vehheavyarty = {
 
     DEAD  = {
       blocking         = true,
+      collisionVolumeScales  = [[40 20 40]],
+      collisionVolumeType    = [[box]],
       featureDead      = [[HEAP]],
       footprintX       = 3,
       footprintZ       = 3,

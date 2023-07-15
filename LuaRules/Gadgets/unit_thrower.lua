@@ -33,11 +33,16 @@ for i = 1, #WeaponDefs do
 	end
 end
 
+local spGetUnitPosition = Spring.GetUnitPosition
 local GetEffectiveWeaponRange = Spring.Utilities.GetEffectiveWeaponRange
 local IterableMap = VFS.Include("LuaRules/Gadgets/Include/IterableMap.lua")
 
 local applyBlockingFrame = {}
 local unitIsNotBlocking = {}
+
+local cachedAttackCommandDesc = false
+
+local _, _, _, overkillPreventionDefault = include("LuaRules/Configs/overkill_prevention_defs.lua")
 
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
@@ -63,6 +68,7 @@ local RECENT_INT_WIDTH = 1
 local MAX_ALTITUDE_AIM = 60
 
 local NO_BLOCK_TIME = 5
+local ATTACK_BLOCK_DEFAULT = 1
 
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
@@ -104,8 +110,10 @@ if (gadgetHandler:IsSyncedCode()) then
 
 include("LuaRules/Configs/customcmds.h.lua")
 local spFindUnitCmdDesc     = Spring.FindUnitCmdDesc
+local spRemoveUnitCmdDesc   = Spring.RemoveUnitCmdDesc
 local spEditUnitCmdDesc     = Spring.EditUnitCmdDesc
 local spInsertUnitCmdDesc   = Spring.InsertUnitCmdDesc
+local spGetUnitLosState     = Spring.GetUnitLosState
 
 local CMD_ATTACK = CMD.ATTACK
 local CMD_INSERT = CMD.INSERT
@@ -119,11 +127,20 @@ local unitBlockAttackCmd = {
 	params  = {0, 'Allowed','Blocked'}
 }
 
+local preventOverkillCmdDesc = {
+	id      = CMD_PREVENT_OVERKILL,
+	type    = CMDTYPE.ICON_MODE,
+	name    = "Prevent Overkill.",
+	action  = 'preventoverkill',
+	tooltip	= 'Enable to prevent units shooting at units which are already going to die.',
+	params 	= {0, "Fire at anything", "On automatic commands", "On fire at will", "Prevent Overkill"}
+}
+
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
 
 local function SetUnitDrag(unitID, drag)
-	local ux, uy, uz = Spring.GetUnitPosition(unitID)
+	local ux, uy, uz = spGetUnitPosition(unitID)
 	local rx, ry, rz = Spring.GetUnitRotation(unitID)
 	local vx, vy, vz = Spring.GetUnitVelocity(unitID)
 	Spring.SetUnitPhysics(unitID, ux, uy, uz, vx, vy, vz, rx, ry, rz, drag, drag, drag)
@@ -141,7 +158,7 @@ local function SendUnitToTarget(unitID, launchMult, sideMult, upMult, odx, ty, o
 	if Spring.GetUnitTransporter(unitID) then
 		return false
 	end
-	local _,_,_, _, ny, _ = Spring.GetUnitPosition(unitID, true)
+	local _,_,_, _, ny = spGetUnitPosition(unitID, true)
 	if not ny then
 		return false
 	end
@@ -153,6 +170,43 @@ local function SendUnitToTarget(unitID, launchMult, sideMult, upMult, odx, ty, o
 	
 	GG.AddGadgetImpulseRaw(unitID, (px - vx)*launchMult*sideMult, (py - vy)*launchMult*upMult, (pz - vz)*launchMult*sideMult, true, true, nil, nil, true)
 	return flyTime
+end
+
+local function GetAffectedUnits(unitID, checkOverlobAllyTeam, unitX, unitZ)
+	-- Use checkOverlobAllyTeam to check if any targets exist in LOS. It was
+	-- shoehorned in as keeping validity in one place seems best.
+	local data = IterableMap.Get(throwUnits, unitID)
+	if not data then
+		return
+	end
+	if not unitX then
+		local _,_,_, ox, oy, oz = spGetUnitPosition(unitID, true)
+		unitX, unitZ = ox, oz
+	end
+	
+	local nearUnits = Spring.GetUnitsInCylinder(unitX, unitZ, data.def.radius)
+	local affectedUnits = false
+	if nearUnits then
+		for i = 1, #nearUnits do
+			local nearID = nearUnits[i]
+			local physicsData = physicsRestore and IterableMap.Get(physicsRestore, nearID)
+			local _, _, _, speed = Spring.GetUnitVelocity(nearID)
+			if ((not physicsData) or (not physicsData.drag) or physicsData.drag > RECENT_MAX) and ValidThrowTarget(unitID, nearID, speed) then
+				if checkOverlobAllyTeam then
+					local inLos = spGetUnitLosState(nearID, checkOverlobAllyTeam, true)
+					if inLos and inLos%2 == 1 then
+						return true
+					end
+				end
+				affectedUnits = affectedUnits or {}
+				affectedUnits[#affectedUnits + 1] = nearUnits[i]
+			end
+		end
+	end
+	if checkOverlobAllyTeam then
+		return false
+	end
+	return affectedUnits
 end
 
 function gadget:ProjectileCreated(proID, proOwnerID, weaponDefID)
@@ -171,14 +225,14 @@ function gadget:ProjectileCreated(proID, proOwnerID, weaponDefID)
 	if targetType == GROUND then
 		tx, ty, tz = targetPos[1], targetPos[2], targetPos[3]
 	else
-		_, _, _, tx, ty, tz = Spring.GetUnitPosition(targetPos, true)
+		_, _, _, tx, ty, tz = spGetUnitPosition(targetPos, true)
 		local groundHeight = math.max(Spring.Utilities.GetGroundHeightMinusOffmap(tx, tz) or 0, 0)
 		ty = math.min(ty, groundHeight - MAX_ALTITUDE_AIM)
 	end
 	ty = math.max(ty, 0)
 	
 	-- Calculate horizontal aiming parameters based on projectile owner position.
-	local _,_,_, ox, oy, oz = Spring.GetUnitPosition(proOwnerID, true)
+	local _,_,_, ox, oy, oz = spGetUnitPosition(proOwnerID, true)
 	local odx, ody, odz = tx - ox, ty - oy, tz - oz
 	local fireDistance = math.sqrt(odx^2 + odz^2)
 	
@@ -197,40 +251,41 @@ function gadget:ProjectileCreated(proID, proOwnerID, weaponDefID)
 	unitIsNotBlocking[proOwnerID] = frame
 	
 	-- Apply impulse
-	local nearUnits = Spring.GetUnitsInCylinder(ox, oz, data.def.radius)
-	if nearUnits then
-		for i = 1, #nearUnits do
-			local nearID = nearUnits[i]
-			local physicsData = physicsRestore and IterableMap.Get(physicsRestore, nearID)
-			local _, _, _, speed = Spring.GetUnitVelocity(nearID)
-			if ((not physicsData) or (not physicsData.drag) or physicsData.drag > RECENT_MAX) and ValidThrowTarget(proOwnerID, nearID, speed) then
-				
-				local recentMult = max(0, min(1, (((physicsData and physicsData.drag) or 0) - RECENT_MAX)/RECENT_INT_WIDTH))
-				local speedMult  = max(0, min(1, (SPEED_MAX - speed)/SPEED_INT_WIDTH))
-				local launchMult = speedMult
-				
-				local flyTime = SendUnitToTarget(nearID, launchMult, 0, 1, odx, ty, odz)
-				if flyTime then
-					flyTime = flyTime + 15 -- Sideways time.
-					
-					SetUnitDrag(nearID, 0)
-					GG.SetCollisionDamageMult(nearID, 0)
-					Spring.SetUnitLeaveTracks(nearID, false)
-					IterableMap.Add(physicsRestore, nearID,
-						{
-							odx = odx,
-							ty = ty,
-							odz = odz,
-							sidewaysCounter = 15,
-							launchMult = launchMult,
-							drag = -1.5,
-							collisionResistence = -5*flyTime/MIN_FLY_TIME,
-						}
-					)
-					SendToUnsynced("addFlying", nearID, Spring.GetUnitDefID(nearID), flyTime)
-					GG.Floating_InterruptFloat(nearID, 60)
-				end
-			end
+	local affectedUnits = GetAffectedUnits(proOwnerID, false, ox, oz)
+	if not affectedUnits then
+		Spring.DeleteProjectile(proID)
+		return
+	end
+	
+	for i = 1, #affectedUnits do
+		local nearID = affectedUnits[i]
+		local _, _, _, speed = Spring.GetUnitVelocity(nearID)
+		local recentMult = max(0, min(1, (((physicsData and physicsData.drag) or 0) - RECENT_MAX)/RECENT_INT_WIDTH))
+		local speedMult  = max(0, min(1, (SPEED_MAX - speed)/SPEED_INT_WIDTH))
+		local launchMult = speedMult
+		
+		local flyTime = SendUnitToTarget(nearID, launchMult, 0, 1, odx, ty, odz)
+		if flyTime then
+			local nearDefID = Spring.GetUnitDefID(nearID)
+			flyTime = flyTime + 15 -- Sideways time.
+			
+			SetUnitDrag(nearID, 0)
+			GG.SetCollisionDamageMult(nearID, 0)
+			Spring.SetUnitLeaveTracks(nearID, false)
+			IterableMap.Add(physicsRestore, nearID,
+				{
+					unitDefID = nearDefID,
+					odx = odx,
+					ty = ty,
+					odz = odz,
+					sidewaysCounter = 15,
+					launchMult = launchMult,
+					drag = -1.5,
+					collisionResistence = -5*flyTime/MIN_FLY_TIME,
+				}
+			)
+			SendToUnsynced("addFlying", nearID, nearDefID, flyTime)
+			GG.Floating_InterruptFloat(nearID, 60)
 		end
 	end
 	
@@ -257,6 +312,16 @@ end
 --------------------------------------------------------------------------------
 -- Command Handling
 
+local function CacheAttackCommandDesc(unitID)
+	local cmdTable = Spring.GetUnitCmdDescs(unitID)
+	for i = 1, #cmdTable do
+		if cmdTable[i].id == CMD.ATTACK then
+			cachedAttackCommandDesc = cmdTable[i]
+			return
+		end
+	end
+end
+
 local function BlockAttackToggle(unitID, cmdParams)
 	local data = IterableMap.Get(throwUnits, unitID)
 	if data then
@@ -267,8 +332,42 @@ local function BlockAttackToggle(unitID, cmdParams)
 			unitBlockAttackCmd.params[1] = state
 			spEditUnitCmdDesc(unitID, cmdDescID, { params = unitBlockAttackCmd.params})
 		end
+		if state == 1 then
+			local cmdDesc = spFindUnitCmdDesc(unitID, CMD.ATTACK)
+			if cmdDesc then
+				if not cachedAttackCommandDesc then
+					CacheAttackCommandDesc(unitID)
+					Spring.Utilities.TableEcho(cachedAttackCommandDesc, "cmdDesc")
+				end
+				spRemoveUnitCmdDesc(unitID, cmdDesc)
+			end
+		elseif cachedAttackCommandDesc then
+			local cmdDesc = spFindUnitCmdDesc(unitID, CMD.ATTACK)
+			if not cmdDesc then
+				spInsertUnitCmdDesc(unitID, cachedAttackCommandDesc)
+			end
+		end
 		data.blockAttack = (state == 1)
 	end
+end
+
+local function PreventOverkillToggleCommand(unitID, cmdParams, cmdOptions)
+	local data = IterableMap.Get(throwUnits, unitID)
+	if not data then
+		return true
+	end
+	local state = cmdParams[1]
+	if cmdOptions and cmdOptions.right then
+		state = (state - 2)%4
+	end
+	local cmdDescID = spFindUnitCmdDesc(unitID, CMD_PREVENT_OVERKILL)
+	
+	if (cmdDescID) then
+		preventOverkillCmdDesc.params[1] = state
+		spEditUnitCmdDesc(unitID, cmdDescID, {params = preventOverkillCmdDesc.params})
+	end
+	data.preventOverlob = ((state >= 1) and state)
+	return false
 end
 
 function gadget:AllowCommand_GetWantedCommand()
@@ -278,6 +377,7 @@ function gadget:AllowCommand_GetWantedCommand()
 		[CMD_INSERT] = true,
 		[CMD_UNIT_SET_TARGET] = true,
 		[CMD_UNIT_SET_TARGET_CIRCLE] = true,
+		[CMD_PREVENT_OVERKILL] = true,
 	}
 end
 
@@ -302,6 +402,9 @@ function gadget:AllowCommand(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOpt
 		return true  -- command was not used
 	end
 	
+	if (cmdID == CMD_PREVENT_OVERKILL) then
+		return PreventOverkillToggleCommand(unitID, cmdParams, cmdOptions)
+	end
 	if (cmdID ~= CMD_DISABLE_ATTACK) then
 		return true  -- command was not used
 	end
@@ -324,7 +427,9 @@ function gadget:UnitCreated(unitID, unitDefID, teamID)
 		)
 		
 		spInsertUnitCmdDesc(unitID, unitBlockAttackCmd)
-		BlockAttackToggle(unitID, {0})
+		spInsertUnitCmdDesc(unitID, preventOverkillCmdDesc)
+		BlockAttackToggle(unitID, {ATTACK_BLOCK_DEFAULT})
+		PreventOverkillToggleCommand(unitID, {overkillPreventionDefault[unitDefID]})
 	end
 end
 
@@ -343,6 +448,21 @@ function externalFunc.BlockAttack(unitID)
 	return unitData and unitData.blockAttack
 end
 
+function externalFunc.CheckOverlobPrevention(unitID)
+	local unitData = unitID and IterableMap.Get(throwUnits, unitID)
+	if not unitData then
+		return false
+	end
+	if not unitData.preventOverlob then
+		return false
+	end
+	if unitData.preventOverlob == 2 and Spring.Utilities.GetUnitFireState(unitID) ~= 2 then
+		return false
+	end
+	-- Don't handle unitData.preventOverlob as Lobster is rarely fired at units and all ground commands are manual
+	return not GetAffectedUnits(unitID, Spring.GetUnitAllyTeam(unitID))
+end
+
 function gadget:Initialize()
 	-- register command
 	gadgetHandler:RegisterCMDID(CMD_DISABLE_ATTACK)
@@ -359,6 +479,9 @@ function gadget:Initialize()
 end
 
 local function UpdateTrajectory(unitID, data)
+	if not Spring.ValidUnitID(unitID) then
+		return true
+	end
 	if data.sidewaysCounter then
 		data.sidewaysCounter = data.sidewaysCounter - 1
 		if data.sidewaysCounter < 10 then
@@ -381,6 +504,7 @@ local function ReinstatePhysics(unitID, data)
 			Spring.SetUnitLeaveTracks(unitID, true)
 			SetUnitDrag(unitID, 1)
 			data.drag = nil
+			GG.Floating_CheckAddFlyingFloat(unitID, data.unitDefID)
 		end
 	end
 	
@@ -421,12 +545,10 @@ else -- UNSYNCED
 
 local glVertex            = gl.Vertex
 local spIsUnitInView      = Spring.IsUnitInView
-local spGetUnitPosition   = Spring.GetUnitPosition
 local spGetUnitLosState   = Spring.GetUnitLosState
 local spValidUnitID       = Spring.ValidUnitID
 local spGetMyAllyTeamID   = Spring.GetMyAllyTeamID
 local spGetUnitVectors    = Spring.GetUnitVectors
-local spGetLocalTeamID    = Spring.GetLocalTeamID
 local spGetUnitIsStunned  = Spring.GetUnitIsStunned
 local spGetUnitRulesParam = Spring.GetUnitRulesParam
 
@@ -467,12 +589,12 @@ end
 local function DrawWire(emitUnitID, recUnitID, spec, myAllyTeam, x, y, z)
 	local point = {}
 	if spValidUnitID(recUnitID) then
-		local los = spGetUnitLosState(recUnitID, myAllyTeam, false)
-		if (spec or (los and los.los)) and (spIsUnitInView(emitUnitID) or spIsUnitInView(recUnitID)) then
+		local los = spGetUnitLosState(recUnitID, myAllyTeam, true)
+		if (spec or (los and los%2 == 1)) and (spIsUnitInView(emitUnitID) or spIsUnitInView(recUnitID)) then
 			local topX, topY, topZ = GetUnitTop(emitUnitID, x, y, z)
 			point[1] = {x, y, z}
 			point[2] = {topX, topY, topZ}
-			local _,_,_, rX, rY, rZ = Spring.GetUnitPosition(recUnitID, true)
+			local _,_,_, rX, rY, rZ = spGetUnitPosition(recUnitID, true)
 			topX, topY, topZ = GetUnitTop(recUnitID, rX, rY, rZ)
 			point[3] = {topX,topY,topZ}
 			point[4] = {rX, rY, rZ}
@@ -492,9 +614,9 @@ local function DrawThrowerWires(unitID, data, index, spec, myAllyTeam)
 	if not UnitIsActive(unitID) then
 		return
 	end
-	local los = spGetUnitLosState(unitID, myAllyTeam, false)
-	if spec or (los and los.los) then
-		local _,_,_, x, y, z = Spring.GetUnitPosition(unitID, true)
+	local los = spGetUnitLosState(unitID, myAllyTeam, true)
+	if spec or (los and (los and los%2 == 1)) then
+		local _,_,_, x, y, z = spGetUnitPosition(unitID, true)
 		local nearUnits = Spring.GetUnitsInCylinder(x, z, data.def.radius)
 		if nearUnits then
 			for i = 1, #nearUnits do

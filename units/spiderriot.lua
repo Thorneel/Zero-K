@@ -1,18 +1,19 @@
 return { spiderriot = {
-  unitname               = [[spiderriot]],
   name                   = [[Redback]],
   description            = [[Riot Spider]],
   acceleration           = 0.66,
   brakeRate              = 3.96,
-  buildCostMetal         = 240,
   buildPic               = [[spiderriot.png]],
   canGuard               = true,
   canMove                = true,
   canPatrol              = true,
   category               = [[LAND]],
   collisionVolumeOffsets = [[0 5 0]],
-  collisionVolumeScales  = [[36 36 36]],
+  collisionVolumeScales  = [[40 36 48]],
   collisionVolumeType    = [[ellipsoid]],
+  selectionVolumeOffsets = [[0 0 4]],
+  selectionVolumeScales  = [[68 45 76]],
+  selectionVolumeType    = [[ellipsoid]],
   corpse                 = [[DEAD]],
 
   customParams           = {
@@ -24,14 +25,12 @@ return { spiderriot = {
   footprintX             = 3,
   footprintZ             = 3,
   iconType               = [[spiderriot]],
-  idleAutoHeal           = 5,
-  idleTime               = 1800,
   leaveTracks            = true,
   maxDamage              = 900,
   maxSlope               = 72,
-  maxVelocity            = 1.8,
+  maxVelocity            = 1.75,
   maxWaterDepth          = 22,
-  minCloakDistance       = 75,
+  metalCost              = 240,
   movementClass          = [[TKBOT3]],
   noChaseCategory        = [[TERRAFORM FIXEDWING SUB]],
   objectName             = [[spiderriot.s3o]],
@@ -43,7 +42,7 @@ return { spiderriot = {
   trackStretch           = 1,
   trackType              = [[ChickenTrackPointyShort]],
   trackWidth             = 55,
-  turnRate               = 2040,
+  turnRate               = 1938,
 
   weapons                = {
 
@@ -72,8 +71,7 @@ return { spiderriot = {
       },
 
       damage                  = {
-        default = 70.01,
-        subs    = 3,
+        default = 80.01,
       },
 
       explosionGenerator      = [[custom:flash1red]],

@@ -1,11 +1,7 @@
 return { turretaaheavy = {
-  unitname                      = [[turretaaheavy]],
   name                          = [[Artemis]],
-  description                   = [[Very Long-Range Anti-Air Missile Tower, Drains 4 m/s 20 second stockpile.]],
-  acceleration                  = 0,
+  description                   = [[Very Long-Range Anti-Air Missile Tower, Drains 4 m/s, 20 second stockpile]],
   activateWhenBuilt             = true,
-  brakeRate                     = 0,
-  buildCostMetal                = 2400,
   builder                       = false,
   buildingGroundDecalDecaySpeed = 30,
   buildingGroundDecalSizeX      = 6,
@@ -19,30 +15,29 @@ return { turretaaheavy = {
   corpse                        = [[DEAD]],
 
   customParams                  = {
+    bait_level_default = 2,
     modelradius    = [[37]],
     stockpilecost  = [[80]],
     stockpiletime  = [[20]],
     priority_misc  = 1, -- Medium
+    okp_damage = 1600,
   },
 
   explodeAs                     = [[ESTOR_BUILDING]],
   footprintX                    = 4,
   footprintZ                    = 4,
   iconType                      = [[heavysam]],
-  idleAutoHeal                  = 5,
-  idleTime                      = 1800,
   maxDamage                     = 3200,
   maxSlope                      = 18,
   maxVelocity                   = 0,
   maxWaterDepth                 = 0,
-  minCloakDistance              = 150,
+  metalCost                     = 2400,
   noAutoFire                    = false,
   objectName                    = [[SCREAMER.s3o]],
   onoffable                     = false,
   script                        = [[turretaaheavy.lua]],
   selfDestructAs                = [[ESTOR_BUILDING]],
   sightDistance                 = 660,
-  turnRate                      = 0,
   useBuildingGroundDecal        = true,
   workerTime                    = 0,
   yardMap                       = [[oooooooooooooooo]],
@@ -70,6 +65,7 @@ return { turretaaheavy = {
 
       customParams              = {
         isaa = [[1]],
+        radar_homing_distance = 1800,
 
         light_color = [[1.5 1.8 1.8]],
         light_radius = 600,
@@ -78,7 +74,6 @@ return { turretaaheavy = {
       damage                  = {
         default    = 160.15,
         planes     = 1601.5,
-        subs       = 80,
       },
 
       edgeEffectiveness       = 0.25,
@@ -91,7 +86,7 @@ return { turretaaheavy = {
       impulseFactor           = 0,
       interceptedByShieldType = 1,
       metalpershot            = 80,
-      model                   = [[wep_m_avalanche.s3o]],
+      model                   = [[wep_m_avalanche.s3o]], -- Model radius 180 for QuadField fix.
       noSelfDamage            = true,
       range                   = 2400,
       reloadtime              = 1.8,
@@ -101,6 +96,7 @@ return { turretaaheavy = {
       startVelocity           = 1000,
       stockpile               = true,
       stockpileTime           = 10000,
+      texture1                = [[flarescale01]],
       tolerance               = 10000,
       tracks                  = true,
       trajectoryHeight        = 0.55,

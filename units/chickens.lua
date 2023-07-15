@@ -1,21 +1,20 @@
 return { chickens = {
-  unitname            = [[chickens]],
   name                = [[Spiker]],
   description         = [[Skirmisher]],
   acceleration        = 1.3,
   activateWhenBuilt   = true,
   brakeRate           = 1.5,
-  buildCostEnergy     = 0,
-  buildCostMetal      = 0,
   builder             = false,
   buildPic            = [[chickens.png]],
-  buildTime           = 200,
   canGuard            = true,
   canMove             = true,
   canPatrol           = true,
   category            = [[SWIM]],
 
   customParams        = {
+    outline_x = 115,
+    outline_y = 115,
+    outline_yoff = 20,
   },
 
   explodeAs           = [[NOWEAPON]],
@@ -28,7 +27,9 @@ return { chickens = {
   maxDamage           = 600,
   maxSlope            = 36,
   maxVelocity         = 2,
-  minCloakDistance    = 75,
+  metalCost           = 0,
+  energyCost          = 0,
+  buildTime           = 200,
   movementClass       = [[BHOVER3]],
   noAutoFire          = false,
   noChaseCategory     = [[TERRAFORM FIXEDWING SATELLITE SUB STUPIDTARGET]],
@@ -48,6 +49,7 @@ return { chickens = {
   },
   sightDistance       = 550,
   sonarDistance       = 550,
+  script              = "chickens.lua",
   trackOffset         = 6,
   trackStrength       = 8,
   trackStretch        = 1,
@@ -92,7 +94,6 @@ return { chickens = {
       damage                  = {
         default = 180,
         planes  = 180,
-        subs    = 180,
       },
 
       explosionGenerator      = [[custom:EMG_HIT]],

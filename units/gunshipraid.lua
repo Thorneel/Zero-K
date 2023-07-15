@@ -1,10 +1,8 @@
 return { gunshipraid = {
-  unitname               = [[gunshipraid]],
   name                   = [[Locust]],
   description            = [[Raider Gunship]],
   acceleration           = 0.18,
   brakeRate              = 0.16,
-  buildCostMetal         = 220,
   builder                = false,
   buildPic               = [[gunshipraid.png]],
   canFly                 = true,
@@ -14,7 +12,7 @@ return { gunshipraid = {
   canSubmerge            = false,
   category               = [[GUNSHIP]],
   selectionVolumeOffsets = [[0 0 0]],
-  selectionVolumeScales  = [[42 42 42]],
+  selectionVolumeScales  = [[63 63 63]],
   selectionVolumeType    = [[ellipsoid]],
   collide                = true,
   corpse                 = [[DEAD]],
@@ -31,11 +29,11 @@ return { gunshipraid = {
   footprintZ             = 2,
   hoverAttack            = true,
   iconType               = [[gunshipraider]],
-  idleAutoHeal           = 5,
+  idleAutoHeal           = 6,
   idleTime               = 150,
   maxDamage              = 800,
   maxVelocity            = 6.9,
-  minCloakDistance       = 75,
+  metalCost              = 220,
   noChaseCategory        = [[TERRAFORM SUB]],
   objectName             = [[banshee.s3o]],
   script                 = [[gunshipraid.lua]],
@@ -88,8 +86,7 @@ return { gunshipraid = {
       },
 
       damage                  = {
-        default = 7.6,
-        subs    = 0.38,
+        default = 7.9,
       },
 
       explosionGenerator      = [[custom:flash1red]],

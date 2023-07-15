@@ -1,20 +1,19 @@
 return { chicken_leaper = {
-  unitname            = [[chicken_leaper]],
   name                = [[Leaper]],
   description         = [[Hopping Raider]],
   acceleration        = 1.5,
   brakeRate           = 1.23,
-  buildCostEnergy     = 0,
-  buildCostMetal      = 0,
   builder             = false,
   buildPic            = [[chicken_leaper.png]],
-  buildTime           = 100,
   canGuard            = true,
   canMove             = true,
   canPatrol           = true,
   category            = [[LAND]],
 
   customParams        = {
+    outline_x = 145,
+    outline_y = 145,
+    outline_yoff = 17.5,
   },
 
   explodeAs           = [[NOWEAPON]],
@@ -28,7 +27,9 @@ return { chicken_leaper = {
   maxDamage           = 720,
   maxSlope            = 36,
   maxVelocity         = 4,
-  minCloakDistance    = 75,
+  metalCost           = 0,
+  energyCost          = 0,
+  buildTime           = 100,
   movementClass       = [[AKBOT3]],
   noAutoFire          = false,
   noChaseCategory     = [[TERRAFORM FIXEDWING SATELLITE GUNSHIP]],
@@ -78,7 +79,6 @@ return { chicken_leaper = {
       damage                  = {
         default = 50,
         planes  = 50,
-        subs    = 2,
       },
 
       duration                = 0.0333,
@@ -101,7 +101,7 @@ return { chicken_leaper = {
       turret                  = true,
       waterWeapon             = true,
       weaponType              = [[LaserCannon]],
-      weaponVelocity          = 2200,
+      weaponVelocity          = 3000,
     },
 
   },

@@ -1,16 +1,12 @@
 return { chicken_roc = {
-  unitname            = [[chicken_roc]],
   name                = [[Roc]],
   description         = [[Heavy Attack Flyer]],
   acceleration        = 1.2,
   activateWhenBuilt   = true,
   airHoverFactor      = 0,
   brakeRate           = 0.8,
-  buildCostEnergy     = 0,
-  buildCostMetal      = 0,
   builder             = false,
   buildPic            = [[chicken_roc.png]],
-  buildTime           = 1250,
   canFly              = true,
   canGuard            = true,
   canLand             = true,
@@ -22,6 +18,9 @@ return { chicken_roc = {
   cruiseAlt           = 150,
 
   customParams        = {
+    outline_x = 180,
+    outline_y = 180,
+    outline_yoff = 17.5,
   },
 
   explodeAs           = [[NOWEAPON]],
@@ -30,13 +29,16 @@ return { chicken_roc = {
   footprintZ          = 2,
   hoverattack         = true,
   iconType            = [[heavygunship]],
-  idleAutoHeal        = 5,
-  idleTime            = 1800,
+  idleAutoHeal        = 20,
+  idleTime            = 300,
   leaveTracks         = true,
   maneuverleashlength = [[64000]],
   maxDamage           = 2500,
   maxSlope            = 36,
   maxVelocity         = 3,
+  metalCost           = 0,
+  energyCost          = 0,
+  buildTime           = 1250,
   minCloakDistance    = 250,
   noAutoFire          = false,
   noChaseCategory     = [[TERRAFORM FIXEDWING SATELLITE GUNSHIP STUPIDTARGET MINE]],
@@ -142,7 +144,6 @@ return { chicken_roc = {
       damage                  = {
         default = 80,
         planes  = 80,
-        subs    = 8,
       },
 
       dance                   = 60,

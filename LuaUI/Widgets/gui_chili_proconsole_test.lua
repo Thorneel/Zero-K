@@ -99,7 +99,8 @@ local MESSAGE_RULES = {
 	point = { format = '#p$playername#e added point.' },
 	autohost = { format = '#o> $argument', noplayername = true },
 	other = { format = '#o$text' }, -- no pattern... will match anything else
-	game_message = { format = '#o$text' } -- no pattern...
+	game_message = { format = '#o$text' }, -- no pattern...
+	game_priority_message = { format = '#e$text' }, -- no pattern...
 }
 
 --------------------------------------------------------------------------------
@@ -108,6 +109,7 @@ local MESSAGE_RULES = {
 local SOUNDS = {
 	ally = "sounds/talk.wav",
 	label = "sounds/talk.wav",
+	lobby = "sounds/beep4_decrackled.wav",
 	highlight = "LuaUI/Sounds/communism/cash-register-01.wav" -- TODO find a better sound :)
 }
 
@@ -119,6 +121,7 @@ local HIGHLIGHT_SURROUND_SEQUENCE_2 = ' <<<'
 local DEDUPE_SUFFIX = 'x '
 
 local MIN_HEIGHT = 50
+local MAX_HEIGHT = 2160
 local MIN_WIDTH = 300
 local MAX_STORED_MESSAGES = 300
 
@@ -186,6 +189,7 @@ options_order = {
 	'backlogArrowOnRight',
 	'changeFont',
 	'enableChatBackground',
+	'hideChat',
 	'toggleBacklog',
 	'text_height_chat',
 	'text_height_console',
@@ -198,6 +202,7 @@ options_order = {
 	
 	'color_chat_background','color_console_background',
 	'color_chat', 'color_ally', 'color_other', 'color_spec',
+	'color_usernames',
 	
 	'hideSpec', 'hideAlly', 'hidePoint', 'hideLabel', 'hideLog',
 	'error_opengl_source',
@@ -205,7 +210,7 @@ options_order = {
 	--'pointButtonOpacity',
 	
 	'highlight_all_private', 'highlight_filter_allies', 'highlight_filter_enemies', 'highlight_filter_specs', 'highlight_filter_other',
-	'highlight_surround', 'highlight_sound', 'color_highlight',
+	'highlight_surround', 'highlight_sound', 'send_lobby_updates', 'sound_for_lobby', 'color_highlight', 'color_from_lobby',
 	
 	--'highlighted_text_height',
 	
@@ -214,6 +219,55 @@ options_order = {
 
 local function onOptionsChanged()
 	RemakeConsole()
+end
+
+local showingBackchat = false
+local showingNothing = false
+local wantHidden = false
+
+local function SwapBacklog()
+	if showingBackchat then
+		if not showingNothing then
+			window_chat:RemoveChild(scrollpanel_backchat)
+		end
+		if wantHidden then
+			showingBackchat = false
+			showingNothing = true
+			return
+		else
+			window_chat:AddChild(scrollpanel_chat)
+			backlogButtonImage.file = 'LuaUI/Images/arrowhead.png'
+			backlogButtonImage:Invalidate()
+		end
+	else
+		if not showingNothing then
+			window_chat:RemoveChild(scrollpanel_chat)
+		end
+		window_chat:AddChild(scrollpanel_backchat)
+		backlogButtonImage.file = 'LuaUI/Images/arrowhead_flipped.png'
+		backlogButtonImage:Invalidate()
+	end
+	showingBackchat = not showingBackchat
+	showingNothing = false
+end
+
+local function SetHidden(hidden)
+	if hidden == wantHidden then
+		return
+	end
+	wantHidden = hidden
+	
+	if wantHidden then
+		if showingBackchat then
+			window_chat:RemoveChild(scrollpanel_backchat)
+		else
+			window_chat:RemoveChild(scrollpanel_chat)
+		end
+		showingNothing = true
+	else
+		showingBackchat = true
+		SwapBacklog()
+	end
 end
 
 options = {
@@ -383,6 +437,22 @@ options = {
 		advanced = true,
 		path = hilite_path,
 	},
+	send_lobby_updates = {
+		name = "Display lobby chat and updates",
+		type = 'bool',
+		value = true,
+		noHotkey = true,
+		OnChange = onOptionsChanged,
+		path = hilite_path,
+	},
+	sound_for_lobby = {
+		name = "Play sound for lobby updates",
+		type = 'bool',
+		value = true,
+		noHotkey = true,
+		OnChange = onOptionsChanged,
+		path = hilite_path,
+	},
 	hideSpec = {
 		name = "Hide Spectator Chat",
 		type = 'bool',
@@ -459,6 +529,14 @@ options = {
 		OnChange = onOptionsChanged,
 		path = color_path,
 	},
+	color_usernames = {
+		name = "Color usernames in messages",
+		type = 'bool',
+		value = true,
+		OnChange = onOptionsChanged,
+		advanced = true,
+		path = color_path,
+	},
 	color_dup = {
 		name = 'Duplicate message mark',
 		type = 'colors',
@@ -470,6 +548,13 @@ options = {
 		name = 'Highlight mark',
 		type = 'colors',
 		value = { 1, 1, 0.2, 1 },
+		OnChange = onOptionsChanged,
+		path = hilite_path,
+	},
+	color_from_lobby = {
+		name = 'Lobby notification color',
+		type = 'colors',
+		value = { 1, 0.2, 1, 1 },
 		OnChange = onOptionsChanged,
 		path = hilite_path,
 	},
@@ -561,6 +646,7 @@ options = {
 					right = ((not options.backlogArrowOnRight.value) and 0) or inputsize,
 					bottom = 0,
 					height = inputsize,
+					noFont = true,
 					backgroundColor = {1,1,1,1},
 					borderColor = {0,0,0,1},
 					--backgroundColor = {1,1,1,1},
@@ -578,6 +664,7 @@ options = {
 					bottom = 0,
 					right = 0,
 					height = inputsize,
+					noFont = true,
 					backgroundColor = {1,1,1,1},
 					borderColor = {0,0,0,1},
 					--backgroundColor = {1,1,1,1},
@@ -650,6 +737,15 @@ options = {
 				window_chat:RemoveChild(inputspace)
 			end
 			scrollpanel_console:Invalidate()
+		end,
+	},
+	hideChat = {
+		name = "Hide when not chatting",
+		desc = "Hide the chat completely when not entering chat.",
+		type = 'bool',
+		value = false,
+		OnChange = function(self)
+			SetHidden(self.value)
 		end,
 	},
 	backchatOpacity = {
@@ -793,7 +889,11 @@ end
 
 local function detectHighlight(msg)
 	-- must handle case where we are spec and message comes from player
-
+	
+	if msg.msgtype == 'game_priority_message' then
+		msg.highlight = true
+		return
+	end
 	if msg.msgtype == 'player_to_player_received' and options.highlight_all_private.value then
 		msg.highlight = true
 		return
@@ -815,7 +915,30 @@ end
 
 local function formatMessage(msg)
 	local format = getOutputFormat(msg.msgtype) or getOutputFormat("other")
-	
+
+	-- Find and colour any usernames in the message body
+	if options.color_usernames.value then
+		-- This could be slightly faster by caching the value for each format rule,
+		-- but that's more effort elsewhere, risks cache bugs,
+		-- this operation is much faster than the N regex replacements,
+		-- and this code path isn't that hot to begin with (not many chat messages per second)
+		local last_colour_code = format:match('.*(#%w)') or '#o'
+		local message_colour = incolors[last_colour_code]
+
+		-- Lua lacks \b, so we match with spaces instead and strip the added ones afterwards
+		local formatted_arg = ' '..msg.argument..' '
+		-- incolors contains the control codes #[aehos] and also each player's username
+		-- we get all the usernames by iterating it and just ignoring the #[aehos] control codes
+		for name, colour in pairs(incolors) do
+			if name:sub(1,1) ~= '#' then
+				local pattern = '([^%w_])(' .. name .. ')([^%w_])'
+				local sub = '%1'..colour..'%2'..message_colour..'%3'
+				formatted_arg, _ = formatted_arg:gsub(pattern, sub)
+			end
+		end
+		msg.argument = formatted_arg:sub(2, -2)  -- strip added spaces
+	end
+
 	-- insert/sandwich colour string into text
 	local formatted, _ = format:gsub('([#%$]%w+)', function(parameter) -- FIXME pattern too broad for 1-char color specifiers
 			if parameter:sub(1,1) == '$' then
@@ -852,6 +975,9 @@ local function MessageIsChatInfo(msg)
 	string.find(msg.argument,'paused the game') or
 	string.find(msg.argument,'Sync error for') or
 	string.find(msg.argument,'Cheating is') or
+	string.find(msg.argument,'GodModeAction') or
+	string.find(msg.argument,'GlobalLosActionExecutor') or
+	string.find(msg.argument,'Everything%-for%-free') or
 	string.find(msg.argument,'resigned') or
 	(string.find(msg.argument,'left the game') and string.find(msg.argument,'Player'))
 	--string.find(msg.argument,'Team') --endgame comedic message. Engine message, loaded from gamedata/messages.lua (hopefully 'Team' with capital 'T' is not used anywhere else)
@@ -920,7 +1046,6 @@ local function AddMessage(msg, target, remake)
 	local textbox = WG.Chili.TextBox:New{
 		width = '100%',
 		align = "left",
-		fontsize = size,
 		valign = "ascender",
 		lineSpacing = 0,
 		padding = { 0, 0, 0, 0 },
@@ -930,14 +1055,11 @@ local function AddMessage(msg, target, remake)
 		autoHeight=true,
 		autoObeyLineHeight=true,
 		--]]
-
-		font = {
+		objectOverrideFont = WG.GetSpecialFont(size, "proconsole", {
 			outlineWidth = 3,
 			outlineWeight = 10,
 			outline = true,
-			
-			--color         = {0,0,0,0},
-		}
+		})
 	}
 	
 	if options.clickable_points.value then
@@ -963,7 +1085,7 @@ local function AddMessage(msg, target, remake)
 				caption = '',
 				children = {
 					WG.Chili.Button:New{
-						caption='',
+						noFont = true,
 						x=0;y=0;
 						width = 30,
 						height = 20,
@@ -1046,13 +1168,13 @@ local function AddMessage(msg, target, remake)
 	end
 
 	stack:UpdateClientArea()
-		
 end
 
 
 local function setupColors()
 	incolor_dup			= color2incolor(options.color_dup.value)
 	incolor_highlight	= color2incolor(options.color_highlight.value)
+	incolor_fromlobby	= color2incolor(options.color_from_lobby.value)
 	incolors['#h']		= incolor_highlight
 	incolors['#a'] 		= color2incolor(options.color_ally.value)
 	incolors['#e'] 		= color2incolor(options.color_chat.value)
@@ -1221,6 +1343,7 @@ local function MakeMessageWindow(name, enabled, ParentFunc)
 		parent = (enabled and screen0) or nil,
 		margin = { 0, 0, 0, 0 },
 		padding = { 0, 0, 0, 0 },
+		noFont = true,
 		dockable = true,
 		name = name,
 		x = x,
@@ -1236,7 +1359,7 @@ local function MakeMessageWindow(name, enabled, ParentFunc)
 		parentWidgetName = widget:GetInfo().name, --for gui_chili_docking.lua (minimize function)
 		minWidth = MIN_WIDTH,
 		minHeight = MIN_HEIGHT,
-		maxHeight = 500,
+		maxHeight = MAX_HEIGHT,
 		color = { 0, 0, 0, 0 },
 		OnMouseDown = {
 			function(self) --//click on scroll bar shortcut to "Settings/HUD Panels/Chat/Console".
@@ -1251,42 +1374,6 @@ local function MakeMessageWindow(name, enabled, ParentFunc)
 			ParentFunc
 		},
 	}
-end
-
-local showingBackchat = false
-local showingNothing = false
-
-local function SetHidden(hidden)
-	if hidden == showingNothing then
-		return
-	end
-	showingNothing = hidden
-	
-	if showingBackchat then
-		window_chat:RemoveChild(scrollpanel_backchat)
-	else
-		window_chat:RemoveChild(scrollpanel_chat)
-	end
-end
-
-local function SwapBacklog()
-	if showingBackchat then
-		if not showingNothing then
-			window_chat:RemoveChild(scrollpanel_backchat)
-		end
-		window_chat:AddChild(scrollpanel_chat)
-		backlogButtonImage.file = 'LuaUI/Images/arrowhead.png'
-		backlogButtonImage:Invalidate()
-	else
-		if not showingNothing then
-			window_chat:RemoveChild(scrollpanel_chat)
-		end
-		window_chat:AddChild(scrollpanel_backchat)
-		backlogButtonImage.file = 'LuaUI/Images/arrowhead_flipped.png'
-		backlogButtonImage:Invalidate()
-	end
-	showingBackchat = not showingBackchat
-	showingNothing = false
 end
 
 local function SetBacklogShow(newShow)
@@ -1453,7 +1540,7 @@ function widget:AddConsoleMessage(msg)
 	
 	if msg.highlight and options.highlight_sound.value then
 		PlaySound("highlight")
-	elseif (msg.msgtype == "player_to_allies") then -- FIXME not for sent messages
+	elseif (msg.msgtype == "player_to_allies") or (msg.msgtype == "game_priority_message") then -- FIXME not for sent messages
 		PlaySound("ally")
 	elseif msg.msgtype == "label" then
 		PlaySound("label")
@@ -1597,6 +1684,7 @@ function widget:Initialize()
 		x = (options.backlogArrowOnRight.value and 0) or inputsize,
 		right = ((not options.backlogArrowOnRight.value) and 0) or inputsize,
 		bottom = 0,
+		noFont = true,
 		height = inputsize,
 		backgroundColor = {1,1,1,1},
 		borderColor = {0,0,0,1},
@@ -1618,7 +1706,7 @@ function widget:Initialize()
 		height = inputsize - 3,
 		classname = "overlay_button_tiny",
 		padding = {1,1,1,1},
-		caption = '',
+		noFont = true,
 		tooltip = 'Swap between decaying chat and scrollable chat backlog.',
 		OnClick = {SwapBacklog},
 		children={ backlogButtonImage },
@@ -1630,6 +1718,7 @@ function widget:Initialize()
 		x = 0,
 		y = 0,
 		width = '100%',
+		noFont = true,
 		bottom = inputsize + 2, -- This line is temporary until chili is fixed so that ReshapeConsole() works both times! -- TODO is it still required??
 		verticalSmartScroll = true,
 -- DISABLED FOR CLICKABLE TextBox		disableChildrenHitTest = true,
@@ -1656,6 +1745,7 @@ function widget:Initialize()
 		padding = { 3,3,3,3 },
 		x = 0,
 		y = 0,
+		noFont = true,
 		width = '100%',
 		bottom = inputsize + 2, -- This line is temporary until chili is fixed so that ReshapeConsole() works both times! -- TODO is it still required??
 		verticalSmartScroll = true,
@@ -1675,6 +1765,7 @@ function widget:Initialize()
 		y = 5,
 		right = 5,
 		bottom = 5,
+		noFont = true,
 		verticalSmartScroll = true,
 		backgroundColor = {0,0,0,0},
 		borderColor = {0,0,0,0},
@@ -1709,6 +1800,25 @@ end
 
 function widget:GameStart()
 	setupPlayers() --re-check teamColor at gameStart for Singleplayer (special case. widget Initialized before player join).
+end
+
+function widget:RecvLuaMsg(msg, playerID)
+	if msg:sub(1,16) == 'LobbyChatUpdate_' then -- FIXME: why does an in-world object care about the overlay?
+		local message = msg:sub(17, msg:len())
+		if message then
+			if options.send_lobby_updates.value then
+				local toAdd = {
+					formatted = "[" .. incolor_fromlobby .. "Lobby Message" .. "\255\255\255\255] " .. message,
+					dup = 0,
+				}
+				AddMessage(toAdd, 'chat')
+				AddMessage(toAdd, 'backchat')
+			end
+			if options.sound_for_lobby.value and not Spring.IsGameOver() then
+				PlaySound('lobby')
+			end
+		end
+	end
 end
 
 -----------------------------------------------------------------------

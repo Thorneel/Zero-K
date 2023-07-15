@@ -1,9 +1,7 @@
 return { turretimpulse = {
-  unitname                      = [[turretimpulse]],
   name                          = [[Newton]],
   description                   = [[Gravity Turret]],
   activateWhenBuilt             = true,
-  buildCostMetal                = 200,
   builder                       = false,
   buildingGroundDecalDecaySpeed = 30,
   buildingGroundDecalSizeX      = 4,
@@ -17,7 +15,10 @@ return { turretimpulse = {
   corpse                        = [[DEAD]],
 
   customParams                  = {
+    bait_level_default = 0,
+    can_target_allies  = 1,
     modelradius    = [[25]],
+    lookahead      = 120,
   },
 
   explodeAs                     = [[MEDIUM_BUILDINGEX]],
@@ -28,11 +29,12 @@ return { turretimpulse = {
   maxDamage                     = 2000,
   maxSlope                      = 36,
   maxWaterDepth                 = 0,
-  minCloakDistance              = 150,
+  metalCost                     = 200,
   noAutoFire                    = false,
   noChaseCategory               = [[FIXEDWING LAND SINK TURRET SHIP SATELLITE SWIM GUNSHIP FLOAT SUB HOVER]],
-  objectName                    = [[CORGRAV]],
+  objectName                    = [[corgrav.s3o]],
   onoffable                     = true,
+  script                        = [[turretimpulse.lua]],
   selfDestructAs                = [[MEDIUM_BUILDINGEX]],
   sightDistance                 = 554, -- Range*1.1 + 48 for radar overshoot
   useBuildingGroundDecal        = true,
@@ -70,7 +72,6 @@ return { turretimpulse = {
       craterMult              = 0,
 
       customParams            = {
-        reaim_time = 8, -- COB
         impulse = [[-150]],
 
         light_color = [[0.33 0.33 1.28]],
@@ -80,7 +81,6 @@ return { turretimpulse = {
       damage                  = {
         default = 0.001,
         planes  = 0.001,
-        subs    = 5E-05,
       },
 
       duration                = 0.0333,
@@ -90,7 +90,7 @@ return { turretimpulse = {
       interceptedByShieldType = 0,
       noSelfDamage            = true,
       proximityPriority       = -15,
-      range                   = 460,
+      range                   = 440,
       reloadtime              = 0.2,
       rgbColor                = [[0 0 1]],
       rgbColor2               = [[1 0.5 1]],
@@ -100,7 +100,7 @@ return { turretimpulse = {
       thickness               = 4,
       tolerance               = 5000,
       turret                  = true,
-      weaponType              = [[LaserCannon]],
+      weaponType              = [[LaserCannon]], -- not hitscan on purpose, to make it difficult to manipulate things perfectly
       weaponVelocity          = 2200,
     },
 
@@ -116,7 +116,6 @@ return { turretimpulse = {
       craterMult              = 0,
 
       customParams            = {
-        reaim_time = 8, -- COB
         impulse = [[150]],
 
         light_color = [[0.85 0.2 0.2]],
@@ -126,7 +125,6 @@ return { turretimpulse = {
       damage                  = {
         default = 0.001,
         planes  = 0.001,
-        subs    = 5E-05,
       },
 
       duration                = 0.0333,
@@ -160,7 +158,7 @@ return { turretimpulse = {
       featureDead      = [[HEAP]],
       footprintX       = 5,
       footprintZ       = 5,
-      object           = [[corgrav_dead]],
+      object           = [[corgrav_dead.s3o]],
     },
 
     HEAP  = {

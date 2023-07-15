@@ -1,10 +1,8 @@
 return { cloakaa = {
-  unitname               = [[cloakaa]],
   name                   = [[Gremlin]],
   description            = [[Cloaked Anti-Air Bot]],
   acceleration           = 1.5,
   brakeRate              = 1.92,
-  buildCostMetal         = 150,
   buildPic               = [[cloakaa.png]],
   canGuard               = true,
   canMove                = true,
@@ -18,6 +16,7 @@ return { cloakaa = {
   corpse                 = [[DEAD]],
 
   customParams           = {
+    bait_level_default = 0,
     modelradius    = [[11]],
     cus_noflashlight = 1,
   },
@@ -26,14 +25,13 @@ return { cloakaa = {
   footprintX             = 2,
   footprintZ             = 2,
   iconType               = [[kbotaa]],
-  idleAutoHeal           = 5,
-  idleTime               = 1800,
   initCloaked            = true,
   leaveTracks            = true,
   maxDamage              = 550,
   maxSlope               = 36,
   maxVelocity            = 2.9,
   maxWaterDepth          = 22,
+  metalCost              = 140,
   minCloakDistance       = 140,
   movementClass          = [[KBOT2]],
   moveState              = 0,
@@ -91,9 +89,8 @@ return { cloakaa = {
       },
 
       damage                  = {
-        default = 1.94,
-        planes  = 19.4,
-        subs    = 1,
+        default = 2,
+        planes  = 20.001,
       },
 
       explosionGenerator      = [[custom:flash_teal7]],
@@ -103,7 +100,7 @@ return { cloakaa = {
       interceptedByShieldType = 1,
       laserFlareSize          = 3.25,
       minIntensity            = 1,
-      range                   = 700,
+      range                   = 720,
       reloadtime              = 0.3,
       rgbColor                = [[0 1 1]],
       soundStart              = [[weapon/laser/rapid_laser]],

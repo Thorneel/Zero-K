@@ -1,10 +1,8 @@
 return { spiderassault = {
-  unitname               = [[spiderassault]],
   name                   = [[Hermit]],
   description            = [[All Terrain Assault Bot]],
   acceleration           = 0.54,
   brakeRate              = 1.32,
-  buildCostMetal         = 160,
   buildPic               = [[spiderassault.png]],
   canGuard               = true,
   canMove                = true,
@@ -16,6 +14,7 @@ return { spiderassault = {
   corpse                 = [[DEAD]],
 
   customParams           = {
+    bait_level_default = 0,
     modelradius    = [[12]],
     cus_noflashlight = 1,
   },
@@ -24,16 +23,14 @@ return { spiderassault = {
   footprintX             = 2,
   footprintZ             = 2,
   iconType               = [[spiderassault]],
-  idleAutoHeal           = 5,
-  idleTime               = 1800,
   leaveTracks            = true,
-  maxDamage              = 1400,
+  maxDamage              = 1500,
   maxSlope               = 36,
   maxVelocity            = 1.7,
   maxWaterDepth          = 22,
-  minCloakDistance       = 75,
+  metalCost              = 150,
   movementClass          = [[TKBOT3]],
-  noChaseCategory        = [[TERRAFORM FIXEDWING SATELLITE SUB]],
+  noChaseCategory        = [[TERRAFORM FIXEDWING SATELLITE SUB DRONE]],
   objectName             = [[hermit.s3o]],
   selfDestructAs         = [[BIG_UNITEX]],
   script                 = [[spiderassault.lua]],
@@ -83,7 +80,6 @@ return { spiderassault = {
       damage                  = {
         default = 141,
         planes  = 141,
-        subs    = 7,
       },
 
       explosionGenerator      = [[custom:MARY_SUE]],

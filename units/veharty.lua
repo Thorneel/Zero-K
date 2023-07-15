@@ -1,10 +1,8 @@
 return { veharty = {
-  unitname            = [[veharty]],
   name                = [[Badger]],
   description         = [[Artillery Minelayer Rover]],
   acceleration        = 0.168,
   brakeRate           = 0.96,
-  buildCostMetal      = 260,
   builder             = false,
   buildPic            = [[veharty.png]],
   canGuard            = true,
@@ -12,12 +10,17 @@ return { veharty = {
   canPatrol           = true,
   category            = [[LAND]],
   selectionVolumeOffsets = [[0 0 0]],
-  selectionVolumeScales  = [[42 42 42]],
+  selectionVolumeScales  = [[63 63 63]],
   selectionVolumeType    = [[ellipsoid]],
   corpse              = [[DEAD]],
 
   customParams        = {
     selection_scale   = 0.85,
+    bait_level_default = 0,
+
+    outline_x = 80,
+    outline_y = 80,
+    outline_yoff = 12.5,
   },
 
   explodeAs           = [[BIG_UNITEX]],
@@ -25,19 +28,18 @@ return { veharty = {
   footprintZ          = 3,
   highTrajectory      = 1,
   iconType            = [[vehiclearty]],
-  idleAutoHeal        = 5,
-  idleTime            = 1800,
   leaveTracks         = true,
   maneuverleashlength = [[650]],
   maxDamage           = 450,
   maxSlope            = 18,
-  maxVelocity         = 2.25,
+  maxVelocity         = 1.85,
   maxWaterDepth       = 22,
-  minCloakDistance    = 75,
+  metalCost           = 270,
   movementClass       = [[TANK3]],
   noAutoFire          = false,
   noChaseCategory     = [[TERRAFORM FIXEDWING SATELLITE GUNSHIP]],
   objectName          = [[corwolv.s3o]],
+  script              = "veharty.lua",
   selfDestructAs      = [[BIG_UNITEX]],
 
   sfxtypes            = {
@@ -56,7 +58,7 @@ return { veharty = {
   trackType           = [[StdTank]],
   trackWidth          = 30,
   turninplace         = 0,
-  turnRate            = 640,
+  turnRate            = 640, --NB: be wary about large turning circles wandering into HLT.
   workerTime          = 0,
 
   weapons             = {
@@ -79,9 +81,9 @@ return { veharty = {
       craterMult              = 0,
 
       customParams            = {
-        reaim_time = 8, -- COB
-        damage_vs_shield = [[220]],
-        damage_vs_feature = [[220]],
+        damage_vs_shield = [[190]],
+        damage_vs_feature = [[190]],
+        force_ignore_ground = [[1]],
 
         spawns_name = "wolverine_mine",
         spawns_expire = 60,
@@ -93,7 +95,6 @@ return { veharty = {
       damage                  = {
         default = 20,
         planes  = 20,
-        subs    = 0.5,
       },
 
       explosionGenerator      = [[custom:dirt]],
@@ -104,7 +105,7 @@ return { veharty = {
       myGravity               = 0.34,
       noSelfDamage            = true,
       range                   = 750,
-      reloadtime              = 5.5,
+      reloadtime              = 5.6,
       soundHit                = [[weapon/cannon/badger_hit]],
       soundStart              = [[weapon/cannon/badger_fire]],
       soundHitVolume          = 8,

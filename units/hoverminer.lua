@@ -1,10 +1,8 @@
 return { hoverminer = {
-  unitname            = [[hoverminer]],
   name                = [[Dampener]],
   description         = [[Minelaying Hover]],
   acceleration        = 0.2175,
   brakeRate           = 2.05,
-  buildCostMetal      = 200,
   builder             = false,
   buildPic            = [[hoverminer.png]],
   canGuard            = true,
@@ -15,20 +13,19 @@ return { hoverminer = {
 
   customParams        = {
     modelradius    = [[25]],
+    turnatfullspeed_hover = [[1]],
   },
 
   explodeAs           = [[BIG_UNITEX]],
   footprintX          = 3,
   footprintZ          = 3,
   iconType            = [[hoverskirm]],
-  idleAutoHeal        = 5,
-  idleTime            = 1800,
   leaveTracks         = true,
   maxDamage           = 400,
   maxSlope            = 18,
   maxVelocity         = 2.1,
   maxWaterDepth       = 22,
-  minCloakDistance    = 75,
+  metalCost           = 200,
   movementClass       = [[HOVER3]],
   moveState           = 0,
   noAutoFire          = false,
@@ -80,7 +77,6 @@ return { hoverminer = {
       damage                  = {
         default = 20,
         planes  = 20,
-        subs    = 0.5,
       },
 
       explosionGenerator      = [[custom:teleport_progress]],

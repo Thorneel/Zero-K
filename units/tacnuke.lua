@@ -1,8 +1,6 @@
 return { tacnuke = {
-  unitname                      = [[tacnuke]],
   name                          = [[Eos]],
   description                   = [[Tactical Nuke]],
-  buildCostMetal                = 600,
   builder                       = false,
   buildingGroundDecalDecaySpeed = 30,
   buildingGroundDecalSizeX      = 3,
@@ -16,17 +14,19 @@ return { tacnuke = {
 
   customParams                  = {
     mobilebuilding = [[1]],
+
+    outline_x = 55,
+    outline_y = 80,
+    outline_yoff = 55,
   },
 
   explodeAs                     = [[WEAPON]],
   footprintX                    = 1,
   footprintZ                    = 1,
   iconType                      = [[cruisemissilesmall]],
-  idleAutoHeal                  = 5,
-  idleTime                      = 1800,
   maxDamage                     = 1000,
   maxSlope                      = 18,
-  minCloakDistance              = 150,
+  metalCost                     = 600,
   objectName                    = [[wep_tacnuke.s3o]],
   script                        = [[cruisemissile.lua]],
   selfDestructAs                = [[WEAPON]],
@@ -47,7 +47,7 @@ return { tacnuke = {
 
     {
       def                = [[WEAPON]],
-      badTargetCategory  = [[SWIM LAND SHIP HOVER]],
+      badTargetCategory  = [[MOBILE]],
       onlyTargetCategory = [[SWIM LAND SINK TURRET FLOAT SHIP HOVER GUNSHIP]],
     },
 
@@ -67,8 +67,6 @@ return { tacnuke = {
       customParams            = {
         burst = Shared.BURST_RELIABLE,
 
-        restrict_in_widgets = 1,
-
       lups_explodelife = 1.5,
         stats_hide_dps = 1, -- meaningless
         stats_hide_reload = 1,
@@ -79,7 +77,6 @@ return { tacnuke = {
       
       damage                  = {
         default = 3502.4,
-        subs    = 175,
       },
 
       edgeEffectiveness       = 0.4,
@@ -89,12 +86,13 @@ return { tacnuke = {
       impulseBoost            = 0,
       impulseFactor           = 0.4,
       interceptedByShieldType = 1,
+      leadLimit               = 0,
       model                   = [[wep_tacnuke.s3o]],
       range                   = 3500,
       reloadtime              = 10,
       smokeTrail              = false,
       soundHit                = [[explosion/mini_nuke]],
-      soundStart              = [[weapon/missile/tacnuke_launch]],
+      soundStart              = [[SiloLaunch]],
       tolerance               = 4000,
       turnrate                = 18000,
       weaponAcceleration      = 180,

@@ -1,11 +1,9 @@
 return { hovershotgun = {
-  unitname            = [[hovershotgun]],
   name                = [[Punisher]],
   description         = [[Shotgun Hover]],
   acceleration        = 0.24,
   activateWhenBuilt   = true,
   brakeRate           = 0.43,
-  buildCostMetal      = 300,
   builder             = false,
   buildPic            = [[hoversonic.png]],
   canGuard            = true,
@@ -16,18 +14,17 @@ return { hovershotgun = {
 
   customParams        = {
     modelradius    = [[25]],
+    turnatfullspeed_hover = [[1]],
  },
 
   explodeAs           = [[BIG_UNITEX]],
   footprintX          = 3,
   footprintZ          = 3,
   iconType            = [[hoverassault]],
-  idleAutoHeal        = 5,
-  idleTime            = 1800,
   maxDamage           = 900,
   maxSlope            = 36,
   maxVelocity         = 3,
-  minCloakDistance    = 75,
+  metalCost           = 300,
   movementClass       = [[HOVER3]],
   noAutoFire          = false,
   noChaseCategory     = [[TERRAFORM FIXEDWING SATELLITE SUB]],
@@ -76,7 +73,6 @@ return { hovershotgun = {
     damage                  = {
         default = 32,
         planes  = 32,
-        subs    = 1.6,
     },
     
     duration                = 0.02,
@@ -88,7 +84,7 @@ return { hovershotgun = {
     interceptedByShieldType = 1,
     noSelfDamage            = true,
     projectiles             = 4,
-    range                   = 250,
+    range                   = 235,
     reloadtime              = 3,
     rgbColor                = [[1 1 0]],
     soundHit                = [[weapon/laser/lasercannon_hit]],

@@ -1,8 +1,6 @@
 return { empmissile = {
-  unitname               = [[empmissile]],
   name                   = [[Shockley]],
   description            = [[EMP missile]],
-  buildCostMetal         = 600,
   builder                = false,
   buildPic               = [[empmissile.png]],
   category               = [[SINK UNARMED]],
@@ -12,17 +10,19 @@ return { empmissile = {
 
   customParams           = {
     mobilebuilding = [[1]],
+
+    outline_x = 55,
+    outline_y = 80,
+    outline_yoff = 55,
   },
 
   explodeAs              = [[EMP_WEAPON]],
   footprintX             = 1,
   footprintZ             = 1,
   iconType               = [[cruisemissilesmall]],
-  idleAutoHeal           = 5,
-  idleTime               = 1800,
   maxDamage              = 1000,
   maxSlope               = 18,
-  minCloakDistance       = 150,
+  metalCost              = 600,
   objectName             = [[wep_empmissile.s3o]],
   script                 = [[cruisemissile.lua]],
   selfDestructAs         = [[EMP_WEAPON]],
@@ -43,7 +43,7 @@ return { empmissile = {
 
     {
       def                = [[EMP_WEAPON]],
-      badTargetCategory  = [[SWIM LAND SHIP HOVER]],
+      badTargetCategory  = [[MOBILE]],
       onlyTargetCategory = [[SWIM LAND SINK TURRET FLOAT SHIP HOVER FIXEDWING GUNSHIP SUB]],
     },
 
@@ -63,8 +63,6 @@ return { empmissile = {
       customparams = {
         burst = Shared.BURST_RELIABLE,
 
-        restrict_in_widgets = 1,
-
         stats_hide_dps = 1, -- one use
         stats_hide_reload = 1,
         
@@ -83,6 +81,7 @@ return { empmissile = {
       impulseBoost            = 0,
       impulseFactor           = 0,
       interceptedByShieldType = 1,
+      leadLimit               = 0,
       model                   = [[wep_empmissile.s3o]],
       paralyzer               = true,
       paralyzeTime            = 45,
@@ -90,7 +89,7 @@ return { empmissile = {
       reloadtime              = 3,
       smokeTrail              = false,
       soundHit                = [[weapon/missile/emp_missile_hit]],
-      soundStart              = [[weapon/missile/tacnuke_launch]],
+      soundStart              = [[SiloLaunch]],
       tolerance               = 4000,
       tracks                  = false,
       turnrate                = 12000,

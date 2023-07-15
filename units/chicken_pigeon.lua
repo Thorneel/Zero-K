@@ -1,15 +1,11 @@
 return { chicken_pigeon = {
-  unitname            = [[chicken_pigeon]],
   name                = [[Pigeon]],
   description         = [[Flying Spore Scout]],
   activateWhenBuilt   = true,
   acceleration        = 0.8,
   brakeRate           = 0.32,
-  buildCostEnergy     = 0,
-  buildCostMetal      = 0,
   builder             = false,
   buildPic            = [[chicken_pigeon.png]],
-  buildTime           = 50,
   canFly              = true,
   canGuard            = true,
   canLand             = true,
@@ -33,12 +29,16 @@ return { chicken_pigeon = {
   maxDamage           = 150,
   maxSlope            = 18,
   maxVelocity         = 10,
+  metalCost           = 0,
+  energyCost          = 0,
+  buildTime           = 50,
   noAutoFire          = false,
   noChaseCategory     = [[TERRAFORM FIXEDWING SATELLITE STUPIDTARGET]],
   objectName          = [[chicken_pigeon.s3o]],
   power               = 50,
   reclaimable         = false,
   selfDestructAs      = [[NOWEAPON]],
+  script              = "chicken_pigeon.lua",
 
   sfxtypes            = {
 

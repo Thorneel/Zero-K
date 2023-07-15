@@ -103,6 +103,23 @@ local floatDefs = {
 		surfaceMinWait = 80,
 		surfaceMaxWait = 120,
 	},
+	[UnitDefNames["shieldshield"].id] = {
+		initialRiseSpeed = 3,
+		riseAccel = 0.14,
+		riseUpDrag = 0.9,
+		riseDownDrag = 0.7,
+		sinkAccel = -0.13,
+		sinkUpDrag = 0.92,
+		sinkDownDrag = 0.9,
+		airAccel = -0.1,
+		airDrag = 0.995,
+		waterHitDrag = 0.52,
+		floatPoint = -15,
+		surfaceDampen = 10,
+		depthRequirement = -35,
+		stopSpeedLeeway = 0.05,
+		stopPositionLeeway = 0.1,
+	},
 	-- This unit expels water with an air tank to float. It results in high rise
 	-- acceleration with low drag. To sink the tank must be filled with water
 	-- which results in a delay and low sink acceleration.

@@ -1,16 +1,13 @@
 return { shipcarrier = {
-  unitname               = [[shipcarrier]],
   name                   = [[Reef]],
   description            = [[Aircraft Carrier (Bombardment), stockpiles disarm missiles at 5 m/s]],
   acceleration           = 0.21,
   activateWhenBuilt      = true,
   brakeRate              = 0.56,
-  buildCostMetal         = 3000,
   builder                = false,
   buildPic               = [[shipcarrier.png]],
   canMove                = true,
   canManualFire          = true,
-  cantBeTransported      = true,
   category               = [[SHIP]],
   CollisionSphereScale   = 0.6,
   collisionVolumeOffsets = [[10 -10 0]],
@@ -26,6 +23,11 @@ return { shipcarrier = {
     priority_misc = 2, -- High
     extradrawrange = 3000,
     ispad         = 1,
+    pad_count     = 2,
+
+    outline_x = 300,
+    outline_y = 300,
+    outline_yoff = 55,
   },
 
   explodeAs              = [[ATOMIC_BLASTSML]],
@@ -33,11 +35,9 @@ return { shipcarrier = {
   footprintX             = 5,
   footprintZ             = 5,
   iconType               = [[shipcarrier]],
-  idleAutoHeal           = 5,
-  idleTime               = 1800,
   maxDamage              = 7500,
   maxVelocity            = 2.75,
-  minCloakDistance       = 75,
+  metalCost              = 3000,
   minWaterDepth          = 10,
   movementClass          = [[BOAT5]],
   objectName             = [[shipcarrier.dae]],
@@ -92,7 +92,8 @@ return { shipcarrier = {
         disarmDamageMult = 1.0,
         disarmDamageOnly = 1,
         disarmTimer      = 10, -- seconds
-        
+        radar_homing_distance = 600,
+
         light_color = [[1 1 1]],
       },
       
@@ -137,7 +138,6 @@ return { shipcarrier = {
       damage                  = {
         default = 1E-06,
         planes  = 1E-06,
-        subs    = 5E-08,
       },
 
       explosionGenerator      = [[custom:NONE]],

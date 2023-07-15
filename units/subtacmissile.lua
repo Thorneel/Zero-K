@@ -1,11 +1,9 @@
 return { subtacmissile = {
-  unitname               = [[subtacmissile]],
   name                   = [[Scylla]],
   description            = [[Tactical Nuke Missile Sub, Drains 20 m/s, 30 second stockpile]],
   acceleration           = 0.223,
   activateWhenBuilt      = true,
   brakeRate              = 2.33,
-  buildCostMetal         = 3000,
   builder                = false,
   buildPic               = [[subtacmissile.png]],
   canGuard               = true,
@@ -18,11 +16,16 @@ return { subtacmissile = {
   corpse                 = [[DEAD]],
 
   customParams           = {
+    bait_level_default = 0,
     modelradius    = [[15]],
     stockpiletime  = [[30]],
     stockpilecost  = [[600]],
     priority_misc  = 1, -- Medium
     no_auto_keep_target = 1,
+
+    outline_x = 160,
+    outline_y = 160,
+    outline_yoff = 12,
   },
 
   explodeAs              = [[BIG_UNITEX]],
@@ -30,16 +33,14 @@ return { subtacmissile = {
   footprintX             = 3,
   footprintZ             = 3,
   iconType               = [[subtacmissile]],
-  idleAutoHeal           = 5,
-  idleTime               = 1800,
   maxDamage              = 3000,
   maxVelocity            = 2.79,
-  minCloakDistance       = 75,
+  metalCost              = 3000,
   minWaterDepth          = 15,
   movementClass          = [[UBOAT3]],
   moveState              = 0,
   noAutoFire             = false,
-  objectName             = [[SUBTACMISSILE]],
+  objectName             = [[subtacmissile.s3o]],
   selfDestructAs         = [[BIG_UNITEX]],
   script                 = [[subtacmissile.lua]],
   sightDistance          = 660,
@@ -73,7 +74,6 @@ return { subtacmissile = {
 
       damage                  = {
         default = 3502.4,
-        subs    = 175,
       },
 
       edgeEffectiveness       = 0.4,
@@ -83,6 +83,7 @@ return { subtacmissile = {
       impulseBoost            = 0,
       impulseFactor           = 0.4,
       interceptedByShieldType = 1,
+      leadLimit               = 0,
       model                   = [[wep_tacnuke.s3o]],
       noSelfDamage            = true,
       range                   = 3000,

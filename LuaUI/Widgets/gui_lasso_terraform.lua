@@ -136,10 +136,10 @@ options = {
 local hotkeyDefaults = {
 	levelPresets = {0, -8, -20, -24},
 	levelTypePreset = {0, 0, 0, 0},
-	raisePresets = {12, 24, 40, 240, -120},
-	raiseTypePreset = {1, 1, 1},
+	raisePresets = {12, 24, 54, 240, -120, 96},
+	raiseTypePreset = {1, 1, 1, 0, 0, 1},
 	levelCursorHotkey = {"alt+g"},
-	raiseHotkey = {"alt+v", "alt+b", "alt+n", "alt+h", "alt+j"},
+	raiseHotkey = {"alt+v", "alt+b", "alt+n", "alt+h", "alt+j", "alt+m"},
 }
 
 ---------------------------------
@@ -180,7 +180,9 @@ local posVolume   = {0, 1, 0, 0.1} -- posisive volume
 local groundGridColor  = {0.3, 0.2, 1, 0.8} -- grid representing new ground height
 
 -- colour of lasso during drawing
-local lassoColor = {0.2, 1.0, 0.2, 1.0}
+local lassoColorGood = {0.2, 1.0, 0.2, 1.0}
+local lassoColorBad  = {1.0, 0.2, 0.2, 1.0}
+local lassoColorCurrent = lassoColorGood
 
 -- colour of ramp
 local vehPathingColor = {0.2, 1.0, 0.2, 1.0}
@@ -212,6 +214,8 @@ local commandMap = {
 	CMD_RAMP,
 	CMD_RESTORE
 }
+
+local terraTag=-1
 
 local volumeSelection = 0
 
@@ -403,7 +407,7 @@ local function completelyStopCommand()
 	volumeSelection = 0
 	
 	currentlyActiveCommand = false
-	spSetActiveCommand(-1)
+	spSetActiveCommand(nil)
 	originalCommandGiven = false
 	drawingLasso = false
 	drawingRectangle = false
@@ -423,12 +427,6 @@ local function completelyStopCommand()
 	simpleDrawingRamp = false
 	points = 0
 	terraform_type = 0
-end
-
-local terraTag=-1
-function WG.Terraform_GetNextTag()
-	terraTag = terraTag + 1
-	return terraTag
 end
 
 local function SendCommand()
@@ -482,7 +480,7 @@ local function SendCommand()
 		if s then
 			originalCommandGiven = true
 		else
-			spSetActiveCommand(-1)
+			spSetActiveCommand(nil)
 			originalCommandGiven = false
 		end
 	else
@@ -513,7 +511,7 @@ local function SendCommand()
 		if s then
 			originalCommandGiven = true
 		else
-			spSetActiveCommand(-1)
+			spSetActiveCommand(nil)
 			originalCommandGiven = false
 		end
 	end
@@ -1073,8 +1071,6 @@ function widget:MousePress(mx, my, button)
 		spSetActiveCommand(index)
 		currentlyActiveCommand = CMD_LEVEL
 		
-		local mx,my = spGetMouseState()
-		
 		setHeight = true
 		drawingRectangle = false
 		placingRectangle = false
@@ -1121,7 +1117,7 @@ function widget:MousePress(mx, my, button)
 	end
 	
 	local toolTip = Spring.GetCurrentTooltip()
-	if not (toolTip == "" or st_find(toolTip, "TechLevel") or st_find(toolTip, "Terrain type") or st_find(toolTip, "Metal:")) then
+	if not (toolTip == "" or st_find(toolTip, "Terrain type") or st_find(toolTip, "Metal:")) then
 		return false
 	end
 	
@@ -1182,7 +1178,7 @@ function widget:MousePress(mx, my, button)
 				end
 			end
 		else
-			spSetActiveCommand(-1)
+			spSetActiveCommand(nil)
 			originalCommandGiven = false
 			return true
 		end
@@ -1294,6 +1290,13 @@ function widget:MouseMove(mx, my, dx, dy, button)
 					end
 					point[2].z = z
 					point[3].z = point[1].z+16
+				end
+
+				if abs(point[2].x - point[3].x) > maxAreaSize
+				or abs(point[2].z - point[3].z) > maxAreaSize then
+					lassoColorCurrent = lassoColorBad
+				else
+					lassoColorCurrent = lassoColorGood
 				end
 			end
 		end
@@ -1531,7 +1534,6 @@ function widget:Update(dt)
 			widget:MousePress(mx, my, 1)
 		end
 	end
-
 end
 
 function widget:MouseRelease(mx, my, button)
@@ -1617,7 +1619,7 @@ function widget:MouseRelease(mx, my, button)
 	elseif drawingRectangle then
 	
 		if button == 1 then
-			--spSetActiveCommand(-1)
+			--spSetActiveCommand(nil)
 			
 			if (not presetTerraHeight) and (terraform_type == 1 or terraform_type == 2) then
 				setHeight = true
@@ -1848,7 +1850,7 @@ function widget:MouseRelease(mx, my, button)
 		if button == 1 then
 			mouseX = mx
 			mouseY = my
-			--spSetActiveCommand(-1)
+			--spSetActiveCommand(nil)
 			drawingRamp = 2
 			return true
 		elseif button == 4 or button == 5 then
@@ -2004,6 +2006,15 @@ local function Terraform_SetPlacingRectangleCheck()
 	return options.structure_altSelect.value
 end
 
+function WG.Terraform_GetNextTag()
+	terraTag = terraTag + 1
+	return terraTag
+end
+
+function WG.Terraform_GetIsPlacingStructure()
+	return (placingRectangle or buildToGive) and true
+end
+
 function widget:Initialize()
 	--set WG content at initialize rather than during file read to avoid conflict with local copy (for dev/experimentation)
 	WG.Terraform_SetPlacingRectangle = Terraform_SetPlacingRectangle
@@ -2051,7 +2062,6 @@ local function DrawRampStart(dis)
 end
 
 local function DrawRampMiddleEnd(dis)
-	
 	local perpendicular = {x = terraformHeight*(point[1].z-point[2].z)/dis, z = -terraformHeight*(point[1].x-point[2].x)/dis}
 	
 	glVertex(point[2].x-perpendicular.x,point[2].y,point[2].z-perpendicular.z)
@@ -2108,10 +2118,10 @@ function widget:DrawWorld()
 			
 			--glDepthTest(false)
 		elseif drawingLasso then
-			glColor(lassoColor)
+			glColor(lassoColorGood)
 			glBeginEnd(GL_LINE_STRIP, DrawLine)
 		elseif drawingRectangle or (placingRectangle and placingRectangle.legalPos) then
-			glColor(lassoColor)
+			glColor(lassoColorCurrent)
 			glBeginEnd(GL_LINE_STRIP, DrawRectangleLine)
 			local a,c,m,s = spGetModKeyState()
 			if c then
@@ -2169,9 +2179,11 @@ function widget:DrawScreen()
 		end
 	end
 end
+
 --------------------------------------------------------------------------------
 -- Drawing
 --------------------------------------------------------------------------------
+
 function widget:Shutdown()
 	if (volumeDraw) then
 		gl.DeleteList(volumeDraw); volumeDraw=nil

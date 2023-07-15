@@ -1,21 +1,20 @@
 return { chicken_spidermonkey = {
-  unitname            = [[chicken_spidermonkey]],
   name                = [[Spidermonkey]],
   description         = [[All-Terrain Support]],
   acceleration        = 1.08,
   activateWhenBuilt   = true,
   brakeRate           = 1.23,
-  buildCostEnergy     = 0,
-  buildCostMetal      = 0,
   builder             = false,
   buildPic            = [[chicken_spidermonkey.png]],
-  buildTime           = 500,
   canGuard            = true,
   canMove             = true,
   canPatrol           = true,
   category            = [[LAND]],
 
   customParams        = {
+    outline_x = 145,
+    outline_y = 145,
+    outline_yoff = 30,
   },
 
   explodeAs           = [[NOWEAPON]],
@@ -29,7 +28,9 @@ return { chicken_spidermonkey = {
   maxSlope            = 72,
   maxVelocity         = 2.2,
   maxWaterDepth       = 22,
-  minCloakDistance    = 75,
+  metalCost           = 0,
+  energyCost          = 0,
+  buildTime           = 500,
   movementClass       = [[ATKBOT3]],
   noAutoFire          = false,
   noChaseCategory     = [[TERRAFORM LAND SINK TURRET SHIP SATELLITE SWIM FLOAT SUB HOVER STUPIDTARGET MINE]],
@@ -76,7 +77,6 @@ return { chicken_spidermonkey = {
       
       customParams            = {
         impulse = [[-100]],
-        timeslow_damagefactor = 1,
         timeslow_onlyslow = 1,
         timeslow_smartretarget = 0.33,
                 light_radius = 0,
@@ -87,7 +87,6 @@ return { chicken_spidermonkey = {
 
       damage                  = {
         default = 30,
-        subs    = 0.75,
       },
 
       dance                   = 150,
@@ -99,10 +98,11 @@ return { chicken_spidermonkey = {
       interceptedByShieldType = 2,
       range                   = 600,
       reloadtime              = 0.1,
+      smokeTime               = 24,
       smokeTrail              = true,
       soundstart              = [[chickens/web]],
       startVelocity           = 600,
-      texture2                = [[smoketrailthin]],
+      texture2                = [[smoketrail]],
       tolerance               = 63000,
       tracks                  = true,
       turnRate                = 90000,

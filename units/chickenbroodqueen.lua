@@ -1,12 +1,9 @@
 return { chickenbroodqueen = {
-  unitname            = [[chickenbroodqueen]],
   name                = [[Chicken Brood Queen]],
   description         = [[Tends the Nest]],
   acceleration        = 0.6,
   autoHeal            = 10,
   brakeRate           = 1.23,
-  buildCostEnergy     = 0,
-  buildCostMetal      = 0,
   buildDistance       = 240,
   builder             = true,
 
@@ -34,30 +31,33 @@ return { chickenbroodqueen = {
   },
 
   buildPic            = [[chickenbroodqueen.png]],
-  buildTime           = 1000,
   CanBeAssisted       = 0,
   canGuard            = true,
   canMove             = true,
   canPatrol           = true,
   canSubmerge         = true,
-  cantBeTransported   = true,
   category            = [[LAND]],
 
   customParams        = {
+    outline_x = 185,
+    outline_y = 185,
+    outline_yoff = 27.5,
   },
 
   explodeAs           = [[SMALL_UNITEX]],
   footprintX          = 4,
   footprintZ          = 4,
   iconType            = [[chickenc]],
-  idleAutoHeal        = 0,
+  idleAutoHeal        = 20,
   idleTime            = 300,
   leaveTracks         = true,
   maxDamage           = 3000,
   maxSlope            = 72,
   maxVelocity         = 2,
   maxWaterDepth       = 22,
-  minCloakDistance    = 75,
+  metalCost           = 0,
+  energyCost          = 0,
+  buildTime           = 1000,
   movementClass       = [[TKBOT3]],
   noAutoFire          = false,
   noChaseCategory     = [[TERRAFORM SATELLITE FIXEDWING GUNSHIP HOVER SHIP SWIM SUB LAND FLOAT SINK TURRET]],
@@ -131,7 +131,6 @@ return { chickenbroodqueen = {
       damage                  = {
         default = 40,
         planes  = 40,
-        subs    = 40,
       },
 
       explosionGenerator      = [[custom:NONE]],
@@ -168,7 +167,6 @@ return { chickenbroodqueen = {
       
       damage                  = {
         default = 30,
-        subs    = 1.5,
       },
 
       dance                   = 60,

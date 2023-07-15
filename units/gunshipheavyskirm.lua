@@ -1,10 +1,8 @@
 return { gunshipheavyskirm = {
-  unitname            = [[gunshipheavyskirm]],
   name                = [[Nimbus]],
   description         = [[Fire Support Gunship]],
   acceleration        = 0.2,
   brakeRate           = 0.16,
-  buildCostMetal      = 760,
   builder             = false,
   buildPic            = [[gunshipheavyskirm.png]],
   canFly              = true,
@@ -21,9 +19,14 @@ return { gunshipheavyskirm = {
   cruiseAlt           = 240,
 
   customParams        = {
+    bait_level_default = 0,
     airstrafecontrol = [[0]],
     modelradius      = [[10]],
     aim_lookahead    = 200,
+
+    outline_x = 110,
+    outline_y = 110,
+    outline_yoff = 10,
   },
 
   explodeAs           = [[GUNSHIPEX]],
@@ -32,12 +35,10 @@ return { gunshipheavyskirm = {
   footprintZ          = 3,
   hoverAttack         = true,
   iconType            = [[heavygunshipskirm]],
-  idleAutoHeal        = 5,
-  idleTime            = 1800,
   maneuverleashlength = [[1280]],
   maxDamage           = 2800,
   maxVelocity         = 3.3,
-  minCloakDistance    = 75,
+  metalCost           = 760,
   noAutoFire          = false,
   noChaseCategory     = [[TERRAFORM SATELLITE SUB]],
   objectName          = [[stingray.s3o]],
@@ -82,7 +83,7 @@ return { gunshipheavyskirm = {
       craterMult              = 0.3,
 
       customparams = {
-        combatrange = 650,
+        combatrange = 630,
         light_camera_height = 2000,
         light_color = [[0.9 0.84 0.45]],
         light_ground_height = 120,
@@ -90,7 +91,6 @@ return { gunshipheavyskirm = {
       
       damage                  = {
         default = 19.3,
-        subs    = 1.0,
       },
 
       edgeEffectiveness       = 0.5,

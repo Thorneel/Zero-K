@@ -1,11 +1,9 @@
 return { jumpsumo = {
-  unitname            = [[jumpsumo]],
   name                = [[Jugglenaut]],
   description         = [[Heavy Riot Jumper]],
   acceleration        = 0.3,
   activateWhenBuilt   = true,
   brakeRate           = 1.8,
-  buildCostMetal      = 1700,
   builder             = false,
   buildPic            = [[jumpsumo.png]],
   canGuard            = true,
@@ -16,9 +14,13 @@ return { jumpsumo = {
   collisionVolumeScales   = [[64 64 64]],
   collisionVolumeType     = [[ellipsoid]],
   selectionvolumeoffsets  = [[0 -16 0]],
+  selectionVolumeScales   = [[105 105 105]],
+  selectionVolumeType     = [[ellipsoid]],
   corpse              = [[DEAD]],
 
   customParams        = {
+    bait_level_default = 0,
+    can_target_allies  = 1,
     canjump            = 1,
     jump_range         = 360,
     jump_height        = 110,
@@ -30,21 +32,20 @@ return { jumpsumo = {
     aimposoffset   = [[0 6 0]],
     midposoffset   = [[0 6 0]],
     modelradius    = [[32]],
+    lookahead      = 120,
   },
 
   explodeAs           = [[BIG_UNIT]],
   footprintX          = 4,
   footprintZ          = 4,
   iconType            = [[t3jumpjetriot]],
-  idleAutoHeal        = 5,
-  idleTime            = 1800,
   leaveTracks         = true,
   losEmitHeight       = 60,
   maxDamage           = 13500,
   maxSlope            = 36,
   maxVelocity         = 1.15,
   maxWaterDepth       = 22,
-  minCloakDistance    = 75,
+  metalCost           = 1700,
   movementClass       = [[KBOT4]],
   noAutoFire          = false,
   noChaseCategory     = [[TERRAFORM FIXEDWING SATELLITE SUB]],
@@ -132,7 +133,6 @@ return { jumpsumo = {
 
       damage                  = {
         default = 0,
-        subs    = 0,
       },
 
       duration                = 0.1,
@@ -184,7 +184,6 @@ return { jumpsumo = {
       damage                  = {
         default = 0.001,
         planes  = 0.001,
-        subs    = 5E-05,
       },
 
       duration                = 0.0333,
@@ -194,7 +193,7 @@ return { jumpsumo = {
       interceptedByShieldType = 0,
       noSelfDamage            = true,
       proximityPriority       = -15,
-      range                   = 460,
+      range                   = 440,
       reloadtime              = 0.2,
       rgbColor                = [[0 0 1]],
       rgbColor2               = [[1 0.5 1]],
@@ -229,7 +228,6 @@ return { jumpsumo = {
       damage                  = {
         default = 0.001,
         planes  = 0.001,
-        subs    = 5E-05,
       },
 
       duration                = 0.0333,
@@ -263,7 +261,6 @@ return { jumpsumo = {
       damage                  = {
         default = 1001.1,
         planes  = 1001.1,
-        subs    = 50,
       },
 
       edgeEffectiveness       = 0,

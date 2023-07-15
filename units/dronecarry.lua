@@ -1,11 +1,9 @@
 return { dronecarry = {
-  unitname            = [[dronecarry]],
   name                = [[Gull]],
   description         = [[Carrier Drone]],
   acceleration        = 0.3,
   airHoverFactor      = 4,
   brakeRate           = 0.24,
-  buildCostMetal      = 15,
   builder             = false,
   buildPic            = [[dronecarry.png]],
   canBeAssisted       = false,
@@ -14,7 +12,7 @@ return { dronecarry = {
   canMove             = true,
   canPatrol           = true,
   canSubmerge         = false,
-  category            = [[GUNSHIP]],
+  category            = [[GUNSHIP DRONE]],
   collisionVolumeOffsets   = [[0 0 0]],
   collisionVolumeScales    = [[26 26 26]],
   collisionVolumeType      = [[ellipsoid]],
@@ -31,15 +29,17 @@ return { dronecarry = {
   idleTime            = 300,
   maxDamage           = 180,
   maxVelocity         = 8.56,
-  minCloakDistance    = 75,
+  metalCost           = 15,
   noAutoFire          = false,
   noChaseCategory     = [[TERRAFORM FIXEDWING SATELLITE SUB]],
   objectName          = [[carrydrone.s3o]],
   reclaimable         = false,
+  repairable          = false, -- mostly not to waste constructor attention on area-repair; has regen anyway
   script              = [[dronecarry.lua]],
   selfDestructAs      = [[TINY_BUILDINGEX]],
   
   customParams        = {
+    bait_level_target      = 1,
     is_drone = 1,
     modelradius    = [[13]],
   },
@@ -88,7 +88,6 @@ return { dronecarry = {
 
       damage                  = {
         default = 8,
-        subs    = 0.4,
       },
 
       explosionGenerator      = [[custom:EMG_HIT]],

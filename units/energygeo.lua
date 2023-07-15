@@ -1,11 +1,7 @@
 return { energygeo = {
-  unitname                      = [[energygeo]],
   name                          = [[Geothermal Generator]],
   description                   = [[Medium Powerplant (+25)]],
-  acceleration                  = 0,
   activateWhenBuilt             = true,
-  brakeRate                     = 0,
-  buildCostMetal                = 500,
   builder                       = false,
   buildingGroundDecalDecaySpeed = 30,
   buildingGroundDecalSizeX      = 7,
@@ -26,7 +22,9 @@ return { energygeo = {
     modelradius    = [[42]],
     removewait     = 1,
     selectionscalemult = 1.15,
-    
+
+    stats_show_death_explosion = 1,
+
     morphto = [[energyheavygeo]],
     morphtime = [[90]],
     
@@ -35,23 +33,19 @@ return { energygeo = {
   },
 
   energyMake                    = 25,
-  energyUse                     = 0,
   explodeAs                     = [[ESTOR_BUILDING]],
   footprintX                    = 5,
   footprintZ                    = 5,
   iconType                      = [[energygeo]],
-  idleAutoHeal                  = 5,
-  idleTime                      = 1800,
   maxDamage                     = 1750,
   maxSlope                      = 18,
   maxVelocity                   = 0,
-  minCloakDistance              = 150,
+  metalCost                     = 500,
   noAutoFire                    = false,
   objectName                    = [[geo.dae]],
   script                        = [[energygeo.lua]],
   selfDestructAs                = [[ESTOR_BUILDING]],
   sightDistance                 = 273,
-  turnRate                      = 0,
   useBuildingGroundDecal        = true,
   workerTime                    = 0,
   yardMap                       = [[ooooo ogggo ogggo ogggo ooooo]],
@@ -60,6 +54,8 @@ return { energygeo = {
 
     DEAD  = {
       blocking         = true,
+      collisionVolumeScales = [[84 84 84]],
+      collisionVolumeType   = [[ellipsoid]],
       featureDead      = [[HEAP]],
       footprintX       = 4,
       footprintZ       = 4,

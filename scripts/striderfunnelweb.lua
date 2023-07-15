@@ -44,7 +44,7 @@ local legMiddleOffset = 0
 local legMiddleSpeed = legMiddleAngle/PERIOD
 
 local legBackwardAngle = math.rad(12)
-local legBackwardTheta = -math.rad(25)
+local legBackwardTheta = math.rad(-25)
 local legBackwardOffset = 0
 local legBackwardSpeed = legBackwardAngle/PERIOD
 
@@ -106,11 +106,6 @@ end
 
 function script.StopMoving ()
 	StartThread (RestoreLegs)
-end
-
-function script.QueryNanoPiece()
-	GG.LUPS.QueryNanoPiece(unitID,unitDefID,Spring.GetUnitTeam(unitID),gaster)
-	return gaster
 end
 
 function script.QueryWeapon(num)

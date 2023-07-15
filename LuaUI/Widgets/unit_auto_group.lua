@@ -18,7 +18,7 @@ local _, ToKeysyms = include("Configs/integral_menu_special_keys.lua")
 local debug = false --of true generates debug messages
 local unit2group = {} -- list of unit types to group
 
-local groupableBuildingTypes = { 'tacnuke', 'empmissile', 'napalmmissile', 'seismic' }
+local groupableBuildingTypes = { 'tacnuke', 'empmissile', 'napalmmissile', 'seismic', 'missileslow' }
 
 local groupableBuildings = {}
 for _, v in ipairs( groupableBuildingTypes ) do
@@ -299,7 +299,7 @@ function DoAutogroupAction(gr)
 end
 
 function widget:KeyPress(key, modifier, isRepeat)
-	if ( modifier.alt and not modifier.meta ) then
+	if (modifier.alt and not modifier.meta ) then
 		local gr = groupNumber[key]
 		if (key == removeAutogroupKey) then gr = -1 end
 		if (gr ~= nil) then
@@ -310,7 +310,7 @@ function widget:KeyPress(key, modifier, isRepeat)
 			local exec = false --set to true when there is at least one unit to process
 			for _, unitID in ipairs(GetSelectedUnits()) do
 				local udid = GetUnitDefID(unitID)
-				if ( not UDefTab[udid]["isFactory"] and (groupableBuildings[udid] or not UDefTab[udid]["isBuilding"] )) then
+				if (not UDefTab[udid]["isFactory"] and (groupableBuildings[udid] or not UDefTab[udid]["isBuilding"] )) then
 					selUnitDefIDs[udid] = true
 					unit2group[udid] = gr
 					--local x, y, z = Spring.GetUnitPosition(unitID)

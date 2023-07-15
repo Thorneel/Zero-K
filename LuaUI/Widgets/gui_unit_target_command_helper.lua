@@ -105,7 +105,7 @@ local function GetActionCommand(right)
 		-- Left click means the active command should be issued.
 		return activeCmdID
 	elseif (not activeCmdID) and right then
-		-- Right click means the default command should be issued, unless 
+		-- Right click means the default command should be issued, unless
 		-- there is an active command, in which case it is cancelled.
 		local _, defaultCmdID = Spring.GetDefaultCommand()
 		return defaultCmdID
@@ -196,7 +196,7 @@ local function MouseRelease(x, y)
 	end
 	
 	if (not shift) or clickRight then
-		Spring.SetActiveCommand(-1)
+		Spring.SetActiveCommand(nil)
 	end
 	
 	GiveNotifyingOrder(clickCommandID, {clickTargetID}, GetCmdOpts(alt, ctrl, meta, shift, clickRight))
@@ -255,10 +255,6 @@ end
 --------------------------------------------------------------------------------
 
 function widget:Initialize()
-	if not Spring.Utilities.IsCurrentVersionNewerThan(104, 1000) then
-		widgetHandler:RemoveWidget(widget)
-		return
-	end
 	screen0 = WG.Chili and WG.Chili.Screen0
 	SetCircleDragThreshold(options.circleDragThreshold.value)
 end

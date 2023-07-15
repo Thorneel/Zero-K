@@ -1,11 +1,9 @@
 return { striderfunnelweb = {
-  unitname               = [[striderfunnelweb]],
   name                   = [[Funnelweb]],
   description            = [[Shield Support Strider]],
   acceleration           = 0.166,
   activateWhenBuilt      = true,
   brakeRate              = 0.825,
-  buildCostMetal         = 4000,
   buildPic               = [[striderfunnelweb.png]],
   builder                = true,
   
@@ -21,31 +19,34 @@ return { striderfunnelweb = {
   collisionVolumeScales         = [[60 50 80]],
   collisionVolumeType           = [[elipsoid]],
   selectionVolumeOffsets        = [[0 0 0]],
-  selectionVolumeScales         = [[80 80 80]],
+  selectionVolumeScales         = [[120 120 120]],
   selectionVolumeType           = [[Sphere]],
 
   corpse                 = [[DEAD]],
 
   customParams           = {
+    modelradius    = [[50]],
     priority_misc  = 1, -- Medium
     shield_emit_height = 45,
     unarmed       = true,
     shield_power_gfx_override = 10000,
     selection_rank = 3,
+
+    outline_x = 160,
+    outline_y = 160,
+    outline_yoff = 25,
   },
 
   explodeAs              = [[ESTOR_BUILDING]],
   footprintX             = 4,
   footprintZ             = 4,
   iconType               = [[t3spiderbuilder]],
-  idleAutoHeal           = 5,
-  idleTime               = 1800,
   leaveTracks            = true,
   maxDamage              = 4500,
   maxSlope               = 36,
   maxVelocity            = 1.3666,
   maxWaterDepth          = 22,
-  minCloakDistance       = 150,
+  metalCost              = 4000,
   movementClass          = [[TKBOT4]],
   noAutoFire             = false,
   noChaseCategory        = [[TERRAFORM FIXEDWING SATELLITE SUB]],

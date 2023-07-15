@@ -35,56 +35,7 @@ local spSetProjectileVelocity = Spring.SetProjectileVelocity
 
 local dist3D = Spring.Utilities.Vector.Dist3D
 
--- In elmos/frame
-local projectileDefs = {
-	[WeaponDefNames["bomberheavy_arm_pidr"].id] = {
-		speed = 19,
-		rangeSqr = 121,
-		leadMult = 0.4,
-	},
-	[WeaponDefNames["hoverdepthcharge_depthcharge"].id] = {
-		speed = 3,
-		track = true,
-		alwaysBurnblow = true,
-		rangeSqr = 121,
-		underwaterTrack = true,
-		leadMult = 0.5,
-	},
-	[WeaponDefNames["hoverdepthcharge_fake_depthcharge"].id] = {
-		speed = 6,
-		alwaysBurnblow = true,
-		moveCtrlSpeed = 6,
-		groundFloat = 5,
-		rangeSqr = 121,
-		leadMult = 0.5,
-		useOwnerWeapon = 2,
-	},
-}
-
-local projectileLead = {
-	[WeaponDefNames["cloakraid_emg"].id] = WeaponDefNames["cloakraid_emg"].projectilespeed,
-	[WeaponDefNames["vehraid_heatray"].id] = WeaponDefNames["vehraid_heatray"].projectilespeed,
-	[WeaponDefNames["hoverraid_gauss"].id] = WeaponDefNames["hoverraid_gauss"].projectilespeed,
-	[WeaponDefNames["shieldraid_laser"].id] = WeaponDefNames["shieldraid_laser"].projectilespeed,
-	[WeaponDefNames["jumpraid_flamethrower"].id] = WeaponDefNames["jumpraid_flamethrower"].projectilespeed,
-}
-
-local projectileLeadLimit = {
-	[WeaponDefNames["cloakraid_emg"].id] = WeaponDefNames["cloakraid_emg"].leadLimit,
-	[WeaponDefNames["vehraid_heatray"].id] = WeaponDefNames["vehraid_heatray"].leadLimit,
-	[WeaponDefNames["hoverraid_gauss"].id] = WeaponDefNames["hoverraid_gauss"].leadLimit,
-	[WeaponDefNames["shieldraid_laser"].id] = WeaponDefNames["shieldraid_laser"].leadLimit,
-	[WeaponDefNames["jumpraid_flamethrower"].id] = WeaponDefNames["jumpraid_flamethrower"].leadLimit,
-}
-for key, value in pairs(projectileLeadLimit) do
-	if value <= 0 then
-		projectileLeadLimit[key] = nil
-	end
-end
-
-local waterWeapon = {
-	[WeaponDefNames["hoverraid_gauss"].id] = true,
-}
+local projectileDefs, projectileLead, projectileLeadLimit, waterWeapon = VFS.Include("LuaRules/Configs/retargetable_projectiles.lua", nil, VFS.GAME)
 
 -- Recluse projectile speed at different distances formula is a result of the least squares linear fit
 -- of the following data set of {distance, averageSpeed} data.
@@ -135,12 +86,27 @@ function gadget:GameFrame(n)
 				local dx, dz = data[1] - px, data[3] - pz
 				if px and dx ~= 0 and dz ~= 0 then
 					local horDist = Dist2D(dx, dz)
-					dx, dz = def.speed*dx/horDist, def.speed*dz/horDist
+					local speed = def.moveCtrlSpeed
+					if def.moveCtrlAccel then
+						local accel = def.moveCtrlAccel
+						if def.moveCtrlAccelAccel then
+							data.accel = (data.accel or accel) + def.moveCtrlAccelAccel
+							accel = data.accel
+						end
+						data.speed = (data.speed or speed) + accel
+						speed = data.speed
+						if def.moveCtrlMaxSpeed and speed > def.moveCtrlMaxSpeed then
+							speed = def.moveCtrlMaxSpeed
+						end
+					end
+					--Spring.Echo("data.speed", data.speed, Spring.GetGameFrame())
+					
+					dx, dz = speed*dx/horDist, speed*dz/horDist
 					
 					local height = Spring.GetGroundHeight(px + dx, pz + dz) + def.groundFloat
 					local dy = height - py
 					local dist = Dist3D(dx, dy, dz)
-					dx, dz = def.speed*dx/dist, def.speed*dz/dist
+					dx, dz = speed*dx/dist, speed*dz/dist
 					
 					height = Spring.GetGroundHeight(px + dx, pz + dz) + def.groundFloat
 					Spring.SetProjectilePosition(proID, px + dx, height, pz + dz)
@@ -248,7 +214,6 @@ local function AddProjectile(proID, def, proOwnerID)
 	
 	if def.moveCtrlSpeed and projectiles[proID] then
 		Spring.SetProjectileMoveControl(proID, true)
-		Spring.SetPieceProjectileParams(proID, 1000)
 	end
 end
 
@@ -280,10 +245,15 @@ local function ApplyProjectileLead(proID, speed, weaponID)
 
 	-- Approximate flight time for direct flight
 	local flyTime = dist3D(tx, ty, tz, px, py, pz)/speed
-	
-	if flyTime < 5 then
+	if flyTime < 1 then
 		return
 	end
+	
+	-- Better fly time not required so far.
+	--flyTime = dist3D(tx + flyTime*vx, ty + flyTime*vy, tz + flyTime*vz, px, py, pz)/speed
+	--if flyTime < 2 then
+	--	return
+	--end
 	
 	-- Reduce additional lead amount by the leadLimit of the weapon
 	if projectileLeadLimit[weaponID] then

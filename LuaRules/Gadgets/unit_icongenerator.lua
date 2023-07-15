@@ -39,7 +39,6 @@ if (gadgetHandler:IsSyncedCode()) then
 
   local units = {};
   local createunits  = {};
-  local curTeam;
   local nextUnitX,nextUnitZ = 100,100;
 
 
@@ -58,11 +57,10 @@ if (gadgetHandler:IsSyncedCode()) then
     units = new;
 
     if (#units>10) then return end;
-    if (#units==0) then curTeam=nil; end;
 
     local leftunits = {};
     for i,cunit in ipairs(createunits) do
-      if (#units>10 or ((curTeam) and (cunit.team~=curTeam))) then
+      if #units>10 then
         leftunits[#leftunits+1] = cunit;
       else
 		local lus = false
@@ -75,11 +73,10 @@ if (gadgetHandler:IsSyncedCode()) then
         local uid = Spring.CreateUnit(cunit.defname,x,y,z,"south", 0);	-- FIXME needs to be a non-gaia team if gaia doesn't have its unitlimit assigned
         if uid then
 			units[#units+1] = {id=uid,defname=cunit.defname,frame=n+cunit.time};
-			curTeam = cunit.team;
 
 			Spring.SetUnitNeutral(uid,true);
-			Spring.GiveOrderToUnit(uid,CMD.FIRE_STATE,{0},0);
-			Spring.GiveOrderToUnit(uid,CMD.STOP,{},0);
+			Spring.GiveOrderToUnit(uid, CMD.FIRE_STATE, 0, 0)
+			Spring.GiveOrderToUnit(uid, CMD.STOP, 0, 0)
 
 			local env = Spring.UnitScript.GetScriptEnv(uid)
 			if env then lus = true end
@@ -135,14 +132,12 @@ if (gadgetHandler:IsSyncedCode()) then
       local attack  = (msg:sub(d+1,a-1) == "1");
       local m = msg:find(";",a+1,true);
       local move    = (msg:sub(a+1,m-1) == "1");
-      local t = msg:find(";",m+1,true);
-      local teamID  = tonumber(msg:sub(m+1,t-1));
-      local w = msg:find(";",t+1,true);
-      local wait    = tonumber(msg:sub(t+1,w-1));
+      local w = msg:find(";",m+1,true);
+      local wait    = tonumber(msg:sub(m+1,w-1));
       local sa = msg:find(";",w+1,true);
       local shotAngle = tonumber(msg:sub(w+1,sa-1));
 
-      createunits[#createunits+1] = {defname=defname,team=teamID,move=move,attack=attack,time=wait,shotAngle=shotAngle};
+      createunits[#createunits+1] = {defname=defname,move=move,attack=attack,time=wait,shotAngle=shotAngle};
 
       gadget.GameFrame = GameFrame
       gadgetHandler:UpdateCallIn("GameFrame");
@@ -606,7 +601,7 @@ end
 local i = 0;
 
 
-local function DrawIcon(udid,teamID,uid)
+local function DrawIcon(udid,uid)
   local cfg = unitConfigs[udid];
   local midx,midy,midz,radius = GetUnitDefDims(udid);
 
@@ -655,7 +650,7 @@ local function DrawIcon(udid,teamID,uid)
     gl.Texture(0,false);
   else
 	gl.Texture(0, "%" .. udid .. ":0");
-	gl.UnitShape(udid, teamID);
+	gl.UnitShape(udid, 0);
 	gl.Texture(0,false);
   end
 
@@ -736,29 +731,36 @@ end
     end
   end
 
+	local function Background(unitDefID)
+		local ud = UnitDefs[unitDefID]
 
-  local function Background(unitdefid)
-    local udef = UnitDefs[unitdefid];
-    for j=1,#backgrounds do
-      local bg = backgrounds[j]
-      if (type(bg.check) == "table") then
-        local fulfill = true
-        for key,value in pairs(bg.check) do
-          if (type(value)=="function") then
-            fulfill = value(udef[key])
-          else
-            fulfill = (udef[key] == value)
-          end
-          if (not fulfill) then break end
-        end
+		if ud.isStrafingAirUnit or ud.isHoveringAirUnit then
+			return "bg_air.png"
+		end
 
-        if (fulfill) then
-          DrawBackground(bg.texture)
-          break
-        end
-      end
-    end
-  end
+		if ud.isImmobile then
+			if ud.maxWaterDepth <= 0 then
+				return "bg_ground.png"
+			elseif ud.minWaterDepth > 0 then
+				return ud.floatOnWater and "bg_water.png" or "bg_underwater.png"
+			else
+				return ud.floatOnWater and "bg_hover.png" or "bg_amphibous.png"
+			end
+		end
+
+		local md = ud.moveDef
+		if md.isSubmarine then
+			return "bg_underwater.png"
+		elseif md.smClass == Game.speedModClasses.Ship then
+			return "bg_water.png"
+		elseif md.smClass == Game.speedModClasses.Hover then
+			return "bg_hover.png"
+		elseif md.depth > 1337 then
+			return "bg_amphibous.png"
+		else
+			return "bg_ground.png"
+		end
+	end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -880,16 +882,7 @@ end
 function gadget:DrawGenesis()
   ProcessJobs()
 end
-
-
-  local function GetFaction(udef_factions)
-    return ((#udef_factions~=1) and 'unknown') or udef_factions[1];
-  end
-
-
   local function CreateIcon(udid,uid)
-    local faction = GetFaction(UnitDefs[udid].factions or {});
-
     local cfg = unitConfigs[udid]
 
     local attempts = 0;
@@ -901,10 +894,10 @@ end
       repeat
         myGLClear();
 
-        gl.Color(factionColors[faction]);
+        gl.Color(cfg.teamColor or teamColor);
 
         gl.UseShader(pre_shader);
-        gl.ActiveFBO(fbo, DrawIcon, udid, factionTeams[faction], uid);
+        gl.ActiveFBO(fbo, DrawIcon, udid, uid);
         gl.UseShader(post_shader);
         gl.ActiveFBO(post_fbo, DrawIconPost);
         gl.UseShader(0);
@@ -926,7 +919,10 @@ end
 
       gl.Clear(GL.COLOR_BUFFER_BIT, 0,0,0,0);
       gl.Color(1,1,1,1);
-      if (background) then Background(udid); end;
+      local bg_texture = Background(udid)
+      if bg_texture then
+        DrawBackground("LuaRules/Images/IconGenBkgs/" .. bg_texture)
+      end
 
       if (halo) then
         gl.UseShader(halo_shader);
@@ -957,6 +953,7 @@ end
       --end;
 
       gl.SaveImage(0,0,iconX,iconY, outfile,{alpha=true});
+      Spring.Echo("saved to", outfile)
     end);
 
     if (not result and not cfg.empty) then
@@ -979,13 +976,10 @@ end
 
       jobsInSynced = jobsInSynced + 1
 
-      local factionTeam = factionTeams[GetFaction(UnitDefs[udid].factions or {})];
-
       local msg = "buildicon " ..
                   UnitDefs[udid].name .. ";" ..
                   ((cfg.attack and "1") or "0") .. ";" ..
                   ((cfg.move and "1") or "0") .. ";" ..
-                  factionTeam .. ";" ..
                   (cfg.wait) .. ";" ..
                   (cfg.shotangle or "0") .. ";"
 
@@ -1080,6 +1074,20 @@ local schemes,resolutions,ratios = {},{},{}
   function gadget:Initialize()
     --// get all known configurations
     schemes,resolutions,ratios = include("LuaRules/Configs/","icon_generator.lua",{info=true})
+
+	if false then -- debug only
+		LoadScheme()
+		local strings = {}
+		for i = 1, #UnitDefs do
+			local ud = UnitDefs[i]
+			if not ud.customParams.dynamic_comm and not ud.customParams.commtype then
+				strings[#strings+1] = ud.name
+				strings[#strings+1] = Background(i)
+			end
+		end
+		Spring.Echo("UNIT ICON BACKGROUNDS")
+		Spring.Echo(table.concat(strings, "\n"))
+	end
 
     gadgetHandler:AddChatAction("buildicon", BuildIcon," : auto generates creates buildicons");
     gadgetHandler:AddChatAction("buildicons", BuildIcon," : auto generates creates buildicons");

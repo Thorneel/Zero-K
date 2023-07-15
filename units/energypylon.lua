@@ -1,9 +1,7 @@
 return { energypylon = {
-  unitname                      = [[energypylon]],
   name                          = [[Energy Pylon]],
   description                   = [[Extends overdrive grid]],
   activateWhenBuilt             = true,
-  buildCostMetal                = 200,
   builder                       = false,
   buildingGroundDecalDecaySpeed = 30,
   buildingGroundDecalSizeX      = 5,
@@ -12,8 +10,11 @@ return { energypylon = {
   buildPic                      = [[energypylon.png]],
   category                      = [[SINK UNARMED]],
   collisionVolumeOffsets        = [[0 0 0]],
-  collisionVolumeScales         = [[48 48 48]],
-  collisionVolumeType           = [[ellipsoid]],
+  collisionVolumeScales         = [[42 42 42]],
+  collisionVolumeType           = [[cylY]],
+  selectionVolumeOffsets        = [[0 0 0]],
+  selectionVolumeScales         = [[46 38 46]],
+  selectionVolumeType           = [[cylY]],
   corpse                        = [[DEAD]],
 
   customParams                  = {
@@ -25,18 +26,17 @@ return { energypylon = {
     removestop     = 1,
     default_spacing = 41, -- Diagonal connection.
     selectionscalemult = 1.15,
+    stats_show_death_explosion = 1,
   },
 
   explodeAs                     = [[ESTOR_BUILDINGEX]],
   footprintX                    = 3,
   footprintZ                    = 3,
   iconType                      = [[pylon]],
-  idleAutoHeal                  = 5,
-  idleTime                      = 1800,
   levelGround                   = false,
   maxDamage                     = 1000,
   maxSlope                      = 18,
-  minCloakDistance              = 150,
+  metalCost                     = 200,
   noAutoFire                    = false,
   objectName                    = [[armestor.s3o]],
   script                        = "energypylon.lua",
@@ -49,6 +49,8 @@ return { energypylon = {
 
     DEAD  = {
       blocking         = true,
+      collisionVolumeScales = [[42 42 42]],
+      collisionVolumeType   = [[cylY]],
       featureDead      = [[HEAP]],
       footprintX       = 3,
       footprintZ       = 3,

@@ -1,8 +1,6 @@
 return { staticheavyarty = {
-  unitname                      = [[staticheavyarty]],
   name                          = [[Big Bertha]],
   description                   = [[Strategic Plasma Cannon]],
-  buildCostMetal                = 6000,
   builder                       = false,
   buildingGroundDecalDecaySpeed = 30,
   buildingGroundDecalSizeX      = 6,
@@ -16,23 +14,31 @@ return { staticheavyarty = {
   corpse                        = [[DEAD]],
 
   customParams                  = {
+    neededlink     = 50,
+    pylonrange     = 50,
+    keeptooltip    = [[any string I want]],
+
+    bait_level_default = 1,
+    want_proximity_targetting = 1,
     aimposoffset = [[0 50 -7]],
     modelradius    = [[35]],
     selectionscalemult = 1,
+
+    outline_x = 270,
+    outline_y = 270,
+    outline_yoff = 90,
   },
 
   explodeAs                     = [[ATOMIC_BLAST]],
   footprintX                    = 4,
   footprintZ                    = 4,
   iconType                      = [[lrpc]],
-  idleAutoHeal                  = 5,
-  idleTime                      = 1800,
   levelGround                   = false,
   losEmitHeight                 = 90,
   maxDamage                     = 4800,
   maxSlope                      = 18,
   maxWaterDepth                 = 0,
-  minCloakDistance              = 150,
+  metalCost                     = 6000,
   noChaseCategory               = [[FIXEDWING LAND SHIP SWIM GUNSHIP SUB HOVER]],
   objectName                    = [[armbrtha.s3o]],
   script                        = [[staticheavyarty.lua]],
@@ -75,18 +81,16 @@ return { staticheavyarty = {
       craterMult              = 0.5,
 
       customParams            = {
-        restrict_in_widgets = 1,
-
-        gatherradius = [[128]],
-        smoothradius = [[96]],
-        smoothmult   = [[0.4]],
+        gatherradius     = [[240]],
+        smoothradius     = [[120]],
+        smoothmult       = [[0.5]],
+        movestructures   = [[0.25]],
         
         light_color = [[2.4 1.5 0.6]],
       },
       
       damage                  = {
         default = 2002.4,
-        subs    = 100,
       },
 
       explosionGenerator      = [[custom:lrpc_expl]],
@@ -111,7 +115,7 @@ return { staticheavyarty = {
     DEAD  = {
       blocking         = true,
       collisionVolumeOffsets        = [[0 0 -7]],
-      collisionVolumeScales         = [[70 194 70]],
+      collisionVolumeScales         = [[65 194 65]],
       collisionVolumeType           = [[cylY]],
       featureDead      = [[HEAP]],
       footprintX       = 4,

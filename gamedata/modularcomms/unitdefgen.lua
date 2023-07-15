@@ -53,7 +53,6 @@ local function DecodeBase64CommData(toDecode, useLegacyTranslator)
 	local err, success
 	
 	if not (toDecode and type(toDecode) == 'string') then
-		err = "Attempt to decode empty or invalid comm data"
 		return {}
 	end
 	
@@ -238,10 +237,10 @@ local function ProcessComm(name, config)
 		-- set costs
 		config.cost = config.cost or 0
 		-- a bit less of a hack
-		local commDefsCost = math.max(commDefs[name].buildcostmetal or 0, commDefs[name].buildcostenergy or 0, commDefs[name].buildtime or 0)  --one of these should be set in actual unitdef file
-		commDefs[name].buildcostmetal = commDefsCost + config.cost
-		commDefs[name].buildcostenergy = commDefsCost + config.cost
-		commDefs[name].buildtime = commDefsCost + config.cost
+		local commDefsCost = math.max(commDefs[name].metalcost or 0, commDefs[name].energycost or 0, commDefs[name].buildtime or 0)  --one of these should be set in actual unitdef file
+		commDefs[name].metalcost  = commDefsCost + config.cost
+		commDefs[name].energycost = commDefsCost + config.cost
+		commDefs[name].buildtime  = commDefsCost + config.cost
 		cp.cost = config.cost
 		
 		if config.power then
@@ -344,17 +343,6 @@ for name, data in pairs(commDefs) do
 		commDefs[name].maxvelocity = commDefs[name].maxvelocity + (commDefs[name].customparams.basespeed*data.customparams.speedbonus)
 	end
 	
-	-- calc lightning real damage based on para damage
-	-- TODO: use for slow-beams
-	if data.weapondefs then
-		for wName, weaponData in pairs(data.weapondefs) do
-			if (weaponData.customparams or {}).extra_damage_mult then
-				weaponData.customparams.extra_damage = weaponData.customparams.extra_damage_mult * weaponData.damage.default
-				weaponData.customparams.extra_damage_mult = nil
-			end
-		end
-	end
-	
 	-- set weapon1 range	- may need exception list in future depending on what weapons we add
 	if data.weapondefs and not data.customparams.dynamic_comm then
 		local maxRange = 0
@@ -397,8 +385,8 @@ for name, data in pairs(commDefs) do
 			mult = 0.2
 		end
 		array.description = typeName .. " - " .. data.name
-		array.metal = data.buildcostmetal * mult
-		array.reclaimtime = data.buildcostmetal * mult
+		array.metal = data.metalcost * mult
+		array.reclaimtime = data.metalcost * mult
 		array.damage = data.maxdamage
 		array.customparams = {}
 		array.customparams.unit = data.unitname

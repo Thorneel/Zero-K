@@ -13,7 +13,7 @@
 function widget:GetInfo()
 	return {
 		name      = "HealthBars",
-		desc      = "Gives various informations about units in form of bars.",
+		desc      = "Gives various information about units in form of bars.",
 		author    = "jK",
 		date      = "2009", --2013 May 12
 		license   = "GNU GPL, v2 or later",
@@ -72,7 +72,7 @@ end
 --------------------------------------------------------------------------------
 
 local messages = {
-	shield = "shield",
+	shield_bar = "shield",
 	health_bar = "health",
 	building = "building",
 	morph = "morph",
@@ -85,6 +85,8 @@ local messages = {
 	teleport = "teleport",
 	teleport_pw = "teleport",
 	ability = "ability",
+	heat = "heat",
+	speed = "speed",
 	reload = "reload",
 	reammo = "reammo",
 	slow = "slow",
@@ -152,7 +154,7 @@ options = {
 		type = 'bool',
 		value = true,
 		noHotkey = true,
-		desc = 'Set jump reload to flashes when issuing the jump command',
+		desc = 'Set jump reload to flash when issuing the jump command',
 	},
 	barScale = {
 		name = 'Bar size scale',
@@ -582,7 +584,7 @@ do
 				height        = Spring.Utilities.GetUnitHeight(ud) + 14,
 				canJump       = (ud.customParams.canjump and true) or false,
 				canGoo        = (ud.customParams.grey_goo and true) or false,
-				canReammo     = (ud.customParams.requireammo and true) or false,
+				canReammo     = (ud.customParams.reammoseconds and true) or false,
 				isPwStructure = (ud.customParams.planetwars_structure and true) or false,
 				canCapture    = (ud.customParams.post_capture_reload and true) or false,
 				maxShield     = ud.shieldPower - 10,
@@ -596,6 +598,9 @@ do
 				maxWaterTank  = ud.customParams.maxwatertank,
 				freeStockpile = (ud.customParams.freestockpile and true) or nil,
 				specialReload = ud.customParams.specialreloadtime,
+				specialRate   = ud.customParams.specialreload_userate,
+				heat          = ud.customParams.heat_per_shot,
+				speed         = ud.customParams.speed_bar,
 			}
 		end
 		ci = customInfo[unitDefID]
@@ -651,14 +656,14 @@ do
 					local shieldOn, shieldPower = GetUnitShieldState(unitID, GetUnitRulesParam(unitID, "comm_shield_num"))
 					if (shieldOn)and(build == 1)and(shieldPower < commShield) then
 						shieldPower = shieldPower / commShield
-						barDrawer.AddBar(addTitle and messages.shield, shieldPower, "shield", (addPercent and floor(shieldPower*100) .. '%'))
+						barDrawer.AddBar(addTitle and messages.shield_bar, shieldPower, "shield", (addPercent and floor(shieldPower*100) .. '%'))
 					end
 				end
 			else
 				local shieldOn, shieldPower = GetUnitShieldState(unitID)
 				if (shieldOn)and(build == 1)and(shieldPower < ci.maxShield) then
 					shieldPower = shieldPower / ci.maxShield
-					barDrawer.AddBar(addTitle and messages.shield, shieldPower, "shield", (addPercent and floor(shieldPower*100) .. '%'))
+					barDrawer.AddBar(addTitle and messages.shield_bar, shieldPower, "shield", (addPercent and floor(shieldPower*100) .. '%'))
 				end
 			end
 		end
@@ -798,10 +803,35 @@ do
 		
 		--// SPECIAL WEAPON
 		if ci.specialReload then
-			local specialReloadState = GetUnitRulesParam(unitID, "specialReloadFrame")
-			if (specialReloadState and specialReloadState > gameFrame) then
-				local special = 1-(specialReloadState-gameFrame)/ci.specialReload	-- don't divide by gamespeed, since specialReload is also in gameframes
-				barDrawer.AddBar(addTitle and messages.ability, special, "reload2", (addPercent and floor(special*100) .. '%'))
+			if ci.specialRate then
+				local specialReloadProp = GetUnitRulesParam(unitID, "specialReloadRemaining") or 0
+				if (specialReloadProp > 0) and (specialReloadProp < 1) then
+					local special = 1 - specialReloadProp
+					barDrawer.AddBar(addTitle and messages.ability, special, "reload2", (addPercent and floor(special*100) .. '%'))
+				end
+			
+			else
+				local specialReloadState = GetUnitRulesParam(unitID, "specialReloadFrame")
+				if (specialReloadState and specialReloadState > gameFrame) then
+					local special = 1-(specialReloadState-gameFrame)/ci.specialReload -- don't divide by gamespeed, since specialReload is also in gameframes
+					barDrawer.AddBar(addTitle and messages.ability, special, "reload2", (addPercent and floor(special*100) .. '%'))
+				end
+			end
+		end
+		
+		--// HEAT
+		if ci.heat and build == 1 then
+			local heatState = GetUnitRulesParam(unitID, "heat_bar")
+			if (heatState and heatState > 0) then
+				barDrawer.AddBar(addTitle and messages.heat, heatState, "reload2", (addPercent and floor(heatState*100) .. '%'))
+			end
+		end
+		
+		--// DRP Speed
+		if ci.speed and build == 1 then
+			local speedState = GetUnitRulesParam(unitID, "speed_bar")
+			if (speedState and speedState < 1) then
+				barDrawer.AddBar(addTitle and messages.speed, speedState, "reload2", (addPercent and floor(speedState*100) .. '%'))
 			end
 		end
 		
@@ -1107,8 +1137,9 @@ function widget:Initialize()
 		ud.shieldPower   = 0
 		local numOverride = ud.customParams.draw_reload_num and tonumber(ud.customParams.draw_reload_num)
 
-		for i = 1, #ud.weapons do
-			local WeaponDefID = ud.weapons[i].weaponDef;
+		local weapons = ud.weapons
+		for i = 1, #weapons do
+			local WeaponDefID = weapons[i].weaponDef;
 			local WeaponDef   = WeaponDefs[ WeaponDefID ];
 			if (WeaponDef.reload > ud.reloadTime) or numOverride == i then
 				ud.reloadTime    = WeaponDef.reload

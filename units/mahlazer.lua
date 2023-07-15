@@ -1,11 +1,7 @@
 return { mahlazer = {
-  unitname                      = [[mahlazer]],
   name                          = [[Starlight]],
   description                   = [[Planetary Energy Chisel]],
-  acceleration                  = 0,
   activateWhenBuilt             = true,
-  brakeRate                     = 0,
-  buildCostMetal                = 45000,
   builder                       = false,
   buildingGroundDecalDecaySpeed = 30,
   buildingGroundDecalSizeX      = 11,
@@ -14,8 +10,8 @@ return { mahlazer = {
   buildPic                      = [[mahlazer.png]],
   category                      = [[SINK]],
   collisionVolumeOffsets        = [[0 0 0]],
-  collisionVolumeScales         = [[120 100 120]],
-  collisionVolumeType           = [[box]],
+  collisionVolumeScales         = [[150 200 150]],
+  collisionVolumeType           = [[ellipsoid]],
   corpse                        = [[DEAD]],
 
   customParams                  = {
@@ -23,19 +19,29 @@ return { mahlazer = {
     aimposoffset   = [[0 35 0]],
     midposoffset   = [[0 0 0]],
     select_no_rotate   = [[1]], -- tells selection widgets to treat the unit as if it has no rotation.
+    bait_level_default = 0,
+    want_precise_proximity_targetting = 1,
+    draw_blueprint_facing = 1,
+    superweapon = 1,
+
+    keeptooltip    = [[any string I want]],
+    neededlink     = 600,
+    pylonrange     = 200,
+
+    outline_x = 235,
+    outline_y = 235,
+    outline_yoff = 42.5,
   },
 
   explodeAs                     = [[ATOMIC_BLAST]],
   footprintX                    = 10,
   footprintZ                    = 10,
   iconType                      = [[mahlazer]],
-  idleAutoHeal                  = 5,
-  idleTime                      = 1800,
-  maxDamage                     = 10000,
+  maxDamage                     = 12000,
   maxSlope                      = 18,
   maxVelocity                   = 0,
   maxWaterDepth                 = 0,
-  minCloakDistance              = 150,
+  metalCost                     = 60000,
   noChaseCategory               = [[FIXEDWING LAND SHIP SATELLITE SWIM GUNSHIP SUB HOVER]],
   objectName                    = [[starlight.dae]],
   script                        = [[mahlazer.lua]],
@@ -49,7 +55,6 @@ return { mahlazer = {
     },
   },
   sightDistance                 = 660,
-  turnRate                      = 0,
   useBuildingGroundDecal        = true,
   workerTime                    = 0,
   yardMap                       = [[oooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo]],
@@ -214,6 +219,8 @@ return { mahlazer = {
 
     DEAD  = {
       blocking         = true,
+      collisionVolumeScales = [[150 200 150]],
+      collisionVolumeType   = [[ellipsoid]],
       featureDead      = [[HEAP]],
       footprintX       = 10,
       footprintZ       = 10,

@@ -61,19 +61,19 @@ local SIG_Walk = 2
 local PACE = 0.8
 
 -- four leg positions - front to straight, then to back, then to bent (then front again)
-local LEG_FRONT_ANGLES    = { thigh=math.rad(-40), knee=math.rad(-10), shin=math.rad(50), foot=math.rad(0), toef=math.rad(0), toeb=math.rad(15) }
+local LEG_FRONT_ANGLES    = { thigh=math.rad(-40), knee=math.rad(-10), shin=math.rad(50), foot=0, toef=0, toeb=math.rad(15) }
 local LEG_FRONT_SPEEDS    = { thigh=math.rad(60)*PACE, knee=math.rad(60)*PACE, shin=math.rad(110)*PACE, foot=math.rad(90)*PACE, toef=math.rad(90)*PACE, toeb=math.rad(30)*PACE }
 
-local LEG_STRAIGHT_ANGLES = { thigh=math.rad(-10), knee=math.rad(-20), shin=math.rad(30), foot=math.rad(0), toef=math.rad(0), toeb=math.rad(0) }
+local LEG_STRAIGHT_ANGLES = { thigh=math.rad(-10), knee=math.rad(-20), shin=math.rad(30), foot=0, toef=0, toeb=0 }
 local LEG_STRAIGHT_SPEEDS = { thigh=math.rad(60)*PACE, knee=math.rad(30)*PACE, shin=math.rad(40)*PACE, foot=math.rad(90)*PACE, toef=math.rad(90)*PACE, toeb=math.rad(30)*PACE }
 
-local LEG_BACK_ANGLES     = { thigh=math.rad(10), knee=math.rad(-5), shin=math.rad(15), foot=math.rad(0), toef=math.rad(-20), toeb=math.rad(-10) }
+local LEG_BACK_ANGLES     = { thigh=math.rad(10), knee=math.rad(-5), shin=math.rad(15), foot=0, toef=math.rad(-20), toeb=math.rad(-10) }
 local LEG_BACK_SPEEDS     = { thigh=math.rad(30)*PACE, knee=math.rad(60)*PACE, shin=math.rad(90)*PACE, foot=math.rad(90)*PACE, toef=math.rad(40)*PACE, toeb=math.rad(60)*PACE }
 
-local LEG_BENT_ANGLES     = { thigh=math.rad(-15), knee=math.rad(20), shin=math.rad(-20), foot=math.rad(0), toef=math.rad(0), toeb=math.rad(0) }
+local LEG_BENT_ANGLES     = { thigh=math.rad(-15), knee=math.rad(20), shin=math.rad(-20), foot=0, toef=0, toeb=0 }
 local LEG_BENT_SPEEDS     = { thigh=math.rad(60)*PACE, knee=math.rad(90)*PACE, shin=math.rad(90)*PACE, foot=math.rad(90)*PACE, toef=math.rad(90)*PACE, toeb=math.rad(90)*PACE }
 
-local LEG_STEP_ANGLES     = { thigh=math.rad(-9), knee=math.rad(30), shin=math.rad(-22), foot=math.rad(0), toef=math.rad(8), toeb=math.rad(0) }
+local LEG_STEP_ANGLES     = { thigh=math.rad(-9), knee=math.rad(30), shin=math.rad(-22), foot=0, toef=math.rad(8), toeb=0 }
 local LEG_STEP_SPEEDS     = { thigh=math.rad(15)*PACE, knee=math.rad(50)*PACE, shin=math.rad(36.6)*PACE, foot=math.rad(50)*PACE, toef=math.rad(13.3)*PACE, toeb=math.rad(50)*PACE }
 
 local TORSO_ANGLE_MOTION = math.rad(8)
@@ -98,6 +98,8 @@ local lastGunAverageHeading = false
 local JUMP_TURN_SPEED = math.pi/80 -- matches jump_delay_turn_scale in unitdef
 
 local isFiring = false
+local resetRestore = false
+
 -- Effects
 local dirtfling = 1024
 local muzzle_flash = 1025
@@ -130,7 +132,7 @@ local function DoRestore()
 end
 
 local function Step(frontLeg, backLeg, impactFoot, pelvisMult)
-	mainLeg, offLeg = offLeg, mainLeg 
+	mainLeg, offLeg = offLeg, mainLeg
 	
 	-- contact: legs fully extended in stride
 	for i,p in pairs(frontLeg) do
@@ -178,11 +180,11 @@ local function Step(frontLeg, backLeg, impactFoot, pelvisMult)
 	Sleep(0)
 end
 
-local function StepInPlace(leftLeg, rightLeg)
+local function StepInPlace(frontLeg, backLeg)
 	Move(pelvis, y_axis, 2, 6)
-	for i, p in pairs(leftLeg) do
-		Turn(leftLeg[i], x_axis, 0.8*LEG_STEP_ANGLES[i], LEG_STEP_SPEEDS[i]*1.4)
-		Turn(rightLeg[i], x_axis, -0.5*LEG_STEP_ANGLES[i], LEG_STEP_SPEEDS[i])
+	for i, p in pairs(frontLeg) do
+		Turn(frontLeg[i], x_axis,  0.8*LEG_STEP_ANGLES[i], LEG_STEP_SPEEDS[i]*1.4)
+		Turn( backLeg[i], x_axis, -0.5*LEG_STEP_ANGLES[i], LEG_STEP_SPEEDS[i])
 	end
 	Sleep(400)
 end
@@ -334,18 +336,27 @@ function jumping(jumpPercent)
 		Turn(torso, x_axis, 0, math.rad(10))
 		weaponBlocked = false
 	end
-
-	if jumpPercent > 95 and not landing then
-		landing = true	
-	end
-end
-
-function halfJump()
 end
 
 function endJump()
-	landing = false
 	StartThread(EndJumpThread)
+end
+
+local function RestoreAfterDelay()
+	local counter = 2
+	while true do
+		if counter > 0 then
+			counter = counter - 1
+		end
+		if resetRestore then
+			resetRestore = false
+			counter = 2
+		end
+		if counter == 0 then
+			DoRestore()
+		end
+		Sleep(1000)
+	end
 end
 
 function script.Create()
@@ -353,14 +364,8 @@ function script.Create()
 	Turn(rarm, z_axis, 0.1)
 	Turn(shoulderflare, x_axis, math.rad(-90))
 	StartThread(GG.Script.SmokeUnit, unitID, smokePiece)
+	StartThread(RestoreAfterDelay)
 	Spring.SetUnitMaxRange(unitID, 510)
-end
-
-local function RestoreAfterDelay()
-	Signal(SIG_Restore)
-	SetSignalMask(SIG_Restore)
-	Sleep(2000)
-	DoRestore()
 end
 
 function script.AimFromWeapon(num)
@@ -390,8 +395,7 @@ function script.AimWeapon(num, heading, pitch)
 	if weaponBlocked and (num == 1 or num == 2 or num == 3 or num == 5) then
 		return false
 	end
-
-	StartThread(RestoreAfterDelay)
+	resetRestore = true
 
 	if num == 1 then  -- Left gunpod
 		leftTorsoHeading = heading

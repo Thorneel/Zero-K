@@ -1,11 +1,7 @@
 return { roost = {
-  unitname          = [[roost]],
   name              = [[Roost]],
   description       = [[Spawns Chicken]],
-  acceleration      = 0,
   activateWhenBuilt = true,
-  brakeRate         = 0,
-  buildCostMetal    = 340,
   builder           = false,
   buildPic          = [[roost.png]],
   category          = [[SINK]],
@@ -18,16 +14,16 @@ return { roost = {
   footprintX        = 3,
   footprintZ        = 3,
   iconType          = [[special]],
-  idleAutoHeal      = 0,
-  idleTime          = 1800,
+  idleAutoHeal      = 20,
+  idleTime          = 300,
   levelGround       = false,
   maxDamage         = 1800,
   maxSlope          = 36,
   maxVelocity       = 0,
+  metalCost         = 340,
   metalMake         = 2.5,
-  minCloakDistance  = 150,
   noAutoFire        = false,
-  objectName        = [[roost]],
+  objectName        = [[roost.s3o]],
   script            = [[roost.lua]],
   selfDestructAs    = [[NOWEAPON]],
 
@@ -40,7 +36,6 @@ return { roost = {
 
   },
   sightDistance     = 273,
-  turnRate          = 0,
   upright           = false,
   waterline         = 0,
   workerTime        = 0,
@@ -76,7 +71,6 @@ return { roost = {
       damage                  = {
         default = 80,
         planes  = 80,
-        subs    = 8,
       },
 
       dance                   = 60,

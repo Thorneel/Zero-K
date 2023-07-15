@@ -1,15 +1,11 @@
 return { chicken_shield = {
-  unitname            = [[chicken_shield]],
   name                = [[Blooper]],
   description         = [[Shield/Anti-Air]],
   acceleration        = 1.08,
   activateWhenBuilt   = true,
   brakeRate           = 1.23,
-  buildCostEnergy     = 0,
-  buildCostMetal      = 0,
   builder             = false,
   buildPic            = [[chicken_shield.png]],
-  buildTime           = 1200,
   canGuard            = true,
   canMove             = true,
   canPatrol           = true,
@@ -18,6 +14,10 @@ return { chicken_shield = {
   customParams        = {
     shield_emit_height = 26,
     shield_emit_offset = 0,
+
+    outline_x = 145,
+    outline_y = 145,
+    outline_yoff = 27.5,
   },
 
   explodeAs           = [[NOWEAPON]],
@@ -31,7 +31,9 @@ return { chicken_shield = {
   maxSlope            = 37,
   maxVelocity         = 1.8,
   maxWaterDepth       = 5000,
-  minCloakDistance    = 75,
+  metalCost           = 0,
+  energyCost          = 0,
+  buildTime           = 1200,
   movementClass       = [[AKBOT4]],
   noAutoFire          = false,
   noChaseCategory     = [[TERRAFORM FIXEDWING SATELLITE GUNSHIP SUB]],
@@ -101,7 +103,6 @@ return { chicken_shield = {
       damage                  = {
         default = 60,
         planes  = 60,
-        subs    = 6,
       },
 
       dance                   = 60,
@@ -146,7 +147,6 @@ return { chicken_shield = {
       damage                  = {
         default = 0.01,
         planes  = 0.01,
-        subs    = 0.01,
       },
 
       explosionGenerator      = [[custom:NONE]],

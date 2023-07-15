@@ -1,15 +1,11 @@
 return { chickenwurm = {
-  unitname            = [[chickenwurm]],
   name                = [[Wurm]],
   description         = [[Burrowing Flamer (Assault/Riot)]],
   acceleration        = 1.08,
   activateWhenBuilt   = true,
   brakeRate           = 1.23,
-  buildCostEnergy     = 0,
-  buildCostMetal      = 0,
   builder             = false,
   buildPic            = [[chickenwurm.png]],
-  buildTime           = 350,
   canGuard            = true,
   canMove             = true,
   canPatrol           = true,
@@ -17,20 +13,26 @@ return { chickenwurm = {
 
   customParams        = {
     fireproof         = 1,
+
+    outline_x = 160,
+    outline_y = 160,
+    outline_yoff = 8,
   },
 
-  explodeAs           = [[jumpraid_PYRO_DEATH]],
+  explodeAs           = [[CHICKENWURM_DEATH]],
   footprintX          = 4,
   footprintZ          = 4,
   iconType            = [[spidergeneric]],
-  idleAutoHeal        = 10,
-  idleTime            = 600,
+  idleAutoHeal        = 20,
+  idleTime            = 300,
   leaveTracks         = true,
   maxDamage           = 1500,
   maxSlope            = 90,
   maxVelocity         = 1.8,
   maxWaterDepth       = 5000,
-  minCloakDistance    = 75,
+  metalCost           = 0,
+  energyCost          = 0,
+  buildTime           = 350,
   movementClass       = [[ATKBOT3]],
   noAutoFire          = false,
   noChaseCategory     = [[SHIP FLOAT SWIM TERRAFORM FIXEDWING GUNSHIP SATELLITE STUPIDTARGET MINE]],
@@ -38,7 +40,7 @@ return { chickenwurm = {
   power               = 350,
   reclaimable         = false,
   script              = [[chickenwurm.lua]],
-  selfDestructAs      = [[jumpraid_PYRO_DEATH]],
+  selfDestructAs      = [[CHICKENWURM_DEATH]],
 
   sfxtypes            = {
 
@@ -104,7 +106,6 @@ return { chickenwurm = {
       damage                  = {
         default = 50,
         planes  = 50,
-        subs    = 2.5,
       },
 
       explosionGenerator      = [[custom:napalm_firewalker]],
@@ -158,6 +159,34 @@ return { chickenwurm = {
       weaponType              = [[Cannon]],
       weaponVelocity          = 600,
       waterWeapon             = true,
+    },
+
+    DEATH = {
+      name                    = [[Napalm Blast]],
+      areaofeffect            = 256,
+      craterboost             = 1,
+      cratermult              = 3.5,
+
+      customparams            = {
+        setunitsonfire = "1",
+        burnchance     = "1",
+        burntime       = 60,
+
+        area_damage = 1,
+        area_damage_radius = 128,
+        area_damage_dps = 20,
+        area_damage_duration = 13.3,
+      },
+
+      damage                  = {
+        default = 50,
+      },
+
+      edgeeffectiveness       = 0.5,
+      explosionGenerator      = [[custom:napalm_pyro]],
+      impulseboost            = 0,
+      impulsefactor           = 0,
+      soundhit                = [[explosion/ex_med3]],
     },
   },
 

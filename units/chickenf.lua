@@ -1,16 +1,12 @@
 return { chickenf = {
-  unitname            = [[chickenf]],
   name                = [[Talon]],
   description         = [[Flying Spike Spitter]],
   acceleration        = 0.8,
   activateWhenBuilt   = true,
   airHoverFactor      = 0,
   brakeRate           = 0.32,
-  buildCostEnergy     = 0,
-  buildCostMetal      = 0,
   builder             = false,
   buildPic            = [[chickenf.png]],
-  buildTime           = 450,
   canFly              = true,
   canGuard            = true,
   canLand             = true,
@@ -22,6 +18,9 @@ return { chickenf = {
   cruiseAlt           = 150,
 
   customParams        = {
+    outline_x = 180,
+    outline_y = 180,
+    outline_yoff = 17.5,
   },
 
   explodeAs           = [[NOWEAPON]],
@@ -35,7 +34,9 @@ return { chickenf = {
   maxDamage           = 1200,
   maxSlope            = 18,
   maxVelocity         = 10,
-  minCloakDistance    = 75,
+  metalCost           = 0,
+  energyCost          = 0,
+  buildTime           = 450,
   noAutoFire          = false,
   noChaseCategory     = [[TERRAFORM SATELLITE STUPIDTARGET MINE]],
   objectName          = [[chickenf.s3o]],

@@ -1,16 +1,12 @@
 return { chicken_tiamat = {
-  unitname            = [[chicken_tiamat]],
   name                = [[Tiamat]],
   description         = [[Heavy Assault/Riot]],
   acceleration        = 1.08,
   activateWhenBuilt   = true,
   autoheal            = 20,
   brakeRate           = 1.23,
-  buildCostEnergy     = 0,
-  buildCostMetal      = 0,
   builder             = false,
   buildPic            = [[chicken_tiamat.png]],
-  buildTime           = 350,
   canGuard            = true,
   canMove             = true,
   canPatrol           = true,
@@ -20,6 +16,10 @@ return { chicken_tiamat = {
     fireproof          = 1,
     shield_emit_height = 32,
     shield_emit_offset = -4,
+
+    outline_x = 185,
+    outline_y = 185,
+    outline_yoff = 27.5,
   },
 
   explodeAs           = [[NOWEAPON]],
@@ -33,7 +33,9 @@ return { chicken_tiamat = {
   maxSlope            = 37,
   maxVelocity         = 2.3,
   maxWaterDepth       = 5000,
-  minCloakDistance    = 75,
+  metalCost           = 0,
+  energyCost          = 0,
+  buildTime           = 350,
   movementClass       = [[AKBOT4]],
   noAutoFire          = false,
   noChaseCategory     = [[TERRAFORM FIXEDWING SATELLITE GUNSHIP STUPIDTARGET MINE]],
@@ -127,7 +129,6 @@ return { chicken_tiamat = {
     
       damage                  = {
         default = 12,
-        subs    = 0.01,
       },
 
       duration          = 0.01,
@@ -141,7 +142,7 @@ return { chicken_tiamat = {
       interceptedByShieldType = 1,
       noExplode               = true,
       noSelfDamage            = true,
-      range                   = 290,
+      range                   = 267,
       reloadtime              = 0.133,
       rgbColor                = [[1 1 1]],
       soundStart              = [[weapon/flamethrower]],
@@ -233,7 +234,6 @@ return { chicken_tiamat = {
       damage                  = {
         default = 100,
         planes  = 100,
-        subs    = 100,
       },
 
       dance                   = 60,

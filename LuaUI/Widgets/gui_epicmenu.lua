@@ -32,11 +32,13 @@ local spGetConfigInt            = Spring.GetConfigInt
 local spSendCommands            = Spring.SendCommands
 local min = math.min
 local max = math.max
+local gameSpeed = Game.gameSpeed
 
 local echo = Spring.Echo
 
 --------------------------------------------------------------------------------
 local isMission = Game.modDesc:find("Mission Mutator")
+local isServerHost = Spring.GetModOptions().sendspringiedata and not Spring.IsReplay()
 
 -- Config file data
 local keybind_dir, keybind_file, defaultkeybinds, defaultkeybind_date, confdata
@@ -67,7 +69,6 @@ local title_text = confdata.title
 local title_image = confdata.title_image
 local subMenuIcons = confdata.subMenuIcons
 local useUiKeys = false
-local lastSaveGameFrame, totalSaveGameFrame
 
 --file_return = nil
 
@@ -203,12 +204,13 @@ local keybounditems = {}
 local keybind_date = 0
 
 local EPIC_SETTINGS_VERSION = 51
+local MUSIC_VOLUME_DEFAULT = 0.25
 
 local settings = {
 	versionmin = EPIC_SETTINGS_VERSION,
 	widgets = {},
 	show_crudemenu = true,
-	music_volume = 0.5,
+	music_volume = MUSIC_VOLUME_DEFAULT,
 	showAdvanced = false, -- Enable to show all settings.
 	simpleSettingsMode = true,
 }
@@ -423,7 +425,9 @@ WG.crude.SetMusicVolume = function (newVolume, viaTrackbar)
 	else
 		Spring.SetSoundStreamVolume(newVolume)
 	end
-	settings.config["epic_Settings/Audio_Music_Volume"] = newVolume
+	if settings.config then
+		settings.config["epic_Settings/Audio_Music_Volume"] = newVolume
+	end
 	WG.music_volume = newVolume
 	if viaTrackbar then
 		if hackyOptionMemory['Music Volume'] then
@@ -631,18 +635,6 @@ local function AllowPauseOnMenuChange(pause)
 end
 WG.crude.AllowPauseOnMenuChange = AllowPauseOnMenuChange
 
-local function PlayingButNoTeammate() --I am playing and playing alone with no teammate
-	if Spring.GetSpectatingState() then
-		return false
-	end
-	local myAllyTeamID = Spring.GetMyAllyTeamID() -- get my alliance ID
-	local teams = Spring.GetTeamList(myAllyTeamID) -- get list of teams in my alliance
-	if #teams == 1 then -- if I'm alone and playing (no ally)
-		return true
-	end
-	return false
-end
-
 local function CanSaveGame()
 	if Spring.IsCheatingEnabled() then
 		return true
@@ -711,11 +703,14 @@ local function MakeFlags()
 		local langData = languages[i]
 		flagChildren[#flagChildren + 1] = Image:New{
 			file = ":cn:".. LUAUI_DIRNAME .. "Images/flags/".. langData.flag ..'.png',
+			lang = langData.lang,
+			OnClick = {SetLang }
 		}
 		flagChildren[#flagChildren + 1] = Button:New{
 			caption = langData.name,
+			objectOverrideFont = WG.GetFont(),
 			name = 'countryButton' .. langData.lang;
-			width = '50%',
+			width = '100%',
 			lang = langData.lang,
 			OnClick = {SetLang }
 		}
@@ -750,6 +745,7 @@ local function MakeFlags()
 			--close button
 			Button:New{caption = 'Close',  x = 5, y = 0-B_HEIGHT, bottom = 5, right = 5,
 				name = 'makeFlagCloseButton';
+				objectOverrideFont = WG.GetFont(),
 				OnClick = {function(self) window_flags:Dispose(); window_flags = nil; end },
 				width = window_width-20,
 				--backgroundColor = color.sub_close_bg, textColor = color.sub_close_fg,
@@ -780,12 +776,13 @@ local function MakeHelp(caption, text)
 				bottom = B_HEIGHT + 3,
 				height = window_height - B_HEIGHT*3 ,
 				children = {
-					TextBox:New{x = 0, y = 10, text = text, textColor = color.sub_fg, width  = window_width - 40}
+					TextBox:New{x = 0, y = 10, text = text, objectOverrideFont = WG.GetSpecialFont(13, "epic_sub_fg", {color = color.sub_fg}), width  = window_width - 40}
 				}
 			},
 			--Close button
 			Button:New{
 				caption = 'Close', OnClick = {function(self) self.parent:Dispose() end },
+				objectOverrideFont = WG.GetFont(),
 				x = 45, bottom = 1, right = 45, height = B_HEIGHT,
 				name = 'makeHelpCloseButton';
 				--backgroundColor = color.sub_close_bg, textColor = color.sub_close_fg,
@@ -1459,8 +1456,8 @@ local function MakeKeybindWindow( path, option, hotkeyButton, optionControl, opt
 		resizable = false,
 		draggable = false,
 		children = {
-			Label:New{x = 8, y = 20, caption = 'Press a key combo', textColor = color.sub_fg},
-			Label:New{x = 8, y = 38, caption = '(Hit "Escape" to clear keybinding)', textColor = color.sub_fg},
+			Label:New{x = 8, y = 20, caption = 'Press a key combo', objectOverrideFont = WG.GetSpecialFont(13, "epic_sub_fg", {color = color.sub_fg})},
+			Label:New{x = 8, y = 38, caption = '(Hit "Escape" to clear keybinding)', objectOverrideFont = WG.GetSpecialFont(13, "epic_sub_fg", {color = color.sub_fg})},
 		}
 	}
 end
@@ -1522,6 +1519,7 @@ local function MakeHotkeyedControl(control, path, option, icon, noHotkey, minHei
 			right = 0,
 			width = hklength,
 			caption = hotkeystring,
+			objectOverrideFont = WG.GetFont(),
 			OnClick = {
 				function(self)
 					if not get_key then
@@ -1698,11 +1696,11 @@ local function SearchElement(termToSearch, path)
 	
 	local roughNumberOfHit = #filtered_pathOptions
 	if roughNumberOfHit == 0 then
-		tree_children[1] = Label:New{caption = "- no match for \"" .. filterUserInsertedTerm .."\" -",  textColor = color.postit}
+		tree_children[1] = Label:New{caption = "- no match for \"" .. filterUserInsertedTerm .."\" -",  objectOverrideFont = WG.GetSpecialFont(13, "epic_postit", {color = color.postit})}
 	elseif  roughNumberOfHit > maximumResult then
-		tree_children[1] = Label:New{caption = "- the term \"" .. filterUserInsertedTerm .."\" had too many match -", textColor = color.postit}
-		tree_children[2] = Label:New{caption = "- please navigate the menu to see all options -",  textColor = color.postit}
-		tree_children[3] = Label:New{caption = "- (" .. roughNumberOfHit .. " match in total) -",  textColor = color.postit}
+		tree_children[1] = Label:New{caption = "- the term \"" .. filterUserInsertedTerm .."\" had too many match -", objectOverrideFont = WG.GetSpecialFont(13, "epic_postit", {color = color.postit})}
+		tree_children[2] = Label:New{caption = "- please navigate the menu to see all options -",  objectOverrideFont = WG.GetSpecialFont(13, "epic_postit", {color = color.postit})}
+		tree_children[3] = Label:New{caption = "- (" .. roughNumberOfHit .. " match in total) -",  objectOverrideFont = WG.GetSpecialFont(13, "epic_postit", {color = color.postit})}
 		filtered_pathOptions = {}
 	end
 	return filtered_pathOptions, tree_children
@@ -1759,13 +1757,12 @@ MakeSubWindow = function(path, pause, labelScroll)
 					x = 0,
 					width = settings_width,
 					minHeight = 20,
-					fontsize = 11,
+					objectOverrideFont = WG.GetFont(11, "epic_postit", {color = color.postit}),
 					caption = "- Location: " .. currentPath,
 					OnClick = {function() filterUserInsertedTerm = ''; end, function(self)
 						MakeSubWindow(currentPath, false)  --this made this "label" open another path when clicked
 					end},
 					backgroundColor = color.transGray,
-					textColor = color.postit,
 					tooltip = currentPath,
 					
 					padding = {2, 2, 2, 2},
@@ -1822,7 +1819,7 @@ MakeSubWindow = function(path, pause, labelScroll)
 					y = 1,
 					minHeight = button_height,
 					--caption = option.name,
-					caption = '',
+					noFont = true,
 					OnClick = escapeSearch and {function() filterUserInsertedTerm = ''; end, option.OnChange} or {option.OnChange},
 					--backgroundColor = disabled and color.disabled_bg or {1, 1, 1, 1},
 					--textColor = disabled and color.disabled_fg or color.sub_button_fg,
@@ -1838,25 +1835,26 @@ MakeSubWindow = function(path, pause, labelScroll)
 					Image:New{file = icon, width = width, height = width, parent = button, x = pos, y = pos}
 				end
 				
-				Label:New{parent = button, x = 35, y = button_height*0.2,  caption = option.name}
+				Label:New{parent = button, x = 35, y = button_height*0.2,  caption = option.name, objectOverrideFont = WG.GetFont(),}
 				
 				tree_children[#tree_children+1] = MakeHotkeyedControl(button, path, option, nil, option.isDirectoryButton or option.noHotkey, button_height)
 			end
 			
 		elseif option.type == 'label' then
-			tree_children[#tree_children+1] = Label:New{caption = option.value or option.name, textColor = color.sub_header}
+			tree_children[#tree_children+1] = Label:New{caption = option.value or option.name, objectOverrideFont = WG.GetSpecialFont(13, "epic_sub_header", {color = color.sub_header})}
 			if labelScroll and (labelScroll == (option.value or option.name)) then
 				scrollTo = tree_children[#tree_children]
 				labelScroll = nil
 			end
 		elseif option.type == 'text' then
-			tree_children[#tree_children+1] = Label:New{caption = option.name, textColor = color.sub_header}
+			tree_children[#tree_children+1] = Label:New{caption = option.name, objectOverrideFont = WG.GetSpecialFont(13, "epic_sub_header", {color = color.sub_header})}
 			tree_children[#tree_children+1] =
 				TextBox:New{
 					name = option.wname .. " " .. option.name;
 					width = "100%",
 					minHeight = 30,
 					text = option.value,
+					WG.GetFont(),
 				}
 			
 		elseif option.type == 'bool' then
@@ -1868,7 +1866,7 @@ MakeSubWindow = function(path, pause, labelScroll)
 				checked = option.value or false,
 				
 				OnClick = {option.OnChange},
-				textColor = color.sub_fg,
+				objectOverrideFont = WG.GetSpecialFont(13, "epic_sub_fg", {color = color.sub_fg}),
 				tooltip   = option.desc,
 			}
 			option.epic_reference = chbox
@@ -1888,9 +1886,10 @@ MakeSubWindow = function(path, pause, labelScroll)
 			}
 			if icon then
 				numberPanel:AddChild(Image:New{file = icon, width = 16, height = 16, x = 4, y = 0})
-				numberPanel:AddChild(Label:New{caption = option.name, textColor = color.sub_fg, x = 20, y = 0, HitTest = returnSelf})
+				numberPanel:AddChild(Label:New{caption = option.name, objectOverrideFont = WG.GetSpecialFont(13, "epic_sub_fg", {color = color.sub_fg}), x = 20, y = 0, HitTest = returnSelf})
 			else
-				numberPanel:AddChild(Label:New{padding = {0, 0, 0, 0}, caption = option.name, tooltip = option.desc, y = 0, textColor = color.sub_fg, HitTest = returnSelf})
+				numberPanel:AddChild(Label:New{padding = {0, 0, 0, 0}, caption = option.name, tooltip = option.desc, y = 0,
+					objectOverrideFont = WG.GetSpecialFont(13, "epic_sub_fg", {color = color.sub_fg}), HitTest = returnSelf})
 			end
 			if option.valuelist then
 				option.value = GetIndex(option.valuelist, option.value)
@@ -1913,7 +1912,7 @@ MakeSubWindow = function(path, pause, labelScroll)
 			)
 			tree_children[#tree_children+1] = numberPanel
 		elseif option.type == 'list' then
-			tree_children[#tree_children+1] = Label:New{caption = option.name, textColor = color.sub_header}
+			tree_children[#tree_children+1] = Label:New{caption = option.name, objectOverrideFont = WG.GetSpecialFont(13, "epic_sub_header", {color = color.sub_header})}
 			local items = {};
 			for i = 1, #option.items do
 				local item = option.items[i]
@@ -1923,6 +1922,7 @@ MakeSubWindow = function(path, pause, labelScroll)
 						name = option.wname .. " " .. item.name;
 						width = "100%",
 						caption = item.name,
+						objectOverrideFont = WG.GetFont(),
 						OnClick = {function(self) option.OnChange(item) end },
 						--classname = "submenu_navigation_button",
 						--backgroundColor = color.sub_button_bg,
@@ -1938,7 +1938,7 @@ MakeSubWindow = function(path, pause, labelScroll)
 			]]--
 		elseif option.type == 'radioButton' then
 			tree_children[#tree_children+1] = Control:New{height = 1, minHeight = 0, padding = {0, 0, 0, 0},}
-			tree_children[#tree_children+1] = Label:New{caption = option.name, textColor = color.sub_header,}
+			tree_children[#tree_children+1] = Label:New{caption = option.name, objectOverrideFont = WG.GetSpecialFont(13, "epic_sub_header", {color = color.sub_header})}
 			for i = 1, #option.items do
 				local item = option.items[i]
 				settings_height = settings_height + B_HEIGHT
@@ -1950,7 +1950,7 @@ MakeSubWindow = function(path, pause, labelScroll)
 					caption = '  ' .. item.name,
 					checked = (option.value == item.value),
 					OnChange = {function(self) option.OnChange(item) end},
-					textColor = color.sub_fg,
+					objectOverrideFont = WG.GetSpecialFont(13, "epic_sub_fg", {color = color.sub_fg}),
 					tooltip = item.desc,
 					round = true,
 				}
@@ -1961,7 +1961,7 @@ MakeSubWindow = function(path, pause, labelScroll)
 			tree_children[#tree_children+1] = Control:New{height = 2, minHeight = 0, padding = {0, 6, 0, 0},}
 		elseif option.type == 'colors' then
 			settings_height = settings_height + B_HEIGHT*2.5
-			tree_children[#tree_children+1] = Label:New{caption = option.name, textColor = color.sub_fg}
+			tree_children[#tree_children+1] = Label:New{caption = option.name, objectOverrideFont = WG.GetSpecialFont(13, "epic_sub_fg", {color = color.sub_fg}),}
 			tree_children[#tree_children+1] =
 				Colorbars:New{
 					width = "100%",
@@ -2029,20 +2029,20 @@ MakeSubWindow = function(path, pause, labelScroll)
 		bottom = B_HEIGHT + 5;
 		
 		caption = 'Simple Settings',
+		tooltip = 'Untick to expand the number of graphics and interface options.',
 		checked = settings.simpleSettingsMode,
 		OnChange = {function(self)
 			settings.simpleSettingsMode = not settings.simpleSettingsMode
 			RemakeEpicMenu()
 		end },
-		textColor = color.sub_fg,
-		tooltip   = 'For experienced users only.',
+		objectOverrideFont = WG.GetSpecialFont(13, "epic_sub_fg", {color = color.sub_fg}),
 	}
 	
 	window_children[#window_children+1] = buttonBar
 	
 	--back button
 	if parent_path then
-		Button:New{name = 'backButton', caption = '',
+		Button:New{name = 'backButton', noFont = true,
 			OnClick = {
 				function()
 					KillSubWindow(not root)
@@ -2059,13 +2059,13 @@ MakeSubWindow = function(path, pause, labelScroll)
 			parent = buttonBar,
 			children = {
 				Image:New{file = LUAUI_DIRNAME  .. 'images/epicmenu/arrow_left.png', width = 16, height = 16, parent = button, x = 4, y = 2},
-				Label:New{caption = 'Back', x = 24, y = 4}
+				Label:New{caption = 'Back', x = 24, y = 4, objectOverrideFont = WG.GetFont(),}
 			}
 		}
 	end
 	
 	--search button
-	Button:New{name = 'searchButton', caption = '',
+	Button:New{name = 'searchButton', noFont = true,
 		OnClick = {function() spSendCommands("chat", "PasteText /search:" ) end },
 		--textColor = color.sub_close_fg, backgroundColor = color.sub_close_bg,
 		--classname = "navigation_button",
@@ -2074,13 +2074,13 @@ MakeSubWindow = function(path, pause, labelScroll)
 		parent = buttonBar,
 		children = {
 			Image:New{file = LUAUI_DIRNAME  .. 'images/epicmenu/find.png', width = 16, height = 16, parent = button, x = 4, y = 2},
-			Label:New{caption = 'Search', x = 24, y = 4}
+			Label:New{caption = 'Search', x = 24, y = 4, objectOverrideFont = WG.GetFont(),}
 		}
 	}
 	
 	if not searchedElement then --do not display reset setting button when search is a bunch of mixed options
 		--reset button
-		Button:New{name = 'resetButton', caption = '',
+		Button:New{name = 'resetButton', noFont = true,
 			OnClick = {function() ResetWinSettings(path); RemakeEpicMenu(); end },
 			--textColor = color.sub_close_fg, backgroundColor = color.sub_close_bg,
 			--classname = "navigation_button",
@@ -2090,13 +2090,13 @@ MakeSubWindow = function(path, pause, labelScroll)
 			parent = buttonBar,
 			children = {
 				Image:New{file = LUAUI_DIRNAME  .. 'images/epicmenu/undo_white.png', width = 16, height = 16, parent = button, x = 4, y = 2},
-				Label:New{caption = 'Reset', x = 24, y = 4}
+				Label:New{caption = 'Reset', x = 24, y = 4, objectOverrideFont = WG.GetFont(),}
 			}
 		}
 	end
 	
 	--close button
-	Button:New{name = 'menuCloseButton', caption = '',
+	Button:New{name = 'menuCloseButton', noFont = true,
 		OnClick = {function() KillSubWindow(); filterUserInsertedTerm = '';  end },
 		--textColor = color.sub_close_fg, backgroundColor = color.sub_close_bg,
 		--classname = "navigation_button",
@@ -2105,7 +2105,7 @@ MakeSubWindow = function(path, pause, labelScroll)
 		parent = buttonBar,
 		children = {
 			Image:New{file = LUAUI_DIRNAME  .. 'images/epicmenu/close.png', width = 16, height = 16, parent = button, x = 4, y = 2},
-			Label:New{caption = 'Close', x = 24, y = 4}
+			Label:New{caption = 'Close', x = 24, y = 4, objectOverrideFont = WG.GetFont(),}
 		}
 	}
 	
@@ -2214,15 +2214,17 @@ local function MakeExitConfirmWindow(text, action, height, unpauseOnYes, unpause
 	Label:New{
 		parent = window_exit_confirm,
 		caption = text,
+		objectOverrideFont = WG.GetFont(),
 		width = "100%",
 		y = 4,
 		align = "center",
-		textColor = color.main_fg
+		objectOverrideFont = WG.GetSpecialFont(13, "epic_main_fg", {color = color.main_fg})
 	}
 	Button:New{
 		name = 'confirmExitYesButton';
 		parent = window_exit_confirm,
 		caption = "Yes",
+		objectOverrideFont = WG.GetFont(),
 		OnClick = {
 			function()
 				action()
@@ -2241,6 +2243,7 @@ local function MakeExitConfirmWindow(text, action, height, unpauseOnYes, unpause
 		name = 'confirmExitNoButton';
 		parent = window_exit_confirm,
 		caption = "No",
+		objectOverrideFont = WG.GetFont(),
 		OnClick = {
 			function()
 				LeaveExitConfirmWindow()
@@ -2353,7 +2356,7 @@ local function GetMainPanel(parent, width, height)
 					max = 1,
 					step = 0.01,
 					trackColor = color.main_fg,
-					value = settings.config["epic_Settings/Audio_Music_Volume"] or 0.5,
+					value = settings.config["epic_Settings/Audio_Music_Volume"] or MUSIC_VOLUME_DEFAULT,
 					OnChange = {
 						function(self)
 							if WG.crude and WG.crude.SetMusicVolume then
@@ -2444,7 +2447,7 @@ local function GetMainPanel(parent, width, height)
 			itemMargin = {1, 1, 1, 1},
 			
 			children = {
-				--Label:New{caption = 'Vol', width = 20, textColor = color.main_fg },
+				--Label:New{caption = 'Vol', width = 20, objectOverrideFont = WG.GetSpecialFont(13, "epic_main_fg", {color = color.main_fg}) },
 				Image:New{tooltip = 'Volume', file = LUAUI_DIRNAME .. 'Images/epicmenu/vol.png', width = 18, height = 18},
 				Trackbar:New{
 					tooltip = 'Volume',
@@ -2471,7 +2474,7 @@ local function GetMainPanel(parent, width, height)
 					max = 1,
 					step = 0.01,
 					trackColor = color.main_fg,
-					value = settings.config["epic_Settings/Audio_Music_Volume"] or 0.5,
+					value = settings.config["epic_Settings/Audio_Music_Volume"] or MUSIC_VOLUME_DEFAULT,
 					OnChange = {
 						function(self)
 							if WG.crude and WG.crude.SetMusicVolume then
@@ -2494,7 +2497,7 @@ local function GetMainPanel(parent, width, height)
 	stackChildren[#stackChildren + 1] = Button:New{
 		name = 'subMenuButton',
 		OnClick = {function() ActionSubmenu(nil, '') end},
-		textColor = color.game_fg,
+		objectOverrideFont = WG.GetSpecialFont(13, "epic_game_fg", {color = color.game_fg}),
 		height = height - 9,
 		width = B_WIDTH_TOMAINMENU + 1,
 		caption = "Menu (\255\0\255\0"..WG.crude.GetHotkey("crudesubmenu").."\008)",
@@ -2512,7 +2515,7 @@ local function GetMainPanel(parent, width, height)
 		stackChildren[#stackChildren + 1] = Button:New{
 			name = 'lobbyButton',
 			OnClick = {function() ViewLobby() end},
-			textColor = color.game_fg,
+			objectOverrideFont = WG.GetSpecialFont(13, "epic_game_fg", {color = color.game_fg}),
 			height = height - 9,
 			width = B_WIDTH_TOMAINMENU + 1,
 			caption = "Lobby (\255\0\255\0"..WG.crude.GetHotkey("viewlobby").."\008)",
@@ -2607,9 +2610,9 @@ local function MakeMenuBar()
 	local crude_height = B_HEIGHT_MAIN + 8
 	
 	-- A bit evil, but par for the course
-	lbl_fps = Label:New{name = 'lbl_fps', caption = 'FPS:', textColor = color.sub_header, margin = {0, 5, 0, 0}}
-	lbl_gtime = Label:New{name = 'lbl_gtime', caption = '00:00', width = 55, height = 5, textColor = color.sub_header}
-	lbl_clock = Label:New{name = 'lbl_clock', caption = 'Clock', width = 45, height = 5, textColor = color.main_fg} -- autosize = false}
+	lbl_fps = Label:New{name = 'lbl_fps', caption = 'FPS:', objectOverrideFont = WG.GetSpecialFont(13, "epic_sub_header", {color = color.sub_header}), margin = {0, 5, 0, 0}}
+	lbl_gtime = Label:New{name = 'lbl_gtime', caption = '00:00', width = 55, height = 5, objectOverrideFont = WG.GetSpecialFont(13, "epic_sub_header", {color = color.sub_header})}
+	lbl_clock = Label:New{name = 'lbl_clock', caption = 'Clock', width = 45, height = 5, objectOverrideFont = WG.GetSpecialFont(13, "epic_main_fg", {color = color.main_fg})} -- autosize = false}
 	img_flag = Image:New{tooltip = 'Choose Language', file = ":cn:".. LUAUI_DIRNAME .. "Images/flags/".. flagByLang[settings.lang] ..'.png', width = 16, height = 11, OnClick = {MakeFlags }, padding = {4, 4, 4, 6}  }
 	
 	local screen_width, screen_height = Spring.GetWindowGeometry()
@@ -2692,6 +2695,22 @@ local function MakeSaveLoadButtons()
 	})
 end
 
+local function PlayingButNoTeammate() --I am playing and playing alone with no teammate
+	if Spring.GetSpectatingState() then
+		return false
+	end
+	local myAllyTeamID = Spring.GetMyAllyTeamID() -- get my alliance ID
+	local teams = Spring.GetTeamList(myAllyTeamID) -- get list of teams in my alliance
+	if #teams == 1 then -- if I'm alone and playing (no ally)
+		return true
+	end
+	return false
+end
+
+local function DisableVoteResign()
+	return Spring.GetPlayerRulesParam(Spring.GetLocalPlayerID(), "initiallyPlayingPlayer") ~= 1 or PlayingButNoTeammate() or isMission
+end
+
 local function MakeQuitButtons()
 	--AddOption('', {
 	--	type = 'label',
@@ -2708,15 +2727,13 @@ local function MakeQuitButtons()
 		desc = "Ask teammates to resign",
 		icon = imgPath..'epicmenu/whiteflag_check.png',
 		OnChange = function()
-				if not (Spring.GetPlayerRulesParam(Spring.GetLocalPlayerID(), "initiallyPlayingPlayer") ~= 1 or PlayingButNoTeammate() or isMission) then
+				if not DisableVoteResign() then
 					spSendCommands("say !poll resign")
 					ActionMenu()
 				end
 			end,
 		key = 'Vote Resign',
-		DisableFunc = function()
-			return (Spring.GetPlayerRulesParam(Spring.GetLocalPlayerID(), "initiallyPlayingPlayer") ~= 1 or PlayingButNoTeammate() or isMission)
-		end, --function that trigger grey colour on buttons (not actually disable their functions)
+		DisableFunc = DisableVoteResign, --function that trigger grey colour on buttons (not actually disable their functions)
 	})
 	AddOption('', {
 		type = 'button',
@@ -2753,9 +2770,9 @@ local function MakeQuitButtons()
 		icon = imgPath..'epicmenu/undo.png',
 		OnChange = function()
 				-- Only allow restarting for local games or by the host of steam coop.
-				if Spring.GetMenuName and Spring.SendLuaMenuMsg and Spring.GetMenuName() then
+				if (not isServerHost) and Spring.GetMenuName and Spring.SendLuaMenuMsg and Spring.GetMenuName() then
 					local myPing = select(6, Spring.GetPlayerInfo(Spring.GetMyPlayerID(), false))
-					if myPing and myPing < 40 then
+					if myPing and myPing < 0.04 then
 						MakeExitConfirmWindow("Are you sure you want to restart?", function()
 							Spring.SendLuaMenuMsg("restartGame")
 						end, nil, false, true)
@@ -2765,9 +2782,12 @@ local function MakeQuitButtons()
 		key = 'Restart',
 		DisableFunc = function()
 			-- Only allow restarting for local games or by the host of steam coop.
+			if isServerHost then
+				return true
+			end
 			if Spring.GetMenuName and Spring.SendLuaMenuMsg and Spring.GetMenuName() then
 				local myPing = select(6, Spring.GetPlayerInfo(Spring.GetMyPlayerID(), false))
-				return not (myPing and myPing < 40)
+				return not (myPing and myPing < 0.04)
 			end
 			return true
 		end,
@@ -3227,7 +3247,7 @@ function widget:SetConfigData(data)
 		settings.music_volume = nil
 	end
 
-	WG.crude.SetMusicVolume(settings.config["epic_Settings/Audio_Music_Volume"] or 0.5)
+	WG.crude.SetMusicVolume(settings.config["epic_Settings/Audio_Music_Volume"] or MUSIC_VOLUME_DEFAULT)
 	LoadKeybinds()
 end
 
@@ -3272,18 +3292,11 @@ function widget:GameFrame(n)
 	if lbl_gtime then
 		local gameOverFrame = Spring.GetGameRulesParam("MissionGameOver_frames")
 		if gameOverFrame then
-			lbl_gtime:SetCaption(GetTimeString((gameOverFrame)/30))
+			lbl_gtime:SetCaption(GetTimeString((gameOverFrame)/gameSpeed))
 			widgetHandler:RemoveWidgetCallIn("GameFrame", self)
 		end
-		if not lastSaveGameFrame then
-			lastSaveGameFrame = Spring.GetGameRulesParam("lastSaveGameFrame") or 0
-		end
-		if not totalSaveGameFrame then
-			totalSaveGameFrame = Spring.GetGameRulesParam("totalSaveGameFrame") or 0
-		end
-		
-		if (n + totalSaveGameFrame)%30 == 0 then
-			lbl_gtime:SetCaption(GetTimeString((n + totalSaveGameFrame)/30))
+		if n%gameSpeed == 0 then
+			lbl_gtime:SetCaption(GetTimeString(n/gameSpeed))
 		end
 	end
 end

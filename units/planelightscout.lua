@@ -1,9 +1,7 @@
 return { planelightscout = {
-  unitname            = [[planelightscout]],
   name                = [[Sparrow]],
   description         = [[Light Scout Plane]],
   brakerate           = 0.4,
-  buildCostMetal      = 235,
   builder             = false,
   buildPic            = [[planelightscout.png]],
   canFly              = true,
@@ -20,8 +18,14 @@ return { planelightscout = {
   cruiseAlt           = 220,
 
   customParams        = {
+    bait_level_target      = 2,
+
     modelradius    = [[8]],
     refuelturnradius = [[130]],
+
+    outline_x = 75,
+    outline_y = 75,
+    outline_yoff = 10,
   },
 
   explodeAs           = [[GUNSHIPEX]],
@@ -29,15 +33,13 @@ return { planelightscout = {
   footprintX          = 2,
   footprintZ          = 2,
   iconType            = [[scoutplane]],
-  idleAutoHeal        = 5,
-  idleTime            = 1800,
   maxAcc              = 0.5,
   maxDamage           = 350,
   maxAileron          = 0.016,
   maxElevator         = 0.022,
   maxRudder           = 0.012,
   maxVelocity         = 7,
-  minCloakDistance    = 75,
+  metalCost           = 235,
   noAutoFire          = false,
   noChaseCategory     = [[TERRAFORM SATELLITE FIXEDWING GUNSHIP HOVER SHIP SWIM SUB LAND FLOAT SINK TURRET]],
   objectName          = [[planelightscout.s3o]],

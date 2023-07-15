@@ -1,10 +1,8 @@
 return { vehcapture = {
-  unitname            = [[vehcapture]],
   name                = [[Dominatrix]],
   description         = [[Capture Rover]],
   acceleration        = 0.266,
   brakeRate           = 0.462,
-  buildCostMetal      = 420,
   builder             = false,
   buildPic            = [[vehcapture.png]],
   canGuard            = true,
@@ -15,11 +13,12 @@ return { vehcapture = {
   collisionVolumeScales  = [[26 26 50]],
   collisionVolumeType    = [[cylZ]],
   selectionVolumeOffsets = [[0 0 0]],
-  selectionVolumeScales  = [[40 40 50]],
+  selectionVolumeScales  = [[60 60 75]],
   selectionVolumeType    = [[cylZ]],
   corpse              = [[DEAD]],
 
   customParams        = {
+    bait_level_default = 1,
     modelradius    = [[13]],
     turnatfullspeed = [[1]],
     cus_noflashlight = 1,
@@ -29,17 +28,15 @@ return { vehcapture = {
   footprintX          = 3,
   footprintZ          = 3,
   iconType            = [[vehiclespecial]],
-  idleAutoHeal        = 5,
-  idleTime            = 1800,
   leaveTracks         = true,
   maxDamage           = 820,
   maxSlope            = 18,
   maxVelocity         = 1.95,
   maxWaterDepth       = 22,
-  minCloakDistance    = 75,
+  metalCost           = 420,
   movementClass       = [[TANK3]],
   noAutoFire          = false,
-  noChaseCategory     = [[TERRAFORM SATELLITE FIXEDWING GUNSHIP]],
+  noChaseCategory     = [[TERRAFORM SATELLITE FIXEDWING GUNSHIP DRONE]],
   objectName          = [[corvrad_big.s3o]],
   script              = [[vehcapture.lua]],
   selfDestructAs      = [[BIG_UNITEX]],
@@ -89,7 +86,6 @@ return { vehcapture = {
 
       damage                  = {
         default = 22,
-        subs    = 0.5,
       },
 
       explosionGenerator      = [[custom:NONE]],

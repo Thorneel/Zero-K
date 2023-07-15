@@ -1,12 +1,10 @@
 return { benzcom1 = {
-  unitname            = [[benzcom1]],
   name                = [[Siege Commander]],
   description         = [[Standoff Combat Commander]],
   acceleration        = 0.54,
   activateWhenBuilt   = true,
   autoHeal            = 5,
   brakeRate           = 2.25,
-  buildCostMetal      = 1200,
   buildDistance       = 128,
   builder             = true,
 
@@ -36,22 +34,19 @@ return { benzcom1 = {
 
   energyMake          = 6,
   energyStorage       = 500,
-  energyUse           = 0,
   explodeAs           = [[ESTOR_BUILDINGEX]],
   footprintX          = 2,
   footprintZ          = 2,
   iconType            = [[commander1]],
-  idleAutoHeal        = 5,
-  idleTime            = 1800,
   leaveTracks         = true,
   losEmitHeight       = 40,
   maxDamage           = 2250,
   maxSlope            = 36,
   maxVelocity         = 1.25,
   maxWaterDepth       = 5000,
+  metalCost           = 1200,
   metalMake           = 4,
   metalStorage        = 500,
-  minCloakDistance    = 75,
   movementClass       = [[AKBOT2]],
   noChaseCategory     = [[TERRAFORM SATELLITE FIXEDWING GUNSHIP HOVER SHIP SWIM SUB LAND FLOAT SINK]],
   objectName          = [[benzcom1.s3o]],
@@ -112,7 +107,6 @@ return { benzcom1 = {
 
       damage                  = {
         default = 0,
-        subs    = 0,
       },
 
       edgeEffectiveness       = 0.99,
@@ -149,7 +143,6 @@ return { benzcom1 = {
       damage                  = {
         default = 360,
         planes  = 360,
-        subs    = 18,
       },
       
       explosionGenerator      = [[custom:INGEBORG]],

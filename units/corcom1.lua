@@ -1,12 +1,10 @@
 return { corcom1 = {
-  unitname            = [[corcom1]],
   name                = [[Battle Commander]],
   description         = [[Heavy Combat Commander]],
   acceleration        = 0.54,
   activateWhenBuilt   = true,
   autoHeal            = 5,
   brakeRate           = 2.25,
-  buildCostMetal      = 1200,
   buildDistance       = 128,
   builder             = true,
 
@@ -37,22 +35,19 @@ return { corcom1 = {
 
   energyMake          = 6,
   energyStorage       = 500,
-  energyUse           = 0,
   explodeAs           = [[ESTOR_BUILDINGEX]],
   footprintX          = 2,
   footprintZ          = 2,
   iconType            = [[commander1]],
-  idleAutoHeal        = 5,
-  idleTime            = 1800,
   leaveTracks         = true,
   losEmitHeight       = 40,
   maxDamage           = 3000,
   maxSlope            = 36,
   maxVelocity         = 1.25,
   maxWaterDepth       = 5000,
+  metalCost           = 1200,
   metalMake           = 4,
   metalStorage        = 500,
-  minCloakDistance    = 75,
   movementClass       = [[AKBOT2]],
   noChaseCategory     = [[TERRAFORM SATELLITE FIXEDWING GUNSHIP HOVER SHIP SWIM SUB LAND FLOAT SINK TURRET]],
   objectName          = [[corcomAlt.s3o]],
@@ -116,7 +111,6 @@ return { corcom1 = {
 
       damage                  = {
         default = 0,
-        subs    = 0,
       },
 
       duration                = 0.1,
@@ -161,7 +155,6 @@ return { corcom1 = {
       damage                  = {
         default = 240,
         planes  = 240,
-        subs    = 12,
       },
 
       edgeEffectiveness       = 0.75,

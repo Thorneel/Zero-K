@@ -1,10 +1,8 @@
 return { spiderskirm = {
-  unitname               = [[spiderskirm]],
   name                   = [[Recluse]],
   description            = [[Skirmisher Spider (Indirect Fire)]],
   acceleration           = 0.78,
   brakeRate              = 4.68,
-  buildCostMetal         = 280,
   buildPic               = [[spiderskirm.png]],
   canGuard               = true,
   canMove                = true,
@@ -15,20 +13,19 @@ return { spiderskirm = {
   customParams           = {
     midposoffset   = [[0 -5 0]],
     aim_lookahead  = 160,
+    bait_level_default = 0,
   },
 
   explodeAs              = [[BIG_UNITEX]],
   footprintX             = 3,
   footprintZ             = 3,
   iconType               = [[spiderskirm]],
-  idleAutoHeal           = 5,
-  idleTime               = 1800,
   leaveTracks            = true,
   maxDamage              = 650,
   maxSlope               = 72,
   maxVelocity            = 1.5,
   maxWaterDepth          = 22,
-  minCloakDistance       = 75,
+  metalCost              = 280,
   movementClass          = [[TKBOT3]],
   noChaseCategory        = [[TERRAFORM FIXEDWING GUNSHIP SATELLITE SUB]],
   objectName             = [[recluse.s3o]],
@@ -72,7 +69,6 @@ return { spiderskirm = {
       damage                  = {
         default = 135,
         planes  = 135,
-        subs    = 7,
       },
 
       edgeEffectiveness       = 0.5,

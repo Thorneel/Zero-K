@@ -1,11 +1,11 @@
 function gadget:GetInfo()
 	return {
-		name 	= "Command Raw Move",
-		desc	= "Make unit move ahead at all cost!",
-		author	= "xponen, GoogleFrog",
-		date	= "June 12 2014",
-		license	= "GNU GPL, v2 or later",
-		layer	= 0,
+		name    = "Command Raw Move",
+		desc    = "Make unit move ahead at all cost!",
+		author  = "xponen, GoogleFrog",
+		date    = "June 12 2014",
+		license = "GNU GPL, v2 or later",
+		layer   = 0,
 		enabled = true,
 	}
 end
@@ -39,6 +39,10 @@ local CMD_OPT_ALT = CMD.OPT_ALT
 local MAX_UNITS = Game.maxUnits
 
 local rawBuildUpdateIgnore = include("LuaRules/Configs/state_commands.lua")
+
+local debugEnabled = false
+local debugUnitRestriction = false
+local debugMoveGoalOverridden = false
 
 local stopCommand = {
 	[CMD.GUARD] = true,
@@ -98,9 +102,14 @@ for i = 1, #UnitDefs do
 		if (ud.moveDef.maxSlope or 0) > 0.8 and ud.speed < 60 then
 			-- Slow spiders need a lot of leeway when climing cliffs.
 			stuckTravelOverride[i] = 5
-			startMovingTime[i] = 12 -- May take longer to start moving
+			startMovingTime[i] = 18 -- May take longer to start moving
 			-- Lower stopping distance for more precise placement on terrain
 			loneStopDist = 4
+		elseif ud.speed < 60 then
+			stuckTravelOverride[i] = 12
+		end
+		if ud.customParams.unstick_leeway then
+			startMovingTime[i] = tonumber(ud.customParams.unstick_leeway)
 		end
 		if ud.canFly then
 			canFlyDefs[i] = true
@@ -119,16 +128,9 @@ for i = 1, #UnitDefs do
 		if stopDist and not goalDist[i] then
 			goalDist[i] = loneStopDist
 		end
-		stoppingRadiusIncrease[i] = ud.xsize*250
+		stoppingRadiusIncrease[i] = ud.xsize*260*(1 + math.max(0, (ud.xsize - 4)*0.15))
 	end
 end
-
--- Debug
---local oldSetMoveGoal = Spring.SetUnitMoveGoal
---function Spring.SetUnitMoveGoal(unitID, x, y, z, radius, speed, raw)
---	oldSetMoveGoal(unitID, x, y, z, radius, speed, raw)
---	Spring.MarkerAddPoint(x, y, z, ((raw and "r") or "") .. (radius or 0))
---end
 
 ----------------------------------------------------------------------------------------------
 ----------------------------------------------------------------------------------------------
@@ -147,6 +149,8 @@ local TEST_MOVE_SPACING = 16
 local LAZY_SEARCH_DISTANCE = 450
 local BLOCK_RELAX_DISTANCE = 250
 local STUCK_TRAVEL = 25
+local STUCK_START_MOVE_TIMER = 12
+local STUCK_TIMER_BASE = 8
 local STUCK_MOVE_RANGE = 140
 local GIVE_UP_STUCK_DIST_SQ = 250^2
 local STOP_STOPPING_RADIUS = 10000000
@@ -168,7 +172,9 @@ local commonStopRadius = {}
 local oldCommandStoppingRadius = {}
 local commandCount = {}
 local oldCommandCount = {}
-local fromFactory = {}
+local fromFactoryReplaceSkip = {}
+local engineMoveAppeared = {}
+local fromFactoryID = {}
 
 local constructors = {}
 local constructorBuildDist = {}
@@ -178,6 +184,7 @@ local constructorsPerFrame = 0
 local constructorIndex = 1
 local alreadyResetConstructors = false
 
+local checkEngineMove
 local moveCommandReplacementUnits
 local fastConstructorUpdate
 
@@ -272,7 +279,7 @@ local function StopRawMoveUnit(unitID, stopNonRaw)
 	--Spring.Echo("StopRawMoveUnit", math.random())
 end
 
-local function HandleRawMove(unitID, unitDefID, cmdParams)
+local function HandleRawMove(unitID, unitDefID, cmdParams, canGiveUp)
 	if spMoveCtrlGetTag(unitID) then
 		--Spring.Echo("ret 10")
 		return true, false
@@ -355,7 +362,7 @@ local function HandleRawMove(unitID, unitDefID, cmdParams)
 
 	if not unitData.stuckCheckTimer then
 		unitData.ux, unitData.uz = x, z
-		unitData.stuckCheckTimer = (startMovingTime[unitDefID] or 8)
+		unitData.stuckCheckTimer = (startMovingTime[unitDefID] or STUCK_START_MOVE_TIMER)
 		if distSq > GIVE_UP_STUCK_DIST_SQ then
 			unitData.stuckCheckTimer = unitData.stuckCheckTimer + math.floor(math.random()*8)
 		end
@@ -367,9 +374,9 @@ local function HandleRawMove(unitID, unitDefID, cmdParams)
 		local travelled = math.abs(oldX - x) + math.abs(oldZ - z)
 		unitData.ux, unitData.uz = x, z
 		if travelled < (stuckTravelOverride[unitDefID] or STUCK_TRAVEL) then
-			unitData.stuckCheckTimer = math.floor(math.random()*6) + 5
+			unitData.stuckCheckTimer = math.floor(math.random()*6) + STUCK_TIMER_BASE
 			if not GG.floatUnit[unitID] then
-				if distSq < GIVE_UP_STUCK_DIST_SQ then
+				if canGiveUp and distSq < GIVE_UP_STUCK_DIST_SQ then
 					StopRawMoveUnit(unitID, true)
 					--Spring.Echo("ret 4")
 					return true, true
@@ -387,7 +394,7 @@ local function HandleRawMove(unitID, unitDefID, cmdParams)
 				end
 			end
 		else
-			unitData.stuckCheckTimer = 4 + math.min(6, math.floor(distSq/500))
+			unitData.stuckCheckTimer = STUCK_TIMER_BASE + math.min(6, math.floor(distSq/500))
 			if distSq > GIVE_UP_STUCK_DIST_SQ then
 				unitData.stuckCheckTimer = unitData.stuckCheckTimer + math.floor(math.random()*10)
 			end
@@ -413,8 +420,11 @@ local function HandleRawMove(unitID, unitDefID, cmdParams)
 		else
 			local distance = math.sqrt(distSq)
 			local rx, rz
-			freePath, rx, rz = IsPathFree(unitDefID, x, z, mx, mz, distance, TEST_MOVE_SPACING, lazy and LAZY_SEARCH_DISTANCE, goalDistOverride and (goalDistOverride - 20), BLOCK_RELAX_DISTANCE)
-			if rx then
+			freePath, rx, rz = IsPathFree(
+				unitDefID, x, z, mx, mz, distance, TEST_MOVE_SPACING, lazy and LAZY_SEARCH_DISTANCE,
+				goalDistOverride and (goalDistOverride - 20), canGiveUp and BLOCK_RELAX_DISTANCE
+			)
+			if rx and freePath then
 				mx, my, mz = rx, Spring.GetGroundHeight(rx, rz), rz
 			end
 			if (not freePath) then
@@ -422,7 +432,7 @@ local function HandleRawMove(unitID, unitDefID, cmdParams)
 			end
 		end
 		if (not unitData.commandHandled) or unitData.doingRawMove ~= freePath then
-			Spring.SetUnitMoveGoal(unitID, mx, my, mz, goalDist[unitDefID] or 16, nil, freePath)
+			Spring.SetUnitMoveGoal(unitID, mx, my, mz, goalDistOverride or goalDist[unitDefID] or 16, nil, freePath)
 			unitData.mx, unitData.mz = mx, mz
 			unitData.nextTestTime = math.floor(math.random()*2) + turnPeriods[unitDefID]
 			unitData.possiblyTurning = true
@@ -452,7 +462,8 @@ function gadget:CommandFallback(unitID, unitDefID, teamID, cmdID, cmdParams, cmd
 	if not (cmdID == CMD_RAW_MOVE or cmdID == CMD_RAW_BUILD) then
 		return false
 	end
-	local cmdUsed, cmdRemove = HandleRawMove(unitID, unitDefID, cmdParams)
+	local canGiveUp = not (cmdID == CMD_RAW_BUILD) -- Build orders are never removed, so raw build should not be either.
+	local cmdUsed, cmdRemove = HandleRawMove(unitID, unitDefID, cmdParams, canGiveUp)
 	return cmdUsed, cmdRemove
 end
 
@@ -476,6 +487,7 @@ function gadget:AllowCommand(unitID, unitDefID, unitTeam, cmdID, cmdParams, cmdO
 	if cmdID == CMD_MOVE and not canFlyDefs[unitDefID] then
 		moveCommandReplacementUnits = moveCommandReplacementUnits or {}
 		moveCommandReplacementUnits[#moveCommandReplacementUnits + 1] = unitID
+		engineMoveAppeared[unitID] = Spring.GetGameFrame()
 	end
 
 	if constructorBuildDistDefs[unitDefID] and not rawBuildUpdateIgnore[cmdID] then
@@ -569,7 +581,7 @@ local function CheckConstructorBuild(unitID)
 		local buildDistSq = (buildDist + 30)^2
 		local distSq = (cx - x)^2 + (cz - z)^2
 		if distSq > buildDistSq then
-			spGiveOrderToUnit(unitID, CMD_INSERT, {0, CMD_RAW_BUILD, 0, cx, cy, cz, buildDist, CONSTRUCTOR_TIMEOUT_RATE}, CMD_OPT_ALT)
+			spGiveOrderToUnit(unitID, CMD_INSERT, {0, CMD_RAW_BUILD, 0, cx, cy, cz, buildDist - 2, CONSTRUCTOR_TIMEOUT_RATE}, CMD_OPT_ALT)
 		end
 	end
 end
@@ -666,8 +678,8 @@ end
 local function ReplaceMoveCommand(unitID)
 	local cmdID, _, cmdTag, cmdParam_1, cmdParam_2, cmdParam_3 = spGetUnitCurrentCommand(unitID)
 	if cmdID == CMD_MOVE and cmdParam_3 then
-		if fromFactory[unitID] then
-			fromFactory[unitID] = nil
+		if fromFactoryReplaceSkip[unitID] then
+			fromFactoryReplaceSkip[unitID] = nil
 		else
 			spGiveOrderToUnit(unitID, CMD_INSERT, {0, CMD_RAW_MOVE, 0, cmdParam_1, cmdParam_2, cmdParam_3}, CMD_OPT_ALT)
 		end
@@ -691,6 +703,96 @@ local function UpdateMoveReplacement()
 	moveCommandReplacementUnits = nil
 end
 
+local function DoFactoryWaypointManually(unitID)
+	local cQueue = spGetCommandQueue(unitID, -1)
+	local foundRightOpts = false
+	for i = 1, #cQueue do
+		if cQueue[i].id ~= CMD_MOVE then
+			return
+		end
+		if cQueue[i].options.coded == 8 then
+			foundRightOpts = true
+		end
+	end
+	if not foundRightOpts then
+		return
+	end
+	local facID = fromFactoryID[unitID]
+	if not Spring.ValidUnitID(facID) then
+		return
+	end
+	local factoryQueue = spGetCommandQueue(facID, -1)
+	local orderArray = {}
+	for i = 1, #factoryQueue do
+		orderArray[i] = {
+			factoryQueue[i].id,
+			factoryQueue[i].params,
+			factoryQueue[i].options.coded
+		}
+	end
+	Spring.GiveOrderArrayToUnitArray({unitID}, orderArray)
+end
+
+local function UpdateEngineMoveCheck(frame)
+	-- Maybe this could be done one frame earlier, but I've already written it this
+	-- way and I don't want to unrewrite it if gadget:UnitFromFactory has recursion.
+	-- See https://github.com/ZeroK-RTS/Zero-K/issues/4317 for a test case.
+	if not checkEngineMove then
+		return
+	end
+
+	for i = 1, #checkEngineMove do
+		local unitID = checkEngineMove[i]
+		if engineMoveAppeared[unitID] ~= frame - 1 then
+			DoFactoryWaypointManually(unitID)
+		end
+		fromFactoryID[unitID] = nil
+	end
+	checkEngineMove = nil
+end
+
+----------------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------------
+-- Debug
+
+local function ToggleDebug(cmd, line, words, player)
+	if not Spring.IsCheatingEnabled() then
+		return
+	end
+	local unitID = tonumber(words[1])
+	if unitID then
+		Spring.Echo("Debug raw move for " .. unitID)
+		debugEnabled = true
+		debugUnitRestriction = debugUnitRestriction or {}
+		debugUnitRestriction[unitID] = true
+	elseif debugEnabled then
+		debugEnabled = false
+		Spring.Echo("Debug raw move disabled")
+	else
+		Spring.Echo("Debug raw move enabled")
+		debugEnabled = true
+		debugUnitRestriction = false
+	end
+	
+	if debugEnabled and not debugMoveGoalOverridden then
+		local oldSetMoveGoal = Spring.SetUnitMoveGoal
+		function Spring.SetUnitMoveGoal(unitID, x, y, z, radius, speed, raw)
+			oldSetMoveGoal(unitID, x, y, z, radius, speed, raw)
+			if (not debugUnitRestriction) or debugUnitRestriction[unitID] then
+				Spring.MarkerAddPoint(x, y, z, ((raw and "r") or "") .. (radius or 0))
+				Spring.Echo("SetGoal", unitID, x, y, z, radius, speed, raw)
+			end
+		end
+		local oldClearUnitGoal = Spring.ClearUnitGoal
+		function Spring.ClearUnitGoal(unitID)
+			oldClearUnitGoal(unitID)
+			if (not debugUnitRestriction) or debugUnitRestriction[unitID] then
+				Spring.Echo("ClearGoal", unitID)
+			end
+		end
+	end
+end
+
 ----------------------------------------------------------------------------------------------
 ----------------------------------------------------------------------------------------------
 -- Gadget Interface
@@ -700,8 +802,8 @@ local function WaitWaitMoveUnit(unitID)
 	if unitData then
 		ResetUnitData(unitData)
 	end
-	Spring.GiveOrderToUnit(unitID, CMD.WAIT, {}, 0)
-	Spring.GiveOrderToUnit(unitID, CMD.WAIT, {}, 0)
+	Spring.GiveOrderToUnit(unitID, CMD.WAIT, 0, 0)
+	Spring.GiveOrderToUnit(unitID, CMD.WAIT, 0, 0)
 end
 
 local function AddRawMoveUnit(unitID)
@@ -715,7 +817,10 @@ local function RawMove_IsPathFree(unitDefID, sX, sZ, gX, gZ)
 end
 
 function gadget:UnitFromFactory(unitID, unitDefID, unitTeam, facID, facDefID)
-	fromFactory[unitID] = true
+	fromFactoryReplaceSkip[unitID] = true
+	fromFactoryID[unitID] = facID
+	checkEngineMove = checkEngineMove or {}
+	checkEngineMove[#checkEngineMove + 1] = unitID
 end
 
 function gadget:Initialize()
@@ -728,6 +833,7 @@ function gadget:Initialize()
 	GG.StopRawMoveUnit = StopRawMoveUnit
 	GG.RawMove_IsPathFree = RawMove_IsPathFree
 	GG.WaitWaitMoveUnit = WaitWaitMoveUnit
+	gadgetHandler:AddChatAction("debugmove", ToggleDebug, "Debugs raw move.")
 end
 
 function gadget:UnitCreated(unitID, unitDefID, teamID)
@@ -758,6 +864,7 @@ function gadget:GameFrame(n)
 	end
 	UpdateConstructors(n)
 	UpdateMoveReplacement()
+	UpdateEngineMoveCheck(n)
 	if n%247 == 4 then
 		oldCommandStoppingRadius = commonStopRadius
 		commonStopRadius = {}
@@ -773,14 +880,6 @@ function gadget:GameFrame(n)
 		CheckUnitQueues()
 		unitQueueCheckRequired = false
 	end
-end
-
---------------------------------------------------------------------------------
---------------------------------------------------------------------------------
--- Save/Load
-
-function gadget:Load(zip)
-	needGlobalWaitWait = true
 end
 
 ----------------------------------------------------------------------------------------------

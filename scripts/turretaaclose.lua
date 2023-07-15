@@ -2,6 +2,8 @@ include "constants.lua"
 
 local scriptReload = include("scriptReload.lua")
 
+local OKP_DAMAGE = tonumber(UnitDefs[unitDefID].customParams.okp_damage)
+
 -- Pieces
 local base = piece 'base'
 local body = piece 'body'
@@ -63,8 +65,8 @@ function script.AimWeapon(num, heading, pitch)
 	--local _, curHeading = Spring.GetUnitPieceDirection(unitID, turret)
 	--local curPitch = Spring.GetUnitPieceDirection(unitID, launcher1)
 	--
-	--local diffHeading = math.pi - math.abs((curHeading - heading)%GG.Script.tau - math.pi)
-	--local diffPitch = math.pi - math.abs((curPitch + pitch)%GG.Script.tau - math.pi)
+	--local diffHeading = math.pi - math.abs((curHeading - heading) % math.tau - math.pi)
+	--local diffPitch = math.pi - math.abs((curPitch + pitch) % math.tau - math.pi)
 	--
 	--local sleepTime = (diffHeading/math.rad(200))*1000 - 300
 	--Spring.Echo(sleepTime)
@@ -110,7 +112,7 @@ end
 
 function script.BlockShot(num, targetID)
 	if gun[shot].loaded then
-		return GG.Script.OverkillPreventionCheck(unitID, targetID, 500.1, 430, 26, 0.1, true)
+		return GG.Script.OverkillPreventionCheck(unitID, targetID, OKP_DAMAGE, 430, 26, 0.1, true)
 	end
 	return true
 end

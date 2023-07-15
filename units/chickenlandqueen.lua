@@ -1,16 +1,12 @@
 return { chickenlandqueen = {
-  unitname               = [[chickenlandqueen]],
   name                   = [[Chicken Queen]],
   description            = [[Clucking Hell!]],
   acceleration           = 3.0,
   activateWhenBuilt      = true,
   autoHeal               = 0,
   brakeRate              = 18.0,
-  buildCostEnergy        = 0,
-  buildCostMetal         = 0,
   builder                = false,
   buildPic               = [[chickenflyerqueen.png]],
-  buildTime              = 40000,
   canGuard               = true,
   canMove                = true,
   canPatrol              = true,
@@ -24,17 +20,24 @@ return { chickenlandqueen = {
 
   customParams           = {
     selection_scale       = 2,
+
+    outline_x = 400,
+    outline_y = 400,
+    outline_yoff = 90,
   },
 
   explodeAs              = [[SMALL_UNITEX]],
   footprintX             = 4,
   footprintZ             = 4,
   iconType               = [[chickenq]],
-  idleAutoHeal           = 5,
-  idleTime               = 1800,
+  idleAutoHeal           = 20,
+  idleTime               = 300,
   leaveTracks            = true,
   maxDamage              = 200000,
   maxVelocity            = 2.5,
+  metalCost              = 0,
+  energyCost             = 0,
+  buildTime              = 40000,
   minCloakDistance       = 250,
   movementClass          = [[AKBOT4]],
   noAutoFire             = false,
@@ -270,7 +273,6 @@ return { chickenlandqueen = {
       damage                  = {
         default = 400,
         planes  = 400,
-        subs    = 2,
       },
 
       explosionGenerator      = [[custom:napalm_koda]],
@@ -305,7 +307,6 @@ return { chickenlandqueen = {
       damage                  = {
         default = 1000,
         planes  = 1000,
-        subs    = 1000,
       },
 
       explosionGenerator      = [[custom:NONE]],
@@ -342,7 +343,6 @@ return { chickenlandqueen = {
         default    = 10,
         chicken    = 0.001,
         planes     = 10,
-        subs       = 5,
       },
 
       edgeEffectiveness       = 1,
@@ -380,7 +380,6 @@ return { chickenlandqueen = {
       damage                  = {
         default = 75,
         planes  = [[150]],
-        subs    = 7.5,
       },
 
       dance                   = 60,

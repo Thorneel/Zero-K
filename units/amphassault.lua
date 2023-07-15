@@ -1,11 +1,9 @@
 return { amphassault = {
-  unitname            = [[amphassault]],
   name                = [[Grizzly]],
   description         = [[Heavy Amphibious Assault Walker]],
   acceleration        = 0.3,
   activateWhenBuilt   = true,
   brakeRate           = 1.8,
-  buildCostMetal      = 2000,
   buildPic            = [[amphassault.png]],
   canGuard            = true,
   canMove             = true,
@@ -14,9 +12,13 @@ return { amphassault = {
   collisionVolumeOffsets  = [[0 0 0]],
   --collisionVolumeScales = [[70 70 70]],
   --collisionVolumeType   = [[ellipsoid]],
+  selectionVolumeOffsets = [[0 0 0]],
+  selectionVolumeScales  = [[105 105 105]],
+  selectionVolumeType    = [[ellipsoid]],
   corpse              = [[DEAD]],
 
   customParams        = {
+    bait_level_default = 1,
     amph_regen = 40,
     amph_submerged_at = 40,
     sink_on_emp    = 0,
@@ -30,14 +32,12 @@ return { amphassault = {
   footprintX          = 4,
   footprintZ          = 4,
   iconType            = [[amphassault]],
-  idleAutoHeal        = 5,
-  idleTime            = 1800,
   leaveTracks         = true,
   maxDamage           = 8400,
   maxSlope            = 36,
   maxVelocity         = 1.5,
   maxReverseVelocity  = 0,
-  minCloakDistance    = 75,
+  metalCost           = 2000,
   movementClass       = [[AKBOT4]],
   noChaseCategory     = [[TERRAFORM FIXEDWING SUB]],
   objectName          = [[amphassault.s3o]],
@@ -98,7 +98,6 @@ return { amphassault = {
       damage                  = {
         default = 750.1,
         planes  = 750.1,
-        subs    = 45.1,
       },
 
       explosionGenerator      = [[custom:flash1bluedark]],
@@ -148,7 +147,6 @@ return { amphassault = {
 
       damage                  = {
         default = 300,
-        subs    = 15,
       },
 
       explosionGenerator      = [[custom:flash1bluedark]],

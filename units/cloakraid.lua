@@ -1,15 +1,13 @@
 return { cloakraid = {
-  unitname               = [[cloakraid]],
   name                   = [[Glaive]],
   description            = [[Light Raider Bot]],
   acceleration           = 1.5,
   brakeRate              = 2.4,
-  buildCostMetal         = 65,
   buildPic               = [[cloakraid.png]],
   canGuard               = true,
   canMove                = true,
   canPatrol              = true,
-  category               = [[LAND TOOFAST]],
+  category               = [[LAND SMALL TOOFAST]],
   collisionVolumeOffsets = [[0 -2 0]],
   collisionVolumeScales  = [[18 28 18]],
   collisionVolumeType    = [[cylY]],
@@ -19,6 +17,8 @@ return { cloakraid = {
     modelradius        = [[16]],
     cus_noflashlight   = 1,
     aim_lookahead      = 80,
+    set_target_range_buffer = 30,
+    set_target_speed_buffer = 8,
   },
 
   explodeAs              = [[SMALL_UNITEX]],
@@ -32,7 +32,7 @@ return { cloakraid = {
   maxSlope               = 36,
   maxVelocity            = 3.85,
   maxWaterDepth          = 22,
-  minCloakDistance       = 75,
+  metalCost              = 65,
   movementClass          = [[KBOT2]],
   noAutoFire             = false,
   noChaseCategory        = [[TERRAFORM FIXEDWING SUB]],
@@ -88,7 +88,6 @@ return { cloakraid = {
 
       damage                  = {
         default = 10.5,
-        subs    = 0.525,
       },
 
       explosionGenerator      = [[custom:FLASHPLOSION]],

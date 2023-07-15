@@ -15,7 +15,6 @@ local THIGH_FRONT_ANGLE = math.rad(-50)
 local THIGH_FRONT_SPEED = math.rad(60) * PACE
 local THIGH_BACK_ANGLE = math.rad(10)
 local THIGH_BACK_SPEED = math.rad(60) * PACE
-local CALF_RETRACT_ANGLE = math.rad(0)
 local CALF_RETRACT_SPEED = math.rad(90) * PACE
 local CALF_STRAIGHTEN_ANGLE = math.rad(70)
 local CALF_STRAIGHTEN_SPEED = math.rad(90) * PACE
@@ -28,29 +27,12 @@ local BODY_TILT_SPEED = math.rad(10)
 local BODY_RISE_HEIGHT = 4
 local BODY_RISE_SPEED = 6*PACE
 
-local ARM_FRONT_ANGLE = -math.rad(20)
-local ARM_FRONT_SPEED = math.rad(22.5) * PACE
-local ARM_BACK_ANGLE = math.rad(10)
-local ARM_BACK_SPEED = math.rad(22.5) * PACE
-local FOREARM_FRONT_ANGLE = -math.rad(40)
-local FOREARM_FRONT_SPEED = math.rad(45) * PACE
-local FOREARM_BACK_ANGLE = math.rad(10)
-local FOREARM_BACK_SPEED = math.rad(45) * PACE
-
 local SIG_WALK = 1
 local SIG_AIM1 = 2
-local SIG_AIM2 = 4
 local SIG_RESTORE = 8
 local SIG_FLOAT = 16
 local SIG_BOB = 32
 local UNDERWATER_DEPTH = -32
-
---------------------------------------------------------------------------------------
---------------------------------------------------------------------------------------
--- Weapon config
-
-local SOUND_PERIOD = 2
-local soundIndex = SOUND_PERIOD
 
 --------------------------------------------------------------------------------------
 --------------------------------------------------------------------------------------
@@ -68,19 +50,20 @@ local function Bob()
 	Signal(SIG_BOB)
 	SetSignalMask(SIG_BOB)
 	while true do
-		Turn(base, x_axis, math.rad(math.random(-2,2)), math.rad(math.random()))
-		Turn(base, z_axis, math.rad(math.random(-2,2)), math.rad(math.random()))
-		Move(base, y_axis, math.rad(math.random(0,2)), math.rad(math.random()))
+		Turn(base, x_axis, math.rad(4)*math.random() - math.rad(2), math.random()*math.rad(1))
+		Turn(base, z_axis, math.rad(4)*math.random() - math.rad(2), math.random()*math.rad(1))
+		Move(base, y_axis, math.rad(2)*math.random(), math.random()*math.rad(1))
 		Sleep(2000)
-		Turn(base, x_axis, math.rad(math.random(-2,2)), math.rad(math.random()))
-		Turn(base, z_axis, math.rad(math.random(-2,2)), math.rad(math.random()))
-		Move(base, y_axis, math.rad(math.random(-2,0)), math.rad(math.random()))
+
+		Turn(base, x_axis, math.rad(4)*math.random() - math.rad(2), math.random()*math.rad(1))
+		Turn(base, z_axis, math.rad(4)*math.random() - math.rad(2), math.random()*math.rad(1))
+		Move(base, y_axis, math.rad(-2)*math.random(), math.random()*math.rad(1))
 		Sleep(2000)
 	end
 end
 
+--[[
 local function FloatBubbles()
-	--[[
 	SetSignalMask(SIG_FLOAT + SIG_WALK)
 	local isSubmerged = true
 	while true do
@@ -98,8 +81,8 @@ local function FloatBubbles()
 		Sleep(33)
 		
 	end
-	]]
 end
+]]
 
 local function riseFloat_thread()
 	if floatState ~= 0 then
@@ -123,28 +106,28 @@ local function riseFloat_thread()
 	
 	while true do
 		
-		Turn(lthigh,x_axis, math.rad(10+25), math.rad(75))
-		Turn(rthigh,x_axis, math.rad(10-25), math.rad(75))
+		Turn(lthigh,x_axis, math.rad(35), math.rad(75))
+		Turn(rthigh,x_axis, math.rad(-15), math.rad(75))
 		
 		
 		Sleep(200)
 		
-		Turn(lcalf,x_axis, math.rad(-25-20), math.rad(100))
-		Turn(lfoot,x_axis, math.rad(10+20), math.rad(100))
-		Turn(rcalf,x_axis, math.rad(-25+20), math.rad(100))
-		Turn(rfoot,x_axis, math.rad(10-20), math.rad(100))
+		Turn(lcalf,x_axis, math.rad(-45), math.rad(100))
+		Turn(lfoot,x_axis, math.rad(30), math.rad(100))
+		Turn(rcalf,x_axis, math.rad(-5), math.rad(100))
+		Turn(rfoot,x_axis, math.rad(-10), math.rad(100))
 		
 		Sleep(200)
 		
-		Turn(lthigh,x_axis, math.rad(10-25), math.rad(75))
-		Turn(rthigh,x_axis, math.rad(10+25), math.rad(75))
+		Turn(lthigh,x_axis, math.rad(-15), math.rad(75))
+		Turn(rthigh,x_axis, math.rad(35), math.rad(75))
 		
 		Sleep(200)
 		
-		Turn(lcalf,x_axis, math.rad(-25+20), math.rad(100))
-		Turn(lfoot,x_axis, math.rad(10-20), math.rad(100))
-		Turn(rcalf,x_axis, math.rad(-25-20), math.rad(100))
-		Turn(rfoot,x_axis, math.rad(10+20), math.rad(100))
+		Turn(lcalf,x_axis, math.rad(-5), math.rad(100))
+		Turn(lfoot,x_axis, math.rad(-10), math.rad(100))
+		Turn(rcalf,x_axis, math.rad(-45), math.rad(100))
+		Turn(rfoot,x_axis, math.rad(30), math.rad(100))
 		
 		Sleep(200)
 	end
@@ -159,33 +142,33 @@ local function staticFloat_thread()
 	Signal(SIG_FLOAT)
 	SetSignalMask(SIG_FLOAT + SIG_WALK)
 		
-	Turn(lcalf,x_axis, math.rad(-25-20), math.rad(50))
-	Turn(lfoot,x_axis, math.rad(10+20), math.rad(50))
-	Turn(rcalf,x_axis, math.rad(-25+20), math.rad(50))
-	Turn(rfoot,x_axis, math.rad(10-20), math.rad(50))
+	Turn(lcalf,x_axis, math.rad(-45), math.rad(50))
+	Turn(lfoot,x_axis, math.rad(30), math.rad(50))
+	Turn(rcalf,x_axis, math.rad(-5), math.rad(50))
+	Turn(rfoot,x_axis, math.rad(-10), math.rad(50))
 	
 	while true do
-		Turn(lthigh,x_axis, math.rad(10+25), math.rad(37.5))
-		Turn(rthigh,x_axis, math.rad(10-25), math.rad(37.5))
+		Turn(lthigh,x_axis, math.rad(35), math.rad(37.5))
+		Turn(rthigh,x_axis, math.rad(-15), math.rad(37.5))
 		
 		Sleep(400)
 		
-		Turn(lcalf,x_axis, math.rad(-25-20), math.rad(50))
-		Turn(lfoot,x_axis, math.rad(10+20), math.rad(50))
-		Turn(rcalf,x_axis, math.rad(-25+20), math.rad(50))
-		Turn(rfoot,x_axis, math.rad(10-20), math.rad(50))
+		Turn(lcalf,x_axis, math.rad(-45), math.rad(50))
+		Turn(lfoot,x_axis, math.rad(30), math.rad(50))
+		Turn(rcalf,x_axis, math.rad(-5), math.rad(50))
+		Turn(rfoot,x_axis, math.rad(-10), math.rad(50))
 		
 		Sleep(400)
 		
-		Turn(lthigh,x_axis, math.rad(10-25), math.rad(37.5))
-		Turn(rthigh,x_axis, math.rad(10+25), math.rad(37.5))
+		Turn(lthigh,x_axis, math.rad(-15), math.rad(37.5))
+		Turn(rthigh,x_axis, math.rad(35), math.rad(37.5))
 		
 		Sleep(400)
 		
-		Turn(lcalf,x_axis, math.rad(-25+20), math.rad(50))
-		Turn(lfoot,x_axis, math.rad(10-20), math.rad(50))
-		Turn(rcalf,x_axis, math.rad(-25-20), math.rad(50))
-		Turn(rfoot,x_axis, math.rad(10+20), math.rad(50))
+		Turn(lcalf,x_axis, math.rad(-5), math.rad(50))
+		Turn(lfoot,x_axis, math.rad(-10), math.rad(50))
+		Turn(rcalf,x_axis, math.rad(-45), math.rad(50))
+		Turn(rfoot,x_axis, math.rad(30), math.rad(50))
 		
 		Sleep(400)
 	end
@@ -209,12 +192,12 @@ local function sinkFloat_thread()
 	Turn(lfoot, x_axis, 0, math.rad(80)*PACE)
 	Turn(pelvis, z_axis, 0, math.rad(20)*PACE)
 	Move(pelvis, y_axis, 0, 12*PACE)
-	
-	Turn(base, x_axis,0, math.rad(math.random(1,2)))
-	Turn(base, z_axis, 0, math.rad(math.random(1,2)))
-	Move(base, y_axis, 0, math.rad(math.random(1,2)))
-	
-	while true do --FIXME: not stopped when sinking ends!
+
+	Turn(base, x_axis, 0, math.rad(1) + math.random()*math.rad(1))
+	Turn(base, z_axis, 0, math.rad(1) + math.random()*math.rad(1))
+	Move(base, y_axis, 0, math.rad(1) + math.random()*math.rad(1))
+
+	while true do -- not infinite, stopped via signal
 		EmitSfx(torso, 1025)
 		Sleep(66)
 	end

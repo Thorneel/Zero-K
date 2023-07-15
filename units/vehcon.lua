@@ -1,10 +1,8 @@
 return { vehcon = {
-  unitname               = [[vehcon]],
   name                   = [[Mason]],
   description            = [[Construction Rover]],
   acceleration           = 0.4,
   brakeRate              = 18.0,
-  buildCostMetal         = 120,
   buildDistance          = 180,
   builder                = true,
 
@@ -27,19 +25,16 @@ return { vehcon = {
     cus_noflashlight = 1,
   },
 
-  energyUse              = 0,
   explodeAs              = [[BIG_UNITEX]],
   footprintX             = 2,
   footprintZ             = 2,
   iconType               = [[builder]],
-  idleAutoHeal           = 5,
-  idleTime               = 1800,
   leaveTracks            = true,
   maxDamage              = 1000,
   maxSlope               = 18,
-  maxVelocity            = 2.4,
+  maxVelocity            = 2.3,
   maxWaterDepth          = 22,
-  minCloakDistance       = 75,
+  metalCost              = 120,
   movementClass          = [[TANK2]],
   noAutoFire             = false,
   noChaseCategory        = [[TERRAFORM SATELLITE FIXEDWING GUNSHIP HOVER SHIP SWIM SUB LAND FLOAT SINK TURRET]],
@@ -61,6 +56,9 @@ return { vehcon = {
 
     DEAD  = {
       blocking         = true,
+      collisionVolumeOffsets = [[0 5 0]],
+      collisionVolumeScales  = [[28 28 40]],
+      collisionVolumeType    = [[cylZ]],
       featureDead      = [[HEAP]],
       footprintX       = 3,
       footprintZ       = 3,

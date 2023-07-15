@@ -1,10 +1,8 @@
 return { gunshipassault = {
-  unitname            = [[gunshipassault]],
   name                = [[Revenant]],
   description         = [[Heavy Raider/Assault Gunship]],
   acceleration        = 0.15,
   brakeRate           = 0.13,
-  buildCostMetal      = 850,
   builder             = false,
   buildPic            = [[gunshipassault.png]],
   canFly              = true,
@@ -21,6 +19,7 @@ return { gunshipassault = {
   cruiseAlt           = 135,
 
   customParams        = {
+    bait_level_default = 1,
     airstrafecontrol = [[1]],
     modelradius    = [[10]],
   },
@@ -31,9 +30,9 @@ return { gunshipassault = {
   footprintZ          = 3,
   hoverAttack         = true,
   iconType            = [[heavygunshipassault]],
-  maxDamage           = 3600,
+  maxDamage           = 4200,
   maxVelocity         = 4.5,
-  minCloakDistance    = 75,
+  metalCost           = 850,
   noAutoFire          = false,
   noChaseCategory     = [[TERRAFORM FIXEDWING SATELLITE GUNSHIP SUB]],
   objectName          = [[Black_Dawn.s3o]],
@@ -62,7 +61,7 @@ return { gunshipassault = {
       areaOfEffect            = 96,
       avoidFeature            = false,
       avoidFriendly           = false,
-      burst                   = 8,
+      burst                   = 9,
       burstrate               = 2/30,
       cegTag                  = [[BANISHERTRAIL]],
       collideFriendly         = false,
@@ -81,10 +80,9 @@ return { gunshipassault = {
 
       damage                  = {
         default = 220.5,
-        subs    = 11,
       },
 
-      dance                   = 30,
+      dance                   = 28,
       edgeEffectiveness       = 0.5,
       explosionGenerator      = [[custom:MEDMISSILE_EXPLOSION]],
       fireStarter             = 70,
@@ -92,7 +90,7 @@ return { gunshipassault = {
       impulseBoost            = 0,
       impulseFactor           = 0.4,
       interceptedByShieldType = 2,
-      model                   = [[hobbes.s3o]],
+      model                   = [[hobbes_nohax.s3o]],
       noSelfDamage            = true,
       range                   = 270,
       reloadtime              = 9,

@@ -1,10 +1,8 @@
 return { neebcomm = {
-  unitname            = [[neebcomm]],
   name                = [[Neeb Comm]],
   description         = [[Ugly Turkey]],
   acceleration        = 0.6,
   brakeRate           = 1.23,
-  buildCostMetal      = 1200,
   buildDistance       = 128,
   builder             = true,
 
@@ -16,7 +14,6 @@ return { neebcomm = {
   canMove             = true,
   canPatrol           = true,
   canSubmerge         = true,
-  cantBeTransported   = true,
   category            = [[LAND UNARMED]],
 
   customParams        = {
@@ -29,16 +26,16 @@ return { neebcomm = {
   footprintX          = 4,
   footprintZ          = 4,
   iconType            = [[chickenc]],
-  idleAutoHeal        = 0,
+  idleAutoHeal        = 20,
   idleTime            = 300,
   leaveTracks         = true,
   maxDamage           = 2000,
   maxSlope            = 36,
   maxVelocity         = 1.2,
   maxWaterDepth       = 22,
+  metalCost           = 1200,
   metalMake           = 2,
   metalStorage        = 500,
-  minCloakDistance    = 75,
   movementClass       = [[AKBOT3]],
   noAutoFire          = false,
   noChaseCategory     = [[TERRAFORM SATELLITE FIXEDWING GUNSHIP HOVER SHIP SWIM SUB LAND FLOAT SINK TURRET]],

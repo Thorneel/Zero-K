@@ -47,6 +47,7 @@ local defaultRank, morphRankTransfer = VFS.Include(LUAUI_DIRNAME .. "Configs/sel
 -- Epic Menu Options
 
 local ctrlFlattenRank = 1
+local altFilterHighRank = 2
 local doubleClickFlattenRank = 1
 local retreatOverride = true
 local retreatingRank = 0
@@ -70,26 +71,39 @@ end
 
 options_path = 'Settings/Interface/Selection'
 local retreatPath = 'Settings/Interface/Retreat Zones'
-options_order = { 'useSelectionFilteringOption', 'selectionFilteringOnlyAltOption', 'ctrlFlattenRankOption', 'doubleClickFlattenRankOption', 'retreatOverrideOption', 'retreatingRankOption', 'retreatDeselects' }
+options_order = {
+	'label_selection_rank',
+	'useSelectionFilteringOption',
+	'ctrlFlattenRankOption',
+	'selectionFilteringOnlyAltOption',
+	'altBlocksHighRankSelection',
+	'doubleClickFlattenRankOption',
+	'retreatOverrideOption',
+	'retreatingRankOption',
+	'retreatDeselects'
+}
+
 options = {
+	label_selection_rank = {
+		type = 'text',
+		name = 'Selection Rank Filtering',
+		value = [[Units have a toggleable selection rank on the right side of their command card (the circle with numbers 0-3).
+ - Normal selection only selects the boxed units with the highest rank.
+ - Shift ignores rank.
+ - Combat units default to rank 3.
+ - Constructors default to rank 2.
+ - Structures default to rank 1.
+ - Rank 0 intended for manual use to make a unit hard to accidentally select.
+ - Default rank can be edited in 'Settings/Unit Behaviour/Default States'.]],
+	},
 	useSelectionFilteringOption = {
-		name = "Use selection filtering",
+		name = "Enable selection filtering",
 		type = "bool",
 		value = true,
 		noHotkey = true,
-		desc = "Filter constructors out of mixed constructor/combat unit selection.",
+		desc = "Enables selection rank, which filters constructors from combat units by default.",
 		OnChange = function (self)
 			useSelectionFiltering = self.value
-		end
-	},
-	selectionFilteringOnlyAltOption = {
-		name = "Only filter when Alt is held",
-		type = "bool",
-		value = false,
-		noHotkey = true,
-		desc = "Enable selection filtering when Alt is held. Requires the main selection filtering option to be enabled.",
-		OnChange = function (self)
-			selectionFilteringOnlyAlt = self.value
 		end
 	},
 	ctrlFlattenRankOption = {
@@ -102,6 +116,28 @@ options = {
 		tooltip_format = "%.0f",
 		OnChange = function (self)
 			ctrlFlattenRank = self.value
+		end
+	},
+	selectionFilteringOnlyAltOption = {
+		name = "Only filter when Alt is held",
+		type = "bool",
+		value = false,
+		noHotkey = true,
+		desc = "Enable selection filtering when Alt is held. Requires the main selection filtering option to be enabled.",
+		OnChange = function (self)
+			selectionFilteringOnlyAlt = self.value
+		end
+	},
+	altBlocksHighRankSelection = {
+		name = 'Hold Alt to filter out ranks above:',
+		desc = "Useful for selecting low-rank units, such as constructors as they default to rank 2.",
+		type = 'number',
+		value = 2,
+		min = 0, max = 3, step = 1,
+		noHotkey = true,
+		tooltip_format = "%.0f",
+		OnChange = function (self)
+			altFilterHighRank = self.value
 		end
 	},
 	doubleClickFlattenRankOption = {
@@ -234,12 +270,12 @@ local function RawGetFilteredSelection(units, subselection, subselectionCheckDon
 		return -- Don't filter when the change is just that something was deselected
 	end
 	
-	if #units <= 1 then
+	if #units <= 1 and not alt then
 		return
 	end
 	
 	if CheckControlGroupHotkeys() then
-		return	-- assume the user is selecting a control group
+		return -- assume the user is selecting a control group
 	end
 	
 	if doubleClickUnitDefID then
@@ -264,7 +300,15 @@ local function RawGetFilteredSelection(units, subselection, subselectionCheckDon
 		if retreatOverride and unitID and (Spring.GetUnitRulesParam(unitID, "retreat") == 1) and (rank > retreatingRank) then
 			rank = retreatingRank
 		end
+
+		if WG.GlobalBuildCommand and WG.GlobalBuildCommand.IsSelectionOverrideSet and WG.GlobalBuildCommand.IsControllingUnit(unitID) and (rank > WG.GlobalBuildCommand.SelectionOverrideRank) then
+			rank = WG.GlobalBuildCommand.SelectionOverrideRank
+		end
+
 		if rank then
+			if (alt and rank > altFilterHighRank) then
+				rank = -1
+			end
 			if ctrl and rank > ctrlFlattenRank then
 				rank = ctrlFlattenRank
 			end

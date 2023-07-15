@@ -11,7 +11,6 @@ local fakeWeapondef = {
 	avoidNeutral            = false,
 	damage                  = {
 		default = 11.34,
-		subs    = 0.567,
 	},
 	explosionGenerator      = [[custom:FLASHPLOSION]],
 	noSelfDamage            = true,
@@ -55,7 +54,7 @@ local structureConfig = {
 
 		unitDef.footprintx = 4
 		unitDef.footprintz = 4
-		unitDef.buildcostmetal = 600*STRUCTURE_COST_MULT
+		unitDef.metalcost = 600*STRUCTURE_COST_MULT
 
 		unitDef.customparams.soundselect = "cloaker_select"
 
@@ -75,7 +74,7 @@ local structureConfig = {
 
 		unitDef.footprintx = 20
 		unitDef.footprintz = 16
-		unitDef.buildcostmetal = 400*STRUCTURE_COST_MULT
+		unitDef.metalcost = 400*STRUCTURE_COST_MULT
 
 		unitDef.customparams.soundselect = "building_select1"
 
@@ -88,8 +87,8 @@ local structureConfig = {
 		unitDef.canattack = true
 		unitDef.workertime = 10
 		unitDef.buildoptions = { [[gunshiptrans]], [[gunshipheavytrans]] }
-		unitDef.customparams.nongroundfac = [[1]]
 		unitDef.customparams.landflystate = [[0]]
+		unitDef.customparams.factory_land_state = 0
 
 		unitDef.yardmap = string.rep("o", unitDef.footprintx * unitDef.footprintz)
 
@@ -108,7 +107,7 @@ local structureConfig = {
 
 		unitDef.footprintx = 16
 		unitDef.footprintz = 11
-		unitDef.buildcostmetal = 400*STRUCTURE_COST_MULT
+		unitDef.metalcost = 400*STRUCTURE_COST_MULT
 
 		unitDef.customparams.soundselect = "building_select1"
 
@@ -122,8 +121,8 @@ local structureConfig = {
 		unitDef.canattack = true
 		unitDef.workertime = 10
 		unitDef.buildoptions = { [[bomberprec]], [[bomberriot]], [[bomberdisarm]], [[bomberheavy]] }
-		unitDef.customparams.nongroundfac = [[1]]
 		unitDef.customparams.landflystate = [[0]]
+		unitDef.customparams.factory_land_state = 0
 
 		unitDef.yardmap = string.rep("o", unitDef.footprintx * unitDef.footprintz)
 
@@ -147,7 +146,7 @@ local structureConfig = {
 
 		unitDef.footprintx = 7
 		unitDef.footprintz = 7
-		unitDef.buildcostmetal = 100*STRUCTURE_COST_MULT
+		unitDef.metalcost = 100*STRUCTURE_COST_MULT
 
 		unitDef.collisionvolumescales = [[90 125 90]]
 
@@ -170,13 +169,17 @@ local structureConfig = {
 
 		unitDef.footprintx = 4
 		unitDef.footprintz = 4
-		unitDef.buildcostmetal = 275*STRUCTURE_COST_MULT
+		unitDef.metalcost = 275*STRUCTURE_COST_MULT
 
 		unitDef.collisionvolumescales = [[56 120 56]]
 		unitDef.collisionvolumetype	= [[CylY]]
 		unitDef.collisionvolumeoffsets = [[0 10 0]]
 
 		unitDef.customparams.soundselect = "building_select2"
+
+		unitDef.customparams.outline_x = 220
+		unitDef.customparams.outline_y = 220
+		unitDef.customparams.outline_yoff = 75
 
 		unitDef.featuredefs.dead.object = "pw_mine_dead.dae"
 		unitDef.featuredefs.heap.object = "debris4x4b.s3o"
@@ -197,7 +200,7 @@ local structureConfig = {
 
 		unitDef.footprintx = 12
 		unitDef.footprintz = 12
-		unitDef.buildcostmetal = 625*STRUCTURE_COST_MULT
+		unitDef.metalcost = 625*STRUCTURE_COST_MULT
 
 		unitDef.explodeas = "NUCLEAR_MISSILE"
 		unitDef.selfdestructas = "NUCLEAR_MISSILE"
@@ -222,7 +225,7 @@ local structureConfig = {
 
 		unitDef.footprintx = 11
 		unitDef.footprintz = 6
-		unitDef.buildcostmetal = 250*STRUCTURE_COST_MULT
+		unitDef.metalcost = 250*STRUCTURE_COST_MULT
 
 		unitDef.customparams.soundselect = "factory_select"
 
@@ -244,16 +247,19 @@ local structureConfig = {
 
 		unitDef.footprintx = 6
 		unitDef.footprintz = 6
-		unitDef.buildcostmetal = 250*STRUCTURE_COST_MULT
+		unitDef.metalcost = 250*STRUCTURE_COST_MULT
 
 		unitDef.customparams.soundselect = "radar_select"
+
+		unitDef.customparams.outline_x = 260
+		unitDef.customparams.outline_y = 260
+		unitDef.customparams.outline_yoff = 95
 
 		unitDef.sightdistance = 800
 		unitDef.radardistance = 2100
 		unitDef.radaremitheight = 150
 		unitDef.losemitheight = 150
 		unitDef.onoffable = false
-		unitDef.energyuse = 0
 
 		unitDef.collisionvolumescales = [[100 80 100]]
 		unitDef.collisionvolumetype = [[Box]]
@@ -263,7 +269,7 @@ local structureConfig = {
 
 	pw_grid = function(unitDef)
 		unitDef.maxdamage = 20000
-		unitDef.name = "Planetary Defense Grid"
+		unitDef.name = "Planetary Defence Grid"
 		unitDef.description = "Defends against everything"
 		unitDef.objectname = "pw_wormhole2.dae"
 		unitDef.icontype = [[pw_defense2]]
@@ -271,7 +277,7 @@ local structureConfig = {
 
 		unitDef.footprintx = 8
 		unitDef.footprintz = 8
-		unitDef.buildcostmetal = 750*STRUCTURE_COST_MULT
+		unitDef.metalcost = 750*STRUCTURE_COST_MULT
 
 		unitDef.canattack = true
 		unitDef.sightdistance = 495
@@ -297,7 +303,7 @@ local structureConfig = {
 
 		unitDef.footprintx = 3
 		unitDef.footprintz = 3
-		unitDef.buildcostmetal = 75*STRUCTURE_COST_MULT
+		unitDef.metalcost = 75*STRUCTURE_COST_MULT
 
 		unitDef.customparams.evacuation_speed = "1" -- 10 minutes
 
@@ -319,7 +325,7 @@ local structureConfig = {
 
 		unitDef.footprintx = 6
 		unitDef.footprintz = 6
-		unitDef.buildcostmetal = 250*STRUCTURE_COST_MULT
+		unitDef.metalcost = 250*STRUCTURE_COST_MULT
 
 		unitDef.customparams.evacuation_speed = "1.25" -- 8 minutes
 
@@ -341,7 +347,7 @@ local structureConfig = {
 
 		unitDef.footprintx = 8
 		unitDef.footprintz = 9
-		unitDef.buildcostmetal = 500*STRUCTURE_COST_MULT
+		unitDef.metalcost = 500*STRUCTURE_COST_MULT
 
 		unitDef.customparams.soundselect = "cloaker_select"
 
@@ -358,7 +364,7 @@ local structureConfig = {
 
 		unitDef.footprintx = 8
 		unitDef.footprintz = 8
-		unitDef.buildcostmetal = 300*STRUCTURE_COST_MULT
+		unitDef.metalcost = 300*STRUCTURE_COST_MULT
 
 		unitDef.explodeas = "GRAV_BLAST"
 		unitDef.selfdestructas = "GRAV_BLAST"
@@ -371,7 +377,7 @@ local structureConfig = {
 		unitDef.customparams.area_cloak_decloak_distance = 75
 		unitDef.radardistancejam = 550
 		unitDef.onoffable = true
-		unitDef.energyuse = 1.5
+		unitDef.energyupkeep = 1.5
 		unitDef.customparams.priority_misc = 2
 
 		unitDef.collisionvolumescales = [[120 100 120]]
@@ -389,7 +395,7 @@ local structureConfig = {
 
 		unitDef.footprintx = 7
 		unitDef.footprintz = 5
-		unitDef.buildcostmetal = 350*STRUCTURE_COST_MULT
+		unitDef.metalcost = 350*STRUCTURE_COST_MULT
 
 		unitDef.customparams.soundselect = "shield_select"
 
@@ -408,7 +414,7 @@ local structureConfig = {
 
 		unitDef.footprintx = 6
 		unitDef.footprintz = 6
-		unitDef.buildcostmetal = 750*STRUCTURE_COST_MULT
+		unitDef.metalcost = 750*STRUCTURE_COST_MULT
 
 		unitDef.customparams.soundselect = "shield_select"
 
@@ -436,7 +442,7 @@ local structureConfig = {
 
 		unitDef.footprintx = 12
 		unitDef.footprintz = 12
-		unitDef.buildcostmetal = 2000
+		unitDef.metalcost = 2000
 
 		unitDef.explodeas = "NUCLEAR_MISSILE"
 		unitDef.selfdestructas = "NUCLEAR_MISSILE"
@@ -450,7 +456,7 @@ local structureConfig = {
 
 	pw_techlab = function(unitDef)
 		unitDef.maxdamage = 2500
-		unitDef.buildcostmetal = 1000
+		unitDef.metalcost = 1000
 		unitDef.name = "Tech Lab"
 		unitDef.description = "Contains powerful ancient technology"
 		unitDef.objectname = "pw_techlab.dae"

@@ -1,18 +1,16 @@
 return { amphriot = {
-  unitname               = [[amphriot]],
   name                   = [[Scallop]],
-  description            = [[Amphibious Riot Bot (Anti-Sub)]],
+  description            = [[Amphibious Riot Bot (Undersea Fire)]],
   acceleration           = 0.54,
   activateWhenBuilt      = true,
   brakeRate              = 2.25,
-  buildCostMetal         = 260,
   buildPic               = [[amphriot.png]],
   canGuard               = true,
   canMove                = true,
   canPatrol              = true,
   category               = [[LAND SINK]],
   selectionVolumeOffsets = [[0 0 0]],
-  selectionVolumeScales  = [[30 30 30]],
+  selectionVolumeScales  = [[45 45 45]],
   selectionVolumeType    = [[ellipsoid]],
   corpse                 = [[DEAD]],
 
@@ -21,19 +19,18 @@ return { amphriot = {
     amph_submerged_at = 40,
     sink_on_emp    = 1,
     floattoggle    = [[1]],
+    set_target_range_buffer = 35,
   },
 
   explodeAs              = [[BIG_UNITEX]],
   footprintX             = 2,
   footprintZ             = 2,
   iconType               = [[amphtorpriot]],
-  idleAutoHeal           = 5,
-  idleTime               = 1800,
   leaveTracks            = true,
-  maxDamage              = 1100,
+  maxDamage              = 1200,
   maxSlope               = 36,
-  maxVelocity            = 1.6,
-  minCloakDistance       = 75,
+  maxVelocity            = 1.7,
+  metalCost              = 260,
   movementClass          = [[AKBOT2]],
   noChaseCategory        = [[TERRAFORM FIXEDWING GUNSHIP HOVER]],
   objectName             = [[amphriot.s3o]],
@@ -90,7 +87,11 @@ return { amphriot = {
       craterBoost             = 0,
       craterMult              = 0,
       cegTag                  = [[torpedo_trail]],
-   
+
+      customparams = {
+        stays_underwater = 1,
+      },
+
       damage                  = {
         default = 48.01,
       },
@@ -139,7 +140,6 @@ return { amphriot = {
 
       damage                  = {
         default = 23,
-        subs    = 1.6,
       },
 
       duration                = 0.02,
@@ -150,7 +150,7 @@ return { amphriot = {
       impulseFactor           = 0.4,
       interceptedByShieldType = 1,
       projectiles             = 3,
-      range                   = 270,
+      range                   = 264,
       reloadtime              = 0.8,
       rgbColor                = [[1 1 0]],
       soundHit                = [[impacts/shotgun_impactv5]],

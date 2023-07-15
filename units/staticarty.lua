@@ -1,11 +1,7 @@
 return { staticarty = {
-  unitname                      = [[staticarty]],
   name                          = [[Cerberus]],
-  description                   = [[Plasma Artillery Battery - Requires connection to a 50 energy grid]],
-  acceleration                  = 0,
+  description                   = [[Plasma Artillery Battery - Power by connecting to a 50 energy grid]],
   activateWhenBuilt             = true,
-  brakeRate                     = 0,
-  buildCostMetal                = 2500,
   builder                       = false,
   buildingGroundDecalDecaySpeed = 30,
   buildingGroundDecalSizeX      = 8,
@@ -21,6 +17,7 @@ return { staticarty = {
     pylonrange  = 50,
     aimposoffset   = [[0 26 0]],
     midposoffset   = [[0 10 0]],
+    bait_level_default = 1,
   },
 
   explodeAs                     = [[LARGE_BUILDINGEX]],
@@ -28,13 +25,11 @@ return { staticarty = {
   footprintZ                    = 5,
   highTrajectory                = 2,
   iconType                      = [[staticarty]],
-  idleAutoHeal                  = 5,
-  idleTime                      = 1800,
   maxDamage                     = 3750,
   maxSlope                      = 18,
   maxVelocity                   = 0,
   maxWaterDepth                 = 0,
-  minCloakDistance              = 150,
+  metalCost                     = 2500,
   noAutoFire                    = false,
   noChaseCategory               = [[FIXEDWING LAND SHIP SATELLITE SWIM GUNSHIP SUB HOVER]],
   objectName                    = [[corbhmth.s3o]],
@@ -50,7 +45,6 @@ return { staticarty = {
 
   },
   sightDistance                 = 660,
-  turnRate                      = 0,
   useBuildingGroundDecal        = true,
   workerTime                    = 0,
   yardMap                       = [[ooooo ooooo ooooo ooooo ooooo]],
@@ -85,7 +79,6 @@ return { staticarty = {
       damage                  = {
         default = 601,
         planes  = 601,
-        subs    = 30,
       },
 
       edgeEffectiveness       = 0.5,

@@ -1,14 +1,10 @@
 return { fakeunit_los = {
-  unitname              = [[fakeunit_los]],
   name                  = [[LOS Provider]],
   description           = [[Knows all and sees all]],
   acceleration          = 1,
   brakeRate             = 0.8,
-  buildCostEnergy       = 0.45,
-  buildCostMetal        = 0.45,
   builder               = false,
   buildPic              = [[levelterra.png]],
-  buildTime             = 0.45,
   canFly                = true,
   canGuard              = true,
   canMove               = true,
@@ -19,8 +15,9 @@ return { fakeunit_los = {
   cruiseAlt             = 300,
   
   customParams          = {
-      dontcount = [[1]],
-      completely_hidden = 1, -- for widget-senpai not to notice me
+    dontcount         = [[1]],
+    dontkill          = [[1]],
+    completely_hidden = 1, -- for widget-senpai not to notice me
   },
   
   floater               = true,
@@ -34,6 +31,7 @@ return { fakeunit_los = {
   maxDamage             = 900000,
   maxVelocity           = 5,
   maxWaterDepth         = 0,
+  metalCost             = 0.45,
   minCloakDistance      = 9,
   noAutoFire            = false,
   objectName            = [[debris1x1b.s3o]],

@@ -1,10 +1,8 @@
 return { hoverskirm2 = {
-  unitname            = [[hoverskirm2]],
   name                = [[Trisula]],
   description         = [[Light Assault/Battle Hovercraft]],
   acceleration        = 0.15,
   brakeRate           = 0.43,
-  buildCostMetal      = 180,
   builder             = false,
   buildPic            = [[hoverskirm2.png]],
   canGuard            = true,
@@ -18,18 +16,17 @@ return { hoverskirm2 = {
 
   customParams        = {
     modelradius    = [[25]],
+    turnatfullspeed_hover = [[1]],
   },
 
   explodeAs           = [[BIG_UNITEX]],
   footprintX          = 2,
   footprintZ          = 2,
   iconType            = [[hoverskirm]],
-  idleAutoHeal        = 5,
-  idleTime            = 1800,
   maxDamage           = 1300,
   maxSlope            = 36,
   maxVelocity         = 2.5,
-  minCloakDistance    = 75,
+  metalCost           = 180,
   movementClass       = [[HOVER2]],
   noChaseCategory     = [[TERRAFORM FIXEDWING SUB]],
   objectName          = [[hoverskirm.s3o]],
@@ -75,7 +72,6 @@ return { hoverskirm2 = {
 
       damage                  = {
         default = 40,
-        subs    = 2,
       },
 
       explosionGenerator      = [[custom:flash1red]],

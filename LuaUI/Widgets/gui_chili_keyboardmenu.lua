@@ -26,7 +26,11 @@ include("keysym.lua")
 local factory_commands,econ_commands, defense_commands, special_commands = include("Configs/integral_menu_commands_processed.lua", nil, VFS.RAW_FIRST)
 local _, _, overrides = include("Configs/integral_menu_config.lua", nil, VFS.RAW_FIRST)
 
+-- "marking menu" is not the best name, but it's also used by
+-- other similar widgets and also people may have already
+-- overridden it locally, so don't rename it
 local build_menu_use = include("Configs/marking_menu_menus.lua")
+
 local custom_cmd_actions = include("Configs/customCmdTypes.lua")
 
 local initialBuilder = 'armcom1'
@@ -1232,7 +1236,7 @@ end
 function widget:MousePress(x,y,button)
 	if build_mode and button == 3 then
 		UpdateButtons()
-		Spring.SetActiveCommand(0)
+		Spring.SetActiveCommand(nil)
 		BuildMode(false)
 		return true
 	end

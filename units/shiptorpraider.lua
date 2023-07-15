@@ -1,17 +1,15 @@
 return { shiptorpraider = {
-  unitname            = [[shiptorpraider]],
   name                = [[Hunter]],
-  description         = [[Torpedo-Boat (Raider)]],
+  description         = [[Torpedo Raider Ship (Anti-Sub)]],
   acceleration        = 0.288,
   activateWhenBuilt   = true,
   brakeRate           = 0.516,
-  buildCostMetal      = 100,
   builder             = false,
   buildPic            = [[shiptorpraider.png]],
   canGuard            = true,
   canMove             = true,
   canPatrol           = true,
-  category            = [[SHIP]],
+  category               = [[SHIP SMALL TOOFAST]],
   collisionVolumeOffsets = [[0 0 0]],
   collisionVolumeScales  = [[28 28 55]],
   collisionVolumeType    = [[cylZ]],
@@ -21,6 +19,8 @@ return { shiptorpraider = {
     modelradius        = [[14]],
     turnatfullspeed    = [[1]],
     aim_lookahead      = 80,
+    bait_level_default = 0,
+    okp_damage = 180,
   },
 
 
@@ -29,12 +29,10 @@ return { shiptorpraider = {
   footprintX          = 3,
   footprintZ          = 3,
   iconType            = [[shiptorpraider]],
-  idleAutoHeal        = 5,
-  idleTime            = 1800,
   maneuverleashlength = [[1280]],
   maxDamage           = 360,
   maxVelocity         = 4.2,
-  minCloakDistance    = 75,
+  metalCost           = 100,
   minWaterDepth       = 5,
   movementClass       = [[BOAT3]],
   noAutoFire          = false,
@@ -76,13 +74,13 @@ return { shiptorpraider = {
       cegTag                  = [[torpedo_trail]],
 
       customParams = {
-          burst = Shared.BURST_RELIABLE,
+        burst = Shared.BURST_RELIABLE,
+
+        stays_underwater = 1,
       },
 
       damage                  = {
-
         default = 220.1,
-        subs    = 220.1,
       },
 
       edgeEffectiveness       = 0.6,

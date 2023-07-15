@@ -23,20 +23,7 @@ imageExt = ".png"
 --// render into a fbo in 4x size
 renderScale = 4
 
---// faction colors (check (and needs) LuaRules/factions.lua)
-factionTeams = {
-  arm     = 0,   --// arm
-  core    = 1,   --// core
-  chicken = 2,   --// chicken
-  unknown = 2,   --// unknown
-}
-factionColors = {
-  arm     = {0.05, 0.96, 0.95},   --// arm
-  core    = {0.05, 0.96, 0.95},   --// core
-  chicken = {1.0,0.8,0.2},   --// chicken
-  unknown = {0.05, 0.96, 0.95},   --// unknown
-}
-
+teamColor = {0.05, 0.96, 0.95}
 
 -----------------------------------------------------------------------
 -----------------------------------------------------------------------
@@ -56,59 +43,6 @@ olTolerance = 0
 
 --// halo (white)
 halo  = false --(scheme~="bw")
-
-
------------------------------------------------------------------------
------------------------------------------------------------------------
-
---// backgrounds
-background = true
-local function Greater30(a)     return a>30;  end
-local function GreaterEq15(a)   return a>=15; end
-local function GreaterZero(a)   return a>0;   end
-local function GreaterEqZero(a) return a>=0;  end
-local function GreaterFour(a)   return a>4;   end
-local function LessEqZero(a)    return a<=0;  end
-local function IsCoreOrChicken(a)
-	if a then return a.chicken
-	else return false end
-end
-local function IsHover(a)
-	return a and a.name and string.find(a.name, "hover") ~= nil
-end
-backgrounds = {
---// stuff that needs hardcoding
-  {check={name="shipcarrier"}, texture="LuaRules/Images/IconGenBkgs/bg_water.png"},
-  {check={name="shipscout"}, texture="LuaRules/Images/IconGenBkgs/bg_water.png"},
-
-
-  
---[[terraforms
-  {check={name="rampup"},                                    texture="LuaRules/Images/IconGenBkgs/rampup.png"},
-  {check={name="rampdown"},                                  texture="LuaRules/Images/IconGenBkgs/rampdown.png"},
-  {check={name="levelterra"},                                texture="LuaRules/Images/IconGenBkgs/level.png"},
-  {check={name="armblock"},                                  texture="LuaRules/Images/IconGenBkgs/block.png"},
-  {check={name="corblock"},                                  texture="LuaRules/Images/IconGenBkgs/block.png"},
-  {check={name="armtrench"},                                 texture="LuaRules/Images/IconGenBkgs/trench.png"},
-  {check={name="cortrench"},                                 texture="LuaRules/Images/IconGenBkgs/trench.png"},
-]]--
---//air
-  {check={canFly=true},                                      texture="LuaRules/Images/IconGenBkgs/bg_air.png"},
---//hovers
-  {check={factions=IsCoreOrChicken,moveDef=IsHover},            texture="LuaRules/Images/IconGenBkgs/bg_hover_rock.png"},
-  {check={moveDef=IsHover},            texture="LuaRules/Images/IconGenBkgs/bg_hover.png"},
---//subs
-  {check={waterline=GreaterEq15,minWaterDepth=GreaterZero},  texture="LuaRules/Images/IconGenBkgs/bg_underwater.png"},
-  {check={floatOnWater=false,minWaterDepth=GreaterFour},          texture="LuaRules/Images/IconGenBkgs/bg_underwater.png"},
---//sea
-  {check={floatOnWater=true,minWaterDepth=GreaterZero},           texture="LuaRules/Images/IconGenBkgs/bg_water.png"},
---//amphibous
-  {check={factions=IsCoreOrChicken,maxWaterDepth=Greater30,minWaterDepth=LessEqZero}, texture="LuaRules/Images/IconGenBkgs/bg_amphibous_rock.png"},
-  {check={maxWaterDepth=Greater30,minWaterDepth=LessEqZero}, texture="LuaRules/Images/IconGenBkgs/bg_amphibous.png"},
---//ground
-  {check={factions=IsCoreOrChicken},                         texture="LuaRules/Images/IconGenBkgs/bg_ground_rock.png"},
-  {check={},                                                 texture="LuaRules/Images/IconGenBkgs/bg_ground.png"},
-}
 
 
 -----------------------------------------------------------------------
@@ -139,6 +73,9 @@ defaults = {border=0.05, angle=45, rot="right", clamp=-10000, scale=1.5, empty=f
 --// per unitdef settings
 unitConfigs = {
   
+  [UnitDefNames.comm_campaign_isonade.id] = {
+    teamColor = { 1, 0.75, 0 },
+  },
   [UnitDefNames.staticradar.id] = {
     scale = 3,
     rot   = 200,

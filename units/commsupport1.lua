@@ -1,12 +1,10 @@
 return { commsupport1 = {
-  unitname            = [[commsupport1]],
   name                = [[Support Commander]],
   description         = [[Econ/Support Commander]],
   acceleration        = 0.75,
   activateWhenBuilt   = true,
   autoHeal            = 5,
   brakeRate           = 2.7,
-  buildCostMetal      = 1200,
   buildDistance       = 250,
   builder             = true,
 
@@ -37,22 +35,19 @@ return { commsupport1 = {
 
   energyMake          = 6,
   energyStorage       = 500,
-  energyUse           = 0,
   explodeAs           = [[ESTOR_BUILDINGEX]],
   footprintX          = 2,
   footprintZ          = 2,
   iconType            = [[commander1]],
-  idleAutoHeal        = 5,
-  idleTime            = 1800,
   leaveTracks         = true,
   losEmitHeight       = 40,
   maxDamage           = 2000,
   maxSlope            = 36,
   maxVelocity         = 1.2,
   maxWaterDepth       = 5000,
+  metalCost           = 1200,
   metalMake           = 4,
   metalStorage        = 500,
-  minCloakDistance    = 75,
   movementClass       = [[AKBOT2]],
   noChaseCategory     = [[TERRAFORM FIXEDWING GUNSHIP HOVER SHIP SWIM SUB LAND FLOAT SINK TURRET]],
   objectName          = [[commsupport.s3o]],
@@ -153,7 +148,6 @@ return { commsupport1 = {
       damage                  = {
         default = 140,
         planes  = 140,
-        subs    = 8,
       },
       
       customParams = {

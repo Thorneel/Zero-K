@@ -1,10 +1,8 @@
 return { gunshipbomb = {
-  unitname               = [[gunshipbomb]],
   name                   = [[Blastwing]],
   description            = [[Flying Bomb/Scout (Burrows)]],
   acceleration           = 0.25,
   brakeRate              = 0.2,
-  buildCostMetal         = 45,
   builder                = false,
   buildPic               = [[gunshipbomb.png]],
   canFly                 = true,
@@ -18,7 +16,7 @@ return { gunshipbomb = {
   collisionVolumeScales  = [[20 20 20]],
   collisionVolumeType    = [[ellipsoid]],
   selectionVolumeOffsets = [[0 0 0]],
-  selectionVolumeScales  = [[32 32 32]],
+  selectionVolumeScales  = [[48 48 48]],
   selectionVolumeType    = [[ellipsoid]],
   corpse                 = [[DEAD]],
   cruiseAlt              = 30,
@@ -35,8 +33,6 @@ return { gunshipbomb = {
   footprintZ             = 2,
   hoverAttack            = true,
   iconType               = [[gunshipspecial]],
-  idleAutoHeal           = 5,
-  idleTime               = 1800,
   kamikaze               = true,
   kamikazeDistance       = 60,
   kamikazeUseLOS         = true,
@@ -44,7 +40,7 @@ return { gunshipbomb = {
   maxDamage              = 100,
   maxSlope               = 36,
   maxVelocity            = 8.2,
-  minCloakDistance       = 75,
+  metalCost              = 45,
   noAutoFire             = false,
   noChaseCategory        = [[TERRAFORM SATELLITE SUB]],
   objectName             = [[f-1.s3o]],
@@ -78,7 +74,7 @@ return { gunshipbomb = {
   weaponDefs = {
     gunshipbomb_EXPLOSION = {
       name               = "Blastwing Explosion",
-      areaOfEffect       = 256,
+      areaOfEffect       = 288,
       craterBoost        = 1,
       craterMult         = 3.5,
 
@@ -87,17 +83,16 @@ return { gunshipbomb = {
         burntime = 30,
 
         area_damage = 1,
-        area_damage_radius = 128,
-        area_damage_dps = 18,
+        area_damage_radius = 144,
+        area_damage_dps = 32,
         area_damage_duration = 20,
 
         --lups_heat_fx = [[firewalker]],
       },
 
       damage = {
-        default = 80,
-        planes  = 80,
-        subs    = 4,
+        default = 40,
+        planes  = 40,
       },
 
       edgeeffectiveness  = 0.7,

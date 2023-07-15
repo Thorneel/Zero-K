@@ -1,12 +1,10 @@
 return { commrecon1 = {
-  unitname            = [[commrecon1]],
   name                = [[Recon Commander]],
   description         = [[High Mobility Commander]],
   acceleration        = 0.75,
   activateWhenBuilt   = true,
   autoHeal            = 5,
   brakeRate           = 2.7,
-  buildCostMetal      = 1200,
   buildDistance       = 128,
   builder             = true,
 
@@ -42,22 +40,19 @@ return { commrecon1 = {
 
   energyMake          = 6,
   energyStorage       = 500,
-  energyUse           = 0,
   explodeAs           = [[ESTOR_BUILDINGEX]],
   footprintX          = 2,
   footprintZ          = 2,
   iconType            = [[commander1]],
-  idleAutoHeal        = 5,
-  idleTime            = 1800,
   leaveTracks         = true,
   losEmitHeight       = 40,
   maxDamage           = 1650,
   maxSlope            = 36,
   maxVelocity         = 1.45,
   maxWaterDepth       = 5000,
+  metalCost           = 1200,
   metalMake           = 4,
   metalStorage        = 500,
-  minCloakDistance    = 75,
   movementClass       = [[AKBOT2]],
   noChaseCategory     = [[TERRAFORM SATELLITE FIXEDWING GUNSHIP HOVER SHIP SWIM SUB LAND FLOAT SINK TURRET]],
   objectName          = [[commrecon.s3o]],
@@ -159,11 +154,12 @@ return { commrecon1 = {
       craterMult              = 0,
 
       customParams            = {
-        timeslow_preset = [[commrecon_slowbeam]],
+        timeslow_onlyslow = 1,
+        timeslow_smartretarget = 0.33,
       },
 
       damage                  = {
-        default = 225,
+        default = 450,
       },
 
       explosionGenerator      = [[custom:flashslow]],

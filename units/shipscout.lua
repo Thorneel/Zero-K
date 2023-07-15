@@ -1,15 +1,13 @@
 return { shipscout = {
-  unitname               = [[shipscout]],
   name                   = [[Cutter]],
-  description            = [[Picket Ship (Disarming Scout)]],
+  description            = [[Scout Ship (Disarming)]],
   acceleration           = 0.6,
   activateWhenBuilt      = true,
   brakeRate              = 0.57,
-  buildCostMetal         = 70,
   builder                = false,
   buildPic               = [[shipscout.png]],
   canMove                = true,
-  category               = [[SHIP]],
+  category               = [[SHIP SMALL TOOFAST]],
   collisionVolumeOffsets = [[0 5 0]],
   collisionVolumeScales  = [[25 25 60]],
   collisionVolumeType    = [[cylZ]],
@@ -18,6 +16,7 @@ return { shipscout = {
   customParams           = {
     modelradius    = [[12]],
     turnatfullspeed = [[1]],
+    bait_level_default = 0,
   },
 
   explodeAs              = [[SMALL_UNITEX]],
@@ -25,11 +24,9 @@ return { shipscout = {
   footprintX             = 3,
   footprintZ             = 3,
   iconType               = [[shipscout]],
-  idleAutoHeal           = 5,
-  idleTime               = 1800,
   maxDamage              = 260,
   maxVelocity            = 5.2,
-  minCloakDistance       = 75,
+  metalCost              = 65,
   movementClass          = [[BOAT3]],
   noChaseCategory        = [[TERRAFORM SUB]],
   objectName             = [[shipscout.s3o]],
@@ -82,7 +79,6 @@ return { shipscout = {
       
       damage                  = {
         default = 35,
-        subs    = 5,
       },
 
       explosionGenerator      = [[custom:mixed_white_lightning_bomb_small]],
@@ -95,7 +91,7 @@ return { shipscout = {
       impulseFactor           = 0.4,
       interceptedByShieldType = 2,
       model                   = [[wep_armpt.s3o]],
-      range                   = 260,
+      range                   = 265,
       reloadtime              = 2.0,
       smokeTrail              = true,
       soundHit                = [[weapon/missile/small_lightning_missile]],

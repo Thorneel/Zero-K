@@ -1,11 +1,9 @@
 return { amphsupport = {
-  unitname               = [[amphsupport]],
   name                   = [[Bulkhead]],
   description            = [[Deployable Amphibious Fire Support (must stop to fire)]],
   acceleration           = 0.4,
   activateWhenBuilt      = true,
   brakeRate              = 2.4,
-  buildCostMetal         = 230,
   builder                = false,
   buildPic               = [[amphsupport.png]],
   canGuard               = true,
@@ -18,6 +16,7 @@ return { amphsupport = {
   corpse                 = [[DEAD]],
 
   customParams           = {
+    bait_level_default = 0,
     amph_regen        = 15,
     amph_submerged_at = 30,
     sink_on_emp       = 0,
@@ -32,13 +31,11 @@ return { amphsupport = {
   footprintX             = 3,
   footprintZ             = 3,
   iconType               = [[amphsupport]],
-  idleAutoHeal           = 5,
-  idleTime               = 1800,
   leaveTracks            = true,
-  maxDamage              = 1720,
+  maxDamage              = 1540,
   maxSlope               = 36,
   maxVelocity            = 1.6,
-  minCloakDistance       = 75,
+  metalCost              = 230,
   movementClass          = [[AKBOT3]],
   moveState              = 0,
   noAutoFire             = false,
@@ -100,7 +97,6 @@ return { amphsupport = {
       damage                  = {
         default = 165.1,
         planes  = 165.1,
-        subs    = 7.5,
       },
 
       edgeEffectiveness       = 0.1,
@@ -134,7 +130,6 @@ return { amphsupport = {
       damage                  = {
         default = 165.1,
         planes  = 165.1,
-        subs    = 7.5,
       },
 
       edgeEffectiveness       = 0.1,

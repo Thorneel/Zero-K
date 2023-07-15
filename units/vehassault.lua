@@ -1,44 +1,45 @@
 return { vehassault = {
-  unitname               = [[vehassault]],
   name                   = [[Ravager]],
   description            = [[Assault Rover]],
   acceleration           = 0.162,
   brakeRate              = 0.462,
-  buildCostMetal         = 250,
   builder                = false,
   buildPic               = [[vehassault.png]],
   canGuard               = true,
   canMove                = true,
   canPatrol              = true,
-  category               = [[LAND]],
+  category               = [[LAND TOOFAST]],
   collisionVolumeOffsets = [[0 -5 0]],
   collisionVolumeScales  = [[42 42 42]],
   collisionVolumeType    = [[ellipsoid]],
   corpse                 = [[DEAD]],
 
   customParams           = {
+    bait_level_default = 0,
     aimposoffset   = [[0 8 0]],
     midposoffset   = [[0 3 0]],
     modelradius    = [[21]],
+
+    outline_x = 80,
+    outline_y = 80,
+    outline_yoff = 12.5,
   },
 
   explodeAs              = [[BIG_UNITEX]],
   footprintX             = 3,
   footprintZ             = 3,
   iconType               = [[vehicleassault]],
-  idleAutoHeal           = 5,
-  idleTime               = 1800,
   leaveTracks            = true,
-  maxDamage              = 1920,
+  maxDamage              = 2000,
   maxSlope               = 18,
   maxVelocity            = 2.95,
   maxWaterDepth          = 22,
-  minCloakDistance       = 75,
+  metalCost              = 250,
   movementClass          = [[TANK3]],
   noAutoFire             = false,
-  noChaseCategory        = [[TERRAFORM FIXEDWING SATELLITE SUB]],
+  noChaseCategory        = [[TERRAFORM FIXEDWING SATELLITE SUB DRONE]],
   objectName             = [[corraid.s3o]],
-  script                 = [[vehassault.cob]],
+  script                 = [[vehassault.lua]],
   selfDestructAs         = [[BIG_UNITEX]],
 
   sfxtypes               = {
@@ -79,14 +80,12 @@ return { vehassault = {
       craterMult              = 0,
 
       customParams        = {
-        reaim_time = 8, -- COB
         light_camera_height = 1500,
       },
 
       damage                  = {
         default = 210,
         planes  = 210,
-        subs    = 11.5,
       },
 
       explosionGenerator      = [[custom:INGEBORG]],
@@ -100,7 +99,7 @@ return { vehassault = {
       soundStart              = [[weapon/cannon/medplasma_fire]],
       turret                  = true,
       weaponType              = [[Cannon]],
-      weaponVelocity          = 225,
+      weaponVelocity          = 245,
     },
 
   },

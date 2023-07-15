@@ -1,10 +1,8 @@
 return { vehsupport = {
-  unitname               = [[vehsupport]],
   name                   = [[Fencer]],
   description            = [[Deployable Missile Rover (must stop to fire)]],
   acceleration           = 0.18,
   brakeRate              = 0.36,
-  buildCostMetal         = 140,
   builder                = false,
   buildPic               = [[vehsupport.png]],
   canGuard               = true,
@@ -15,7 +13,7 @@ return { vehsupport = {
   collisionVolumeScales  = [[26 30 36]],
   collisionVolumeType    = [[box]],
   selectionVolumeOffsets = [[0 0 0]],
-  selectionVolumeScales  = [[45 45 45]],
+  selectionVolumeScales  = [[68 68 68]],
   selectionVolumeType    = [[ellipsoid]],
   corpse                 = [[DEAD]],
 
@@ -23,20 +21,23 @@ return { vehsupport = {
     modelradius    = [[13]],
     aimposoffset   = [[0 10 0]],
     chase_everything = [[1]], -- Does not get stupidtarget added to noChaseCats
+    okp_damage = 35,
+
+    outline_x = 80,
+    outline_y = 80,
+    outline_yoff = 12.5,
   },
 
   explodeAs              = [[BIG_UNITEX]],
   footprintX             = 3,
   footprintZ             = 3,
   iconType               = [[vehiclesupport]],
-  idleAutoHeal           = 5,
-  idleTime               = 1800,
   leaveTracks            = true,
-  maxDamage              = 560,
+  maxDamage              = 530,
   maxSlope               = 18,
   maxVelocity            = 2.8,
   maxWaterDepth          = 22,
-  minCloakDistance       = 75,
+  metalCost              = 145,
   movementClass          = [[TANK3]],
   moveState              = 0,
   noAutoFire             = false,
@@ -91,7 +92,6 @@ return { vehsupport = {
 
       damage                  = {
         default = 40.01,
-        subs    = 2,
       },
 
       explosionGenerator      = [[custom:FLASH2]],
@@ -124,6 +124,9 @@ return { vehsupport = {
 
     DEAD  = {
       blocking         = true,
+      collisionVolumeOffsets = [[0 5 0]],
+      collisionVolumeScales  = [[26 30 36]],
+      collisionVolumeType    = [[box]],
       featureDead      = [[HEAP]],
       footprintX       = 3,
       footprintZ       = 3,

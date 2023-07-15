@@ -12,7 +12,6 @@ Spring.Echo("Loading UnitDefs_posts")
 --
 
 VFS.Include("LuaRules/Configs/constants.lua")
-local TRANSPORT_LIGHT_COST_MAX = 1000
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -94,9 +93,9 @@ end
 
 do
 	local append = false
-	local name = "tweakunits"
-	while modOptions[name] and modOptions[name] ~= "" do
-		local tweaks = Spring.Utilities.CustomKeyToUsefulTable(modOptions[name])
+	local modoptName = "tweakunits"
+	while modOptions[modoptName] and modOptions[modoptName] ~= "" do
+		local tweaks = Spring.Utilities.CustomKeyToUsefulTable(modOptions[modoptName])
 		if type(tweaks) == "table" then
 			Spring.Echo("Loading tweakunits modoption", append or 0)
 			for name, ud in pairs(UnitDefs) do
@@ -107,7 +106,7 @@ do
 			end
 		end
 		append = (append or 0) + 1
-		name = "tweakunits" .. append
+		modoptName = "tweakunits" .. append
 	end
 end
 
@@ -132,6 +131,26 @@ end]]
 VFS.Include('gamedata/modularcomms/unitdefgen.lua')
 VFS.Include('gamedata/planetwars/pw_unitdefgen.lua')
 local Utilities = VFS.Include('gamedata/utilities.lua')
+
+-- Handle obsolete keys in mods gracefully while they migrate
+for name, ud in pairs(UnitDefs) do
+	if ud.metaluse then
+		Spring.Echo("ERROR: " .. name .. ".metalUse set, should be metalUpkeep instead!")
+		ud.metalupkeep = ud.metalupkeep or ud.metaluse
+	end
+	if ud.energyuse then
+		Spring.Echo("ERROR: " .. name .. ".energyuse set, should be energyUpkeep instead!")
+		ud.energyupkeep = ud.energyupkeep or ud.energyuse
+	end
+	if ud.buildcostmetal then
+		Spring.Echo("ERROR: " .. name .. ".buildCostMetal set, should be metalCost instead!")
+		ud.metalcost = ud.metalcost or ud.buildcostmetal
+	end
+	if ud.buildcostenergy then
+		Spring.Echo("ERROR: " .. name .. ".buildCostEnergy set, should be energyCost instead!")
+		ud.energycost = ud.energycost or ud.buildcostenergy
+	end
+end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -228,7 +247,6 @@ for i = 1, #typeNames do
 end
 
 -- Set build options from pos_ customparam
-local buildOpts = VFS.Include("gamedata/buildoptions.lua")
 for name, ud in pairs(UnitDefs) do
 	local cp = ud.customparams
 	for i = 1, #typeNamesLower do
@@ -259,13 +277,20 @@ end
 --
 
 local sqrt = math.sqrt
-
+local cloakFootMult = 6 * sqrt(2)
 for name, ud in pairs(UnitDefs) do
+	local fx = ud.customparams.decloak_footprint or (ud.footprintx and tonumber(ud.footprintx) or 1)
+	local fz = ud.customparams.decloak_footprint or (ud.footprintz and tonumber(ud.footprintz) or 1)
+	-- Note that the full power of this equation is never used in practise, since units have square
+	-- footprints and most structures don't cloak (the ones that do have square footprints).
+	local radius = cloakFootMult * sqrt((fx * fx) + (fz * fz)) + 56
+	-- 2x2 = 80
+	-- 3x3 = 92
+	-- 4x4 = 104
 	if (not ud.mincloakdistance) then
-		local fx = ud.footprintx and tonumber(ud.footprintx) or 1
-		local fz = ud.footprintz and tonumber(ud.footprintz) or 1
-		local radius = 8 * sqrt((fx * fx) + (fz * fz))
-		ud.mincloakdistance = (radius + 48)
+		ud.mincloakdistance = radius
+	elseif radius < ud.mincloakdistance then
+		ud.customparams.cloaker_bestowed_radius = radius
 	end
 end
 
@@ -340,13 +365,12 @@ end
 local BP2RES = 0
 local BP2RES_FACTORY = 0
 local BP2TERRASPEED = 1000 --used to be 60 in most of the cases
---local SEISMICSIG = 4 --used to be 4 in most of the cases
 for name, ud in pairs (UnitDefs) do
-	local cost = math.max (ud.buildcostenergy or 0, ud.buildcostmetal or 0, ud.buildtime or 0) --one of these should be set in actual unitdef file
+	local cost = math.max (ud.energycost or 0, ud.metalcost or 0, ud.buildtime or 0) --one of these should be set in actual unitdef file
 
 	--setting uniform buildTime, M/E cost
-	if not ud.buildcostenergy then ud.buildcostenergy = cost end
-	if not ud.buildcostmetal then ud.buildcostmetal = cost end
+	if not ud.energycost then ud.energycost = cost end
+	if not ud.metalcost then ud.metalcost = cost end
 	if not ud.buildtime then ud.buildtime = cost end
 
 	--setting uniform M/E storage
@@ -374,15 +398,6 @@ for name, ud in pairs (UnitDefs) do
 		end
 	end
 
-	--setting standard seismicSignature
-	--[[
-	if ud.floater or ud.canhover or ud.canfly then
-		if not ud.seismicsignature then ud.seismicsignature = 0 end
-	else
-		if not ud.seismicsignature then ud.seismicsignature = SEISMICSIG end
-	end
-	]]--
-
 	--setting levelGround
 	--[[
 	if (ud.isBuilding == true or ud.maxAcc == 0) and (not ud.customParams.mobilebuilding) then --looks like a building
@@ -395,14 +410,14 @@ end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
--- Lua implementation of energyUse
+-- Lua implementation of energyUpkeep
 --
 
 for name, ud in pairs(UnitDefs) do
-	local energyUse = tonumber(ud.energyuse or 0)
-	if energyUse and (energyUse > 0) then
-		ud.customparams.upkeep_energy = energyUse
-		ud.energyuse = 0
+	local energyUpkeep = tonumber(ud.energyupkeep or 0)
+	if energyUpkeep and (energyUpkeep > 0) then
+		ud.customparams.upkeep_energy = energyUpkeep
+		ud.energyupkeep = 0
 	end
 end
 
@@ -470,6 +485,20 @@ end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
+-- Resurrect
+--
+
+if (modOptions and (modOptions.disableresurrect == 1 or modOptions.disableresurrect == "1")) then
+	for name, unitDef in pairs(UnitDefs) do
+		if (unitDef.canresurrect) then
+			unitDef.canresurrect = false
+		end
+	end
+
+end
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 -- unitspeedmult
 --
 
@@ -501,13 +530,13 @@ if (modOptions and modOptions.damagemult and modOptions.damagemult ~= 1) then
 			unitDef.idleautoheal = unitDef.idleautoheal * damagemult
 		end
 		
-		if (unitDef.capturespeed) then 
+		if (unitDef.capturespeed) then
 			unitDef.capturespeed = unitDef.capturespeed * damagemult
 		elseif (unitDef.workertime) then
 			unitDef.capturespeed = unitDef.workertime * damagemult
 		end
 		
-		if (unitDef.repairspeed) then 
+		if (unitDef.repairspeed) then
 			unitDef.repairspeed = unitDef.repairspeed * damagemult
 		elseif (unitDef.workertime) then
 			unitDef.repairspeed = unitDef.workertime * damagemult
@@ -520,15 +549,20 @@ end
 -- Set turnInPlace speed limits, reverse velocities (but not for ships)
 --
 for name, ud in pairs(UnitDefs) do
-	if ud.turnrate and (ud.turnrate > 600 or ud.customparams.turnatfullspeed) then
-		ud.turninplace = false
-		ud.turninplacespeedlimit = (ud.maxvelocity or 0)
-	elseif ud.turninplace ~= true then
-		ud.turninplace = false	-- true
-		ud.turninplacespeedlimit = ud.turninplacespeedlimit or (ud.maxvelocity and ud.maxvelocity*0.6 or 0)
-		--ud.turninplaceanglelimit = 180
+	if ud.turnrate then
+		if ud.customparams.turnatfullspeed_hover then
+			ud.turninplace = false
+			ud.turninplacespeedlimit = (ud.maxvelocity or 0)*(ud.customparams.boost_speed_mult or 0.8)
+			ud.turninplaceanglelimit = 90
+		elseif (ud.turnrate > 600 or ud.customparams.turnatfullspeed) then
+			ud.turninplace = false
+			ud.turninplacespeedlimit = (ud.maxvelocity or 0)
+		elseif ud.turninplace ~= true then
+			ud.turninplace = false -- true
+			ud.turninplacespeedlimit = ud.turninplacespeedlimit or (ud.maxvelocity and ud.maxvelocity*0.6 or 0)
+			--ud.turninplaceanglelimit = 180
+		end
 	end
-
 
 	if ud.category and not (ud.category:find("SHIP", 1, true) or ud.category:find("SUB", 1, true)) then
 		if (ud.maxvelocity) and not ud.maxreversevelocity then
@@ -577,7 +611,7 @@ end
 -- Avoid firing at unarmed
 --
 for name, ud in pairs(UnitDefs) do
-	if (ud.weapons and not ud.canfly) then
+	if ud.weapons and not ud.canfly and not ud.target_stupid_targets then
 		for wName, wDef in pairs(ud.weapons) do
 			if wDef.badtargetcategory then
 				wDef.badtargetcategory = wDef.badtargetcategory .. " STUPIDTARGET"
@@ -652,7 +686,7 @@ end
 --
 
 --for name, ud in pairs(UnitDefs) do
---	if ud.buildcostmetal ~= ud.buildcostenergy or ud.buildtime ~= ud.buildcostenergy then
+--	if ud.metalcost ~= ud.energycost or ud.buildtime ~= ud.energycost then
 --		Spring.Echo("Inconsistent Cost for " .. ud.name)
 --	end
 --end
@@ -758,11 +792,7 @@ for name, ud in pairs(UnitDefs) do
 	
 	if ud.collisionvolumescales or ud.selectionvolumescales then
 		-- Do not override default colvol because it is hard to measure.
-		
-		if ud.selectionvolumescales then
-			local dim = GetDimensions(ud.selectionvolumescales)
-			ud.selectionvolumescales  = math.ceil(dim[1]*scale) .. " " .. math.ceil(dim[2]*scale) .. " " .. math.ceil(dim[3]*scale)
-		else
+		if not ud.selectionvolumescales then
 			local size = math.max(ud.footprintx or 0, ud.footprintz or 0)*15
 			if size > 0 then
 				local dimensions, largest = GetDimensions(ud.collisionvolumescales)
@@ -823,8 +853,8 @@ end
 
 if modOptions and modOptions.hpmult and modOptions.hpmult ~= 1 then
 	local hpMulti = modOptions.hpmult
-	for unitDefID, unitDef in pairs(UnitDefs) do
-		if unitDef.maxdamage and unitDef.unitname ~= "terraunit" then
+	for name, unitDef in pairs(UnitDefs) do
+		if unitDef.maxdamage and name ~= "terraunit" then
 			unitDef.maxdamage = math.max(unitDef.maxdamage * hpMulti, 1)
 		end
 	end
@@ -848,9 +878,9 @@ end
 --
 
 --[[for name, ud in pairs(UnitDefs) do
-	if (ud.unitname:sub(1,7) == "chicken") then
-		ud.buildcostmetal = ud.buildtime
-		ud.buildcostenergy = ud.buildtime
+	if (name:sub(1,7) == "chicken") then
+		ud.metalcost = ud.buildtime
+		ud.energycost = ud.buildtime
 	end
 end]]
 
@@ -902,6 +932,7 @@ for name, ud in pairs(UnitDefs) do
 		if not cp.area_cloak_grow_rate then cp.area_cloak_grow_rate = tostring(area_cloak_defaults.grow_rate) end
 		if not cp.area_cloak_shrink_rate then cp.area_cloak_shrink_rate = tostring(area_cloak_defaults.shrink_rate) end
 		if not cp.area_cloak_decloak_distance then cp.area_cloak_decloak_distance = tostring(area_cloak_defaults.decloak_distance) end
+		if not cp.area_cloak_recloak_rate then cp.area_cloak_recloak_rate = tostring(area_cloak_defaults.recloak_rate) end
 
 		if not cp.area_cloak_init then cp.area_cloak_init = tostring(area_cloak_defaults.init) end
 		if not cp.area_cloak_draw then cp.area_cloak_draw = tostring(area_cloak_defaults.draw) end
@@ -935,8 +966,13 @@ end
 if Utilities.IsCurrentVersionNewerThan(104, 600) then
 	for name, ud in pairs (UnitDefs) do
 		ud.transportmass = nil
-		if ud.buildcostmetal and tonumber(ud.buildcostmetal) > TRANSPORT_LIGHT_COST_MAX then
-			ud.customparams.requireheavytrans = 1
+		local buildCost = ud.metalcost and tonumber(ud.metalcost)
+		if buildCost then
+			if buildCost > TRANSPORT_MEDIUM_COST_MAX then
+				ud.customparams.requireheavytrans = 1
+			elseif buildCost > TRANSPORT_LIGHT_COST_MAX then
+				ud.customparams.requiremediumtrans = 1
+			end
 		end
 	end
 else
@@ -957,5 +993,50 @@ end
 
 local ai_start_units = VFS.Include("LuaRules/Configs/ai_commanders.lua")
 for i = 1, #ai_start_units do
-	UnitDefs[ai_start_units[i]].customparams.ai_start_unit = true
+	if UnitDefs[ai_start_units[i]] then -- valid entries can still be nil in wiki exporter script
+		UnitDefs[ai_start_units[i]].customparams.ai_start_unit = true
+	end
+end
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+-- Superweapon revealing
+--
+
+if (modOptions and tobool(modOptions.reveal_superweapons)) then
+	for name, ud in pairs(UnitDefs) do
+		if ud.customparams.superweapon then
+			ud.customparams.reveal_at_build = 0.05
+		end
+	end
+end
+
+-- Units with nonzero signatures produce seismic pings even though we
+-- have no seismic detection, which is fairly pointless. Modders might
+-- want to set them explicitly anyway, because the defaults are "realism"
+-- oriented and therefore suck (for example hovercraft don't produce pings).
+for name, ud in pairs(UnitDefs) do
+	if not ud.seismicsignature then
+		ud.seismicsignature = 0
+	end
+end
+
+if not Script or not Script.IsEngineMinVersion(105, 0, 1801) then
+	for name, ud in pairs(UnitDefs) do
+		ud.metaluse  = ud.metalupkeep
+		ud.energyuse = ud.energyupkeep
+		ud.buildcostmetal  = ud.metalcost
+		ud.buildcostenergy = ud.energycost
+	end
+end
+
+if Game.gameSpeed ~= 30 then
+	local FPS_SCALE = 30 / Game.gameSpeed
+	for name, ud in pairs(UnitDefs) do
+		if ud.maxvelocity        then ud.maxvelocity        = ud.maxvelocity        * FPS_SCALE end
+		if ud.maxreversevelocity then ud.maxreversevelocity = ud.maxreversevelocity * FPS_SCALE end
+		if ud.acceleration       then ud.acceleration       = ud.acceleration       * FPS_SCALE end
+		if ud.brakerate          then ud.brakerate          = ud.brakerate          * FPS_SCALE end
+		if ud.turnrate           then ud.turnrate           = ud.turnrate           * FPS_SCALE end
+	end
 end

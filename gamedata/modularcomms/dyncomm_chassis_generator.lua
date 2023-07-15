@@ -108,7 +108,7 @@ local chassisDefs = {
 	{
 		name = "dynknight1",
 		weapons = {
-			-- Aiming from earlier weapons is overridden by 
+			-- Aiming from earlier weapons is overridden by later
 			"commweapon_peashooter",
 			"commweapon_rocketlauncher", -- 430
 			"commweapon_rocketlauncher_napalm", -- 430
@@ -151,8 +151,8 @@ local statOverrides = {
 	cloakcostmoving = 10,
 	onoffable       = true, -- For jammer and cloaker toggling
 	canmanualfire   = true, -- For manualfire weapons.
-	buildcostmetal  = commanderCost,
-	buildcostenergy = commanderCost,
+	metalcost       = commanderCost,
+	energycost      = commanderCost,
 	buildtime       = commanderCost,
 	power           = 1200,
 }

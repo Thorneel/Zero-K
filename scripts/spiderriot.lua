@@ -24,7 +24,7 @@ local smokePiece = {base, turret}
 local SIG_WALK = 1
 local SIG_AIM = 2
 
-local PERIOD = 0.17
+local PERIOD = 0.185
 
 local sleepTime = PERIOD*1000
 
@@ -43,7 +43,7 @@ local legMiddleOffset = 0
 local legMiddleSpeed = legMiddleAngle/PERIOD
 
 local legBackwardAngle = math.rad(20)
-local legBackwardTheta = -math.rad(45)
+local legBackwardTheta = math.rad(-45)
 local legBackwardOffset = math.rad(30)
 local legBackwardSpeed = legBackwardAngle/PERIOD
 

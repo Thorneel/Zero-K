@@ -1,12 +1,10 @@
 return { cremcom1 = {
-  unitname               = [[cremcom1]],
   name                   = [[Commander]],
   description            = [[Mobile Assault Commander]],
   acceleration           = 0.54,
   activateWhenBuilt      = true,
   autoHeal               = 5,
   brakeRate              = 2.25,
-  buildCostMetal         = 1200,
   buildDistance          = 128,
   builder                = true,
 
@@ -37,22 +35,19 @@ return { cremcom1 = {
 
   energyMake             = 6,
   energyStorage          = 500,
-  energyUse              = 0,
   explodeAs              = [[ESTOR_BUILDINGEX]],
   footprintX             = 2,
   footprintZ             = 2,
   iconType               = [[commander1]],
-  idleAutoHeal           = 5,
-  idleTime               = 1800,
   leaveTracks            = true,
   losEmitHeight       = 40,
   maxDamage              = 2500,
   maxSlope               = 36,
   maxVelocity            = 1.35,
   maxWaterDepth          = 5000,
+  metalCost              = 1200,
   metalMake              = 4,
   metalStorage           = 500,
-  minCloakDistance       = 75,
   modelCenterOffset      = [[0 1 0]],
   movementClass          = [[AKBOT2]],
   noChaseCategory        = [[TERRAFORM SATELLITE FIXEDWING GUNSHIP HOVER SHIP SWIM SUB LAND FLOAT SINK TURRET]],
@@ -116,7 +111,6 @@ return { cremcom1 = {
 
       damage                  = {
         default = 0,
-        subs    = 0,
       },
 
       duration                = 0.11,
@@ -158,7 +152,6 @@ return { cremcom1 = {
 
       damage                  = {
         default = 16.5,
-        subs    = 8.25,
       },
 
       duration                = 0.1,

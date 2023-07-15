@@ -22,13 +22,13 @@ include("LuaRules/Configs/customcmds.h.lua")
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
-local spValidUnitID         = Spring.ValidUnitID
-local spFindUnitCmdDesc     = Spring.FindUnitCmdDesc
-local spEditUnitCmdDesc     = Spring.EditUnitCmdDesc
-local spInsertUnitCmdDesc   = Spring.InsertUnitCmdDesc
-local spSetUnitTarget       = Spring.SetUnitTarget
-local spGetCommandQueue     = Spring.GetCommandQueue
-local spGiveOrderToUnit     = Spring.GiveOrderToUnit
+local spValidUnitID           = Spring.ValidUnitID
+local spFindUnitCmdDesc       = Spring.FindUnitCmdDesc
+local spEditUnitCmdDesc       = Spring.EditUnitCmdDesc
+local spInsertUnitCmdDesc     = Spring.InsertUnitCmdDesc
+local spSetUnitTarget         = Spring.SetUnitTarget
+local spGetCommandQueue       = Spring.GetCommandQueue
+local spGiveOrderToUnit       = Spring.GiveOrderToUnit
 
 local FEATURE = 102
 local UNIT = 117
@@ -44,7 +44,7 @@ local preventOverkillCmdDesc = {
 	name    = "Prevent Overkill.",
 	action  = 'preventoverkill',
 	tooltip	= 'Enable to prevent units shooting at units which are already going to die.',
-	params 	= {0, "Prevent Overkill", "Fire at anything"}
+	params 	= {0, "Fire at anything", "On automatic commands", "On fire at will", "Prevent Overkill"}
 }
 
 local shotRequirement = {}
@@ -88,7 +88,7 @@ local function SumOverlappingAreas(_, data, _, tx, ty, tz, allyTeamID, areaLimit
 			return true -- Remove
 		end
 		if data.posUpdateFrame and data.posUpdateFrame > gameFrame then
-			if data.targetID and Spring.ValidUnitID(data.targetID) then
+			if data.targetID and spValidUnitID(data.targetID) then
 				local _,_,_,_,_,_, x, y, z = Spring.GetUnitPosition(data.targetID, true, true)
 				data.x = x
 				data.y = y
@@ -117,11 +117,15 @@ function GG.OverkillPreventionPlaceholder_CheckBlock(unitID, targetID, allyTeamI
 	if not (unitID and targetID and units[unitID]) then
 		return false
 	end
+	if not GG.OverkillPrevention_IsWanted(unitID, targetID, units) then
+		return false
+	end
 	
 	local _,_,_,_,_,_, x, y, z = Spring.GetUnitPosition(targetID, true, true)
 	
 	local targetVisiblityState = Spring.GetUnitLosState(targetID, allyTeamID, true)
-	local targetIdentified = (targetVisiblityState > 2)
+	local targetIdentified = (targetVisiblityState == 15) or (math.floor(targetVisiblityState / 4) % 4 == 3)
+	local shotsRequired
 	if targetIdentified then
 		local targetDefID = Spring.GetUnitDefID(targetID)
 		shotsRequired = shotRequirement[targetDefID] or 2
@@ -152,7 +156,7 @@ function GG.OverkillPreventionPlaceholder_CheckBlock(unitID, targetID, allyTeamI
 			local cmdID, cmdOpts, cmdTag, cp_1, cp_2 = Spring.GetUnitCurrentCommand(unitID)
 			if cmdID == CMD.ATTACK and Spring.Utilities.CheckBit(gadget:GetInfo().name, cmdOpts, CMD.OPT_INTERNAL) and cp_1 and (not cp_2) and cp_1 == targetID then
 				--Spring.Echo("Removing auto-attack command")
-				spGiveOrderToUnit(unitID, CMD.REMOVE, {cmdTag}, 0 )
+				spGiveOrderToUnit(unitID, CMD.REMOVE, cmdTag, 0 )
 			end
 		else
 			spSetUnitTarget(unitID, 0)
@@ -255,16 +259,17 @@ end
 local function PreventOverkillToggleCommand(unitID, cmdParams, cmdOptions)
 	if canHandleUnit[unitID] then
 		local state = cmdParams[1]
+		if cmdOptions and cmdOptions.right then
+			state = (state - 2)%4
+		end
 		local cmdDescID = spFindUnitCmdDesc(unitID, CMD_PREVENT_OVERKILL)
 		
 		if (cmdDescID) then
 			preventOverkillCmdDesc.params[1] = state
 			spEditUnitCmdDesc(unitID, cmdDescID, {params = preventOverkillCmdDesc.params})
 		end
-		if state == 1 then
-			if not units[unitID] then
-				units[unitID] = true
-			end
+		if state >= 1 then
+			units[unitID] = state
 		else
 			if units[unitID] then
 				units[unitID] = nil
@@ -298,7 +303,7 @@ function gadget:UnitCreated(unitID, unitDefID, teamID)
 	if handledUnitDefIDs[unitDefID] then
 		spInsertUnitCmdDesc(unitID, preventOverkillCmdDesc)
 		canHandleUnit[unitID] = true
-		PreventOverkillToggleCommand(unitID, {1})
+		PreventOverkillToggleCommand(unitID, {handledUnitDefIDs[unitDefID]})
 	end
 end
 

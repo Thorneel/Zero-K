@@ -1,11 +1,9 @@
 return { droneheavyslow = {
-  unitname            = [[droneheavyslow]],
   name                = [[Viper]],
   description         = [[Advanced Battle Drone]],
   acceleration        = 0.3,
   airHoverFactor      = 4,
   brakeRate           = 0.24,
-  buildCostMetal      = 35,
   builder             = false,
   buildPic            = [[droneheavyslow.png]],
   canBeAssisted       = false,
@@ -14,9 +12,9 @@ return { droneheavyslow = {
   canMove             = true,
   canPatrol           = true,
   canSubmerge         = false,
-  category            = [[GUNSHIP]],
+  category            = [[GUNSHIP DRONE]],
   collide             = false,
-  cruiseAlt           = 100,
+  cruiseAlt           = 95,
   explodeAs           = [[TINY_BUILDINGEX]],
   floater             = true,
   footprintX          = 2,
@@ -27,16 +25,17 @@ return { droneheavyslow = {
   idleTime            = 300,
   maxDamage           = 430,
   maxVelocity         = 5,
-  minCloakDistance    = 75,
+  metalCost           = 35,
   noAutoFire          = false,
   noChaseCategory     = [[TERRAFORM SATELLITE SUB]],
   objectName          = [[battledrone.s3o]],
   reclaimable         = false,
+  repairable          = false, -- mostly not to waste constructor attention on area-repair; has regen anyway
   script              = [[droneheavyslow.lua]],
   selfDestructAs      = [[TINY_BUILDINGEX]],
   
   customParams        = {
-
+    bait_level_target      = 2,
     is_drone = 1,
   },
   
@@ -98,7 +97,7 @@ return { droneheavyslow = {
       laserFlareSize          = 4.33,
       minIntensity            = 1,
       noSelfDamage            = true,
-      range                   = 250,
+      range                   = 200,
       reloadtime              = 2,
       rgbColor                = [[0.3 0 0.4]],
       soundStart              = [[weapon/laser/heavy_laser5]],

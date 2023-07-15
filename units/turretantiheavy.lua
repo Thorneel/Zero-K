@@ -1,9 +1,7 @@
 return { turretantiheavy = {
-  unitname                      = [[turretantiheavy]],
   name                          = [[Lucifer]],
-  description                   = [[Tachyon Projector - Requires connection to a 50 energy grid]],
+  description                   = [[Tachyon Projector - Power by connecting to a 50 energy grid]],
   activateWhenBuilt             = true,
-  buildCostMetal                = 2200,
   builder                       = false,
   buildingGroundDecalDecaySpeed = 30,
   buildingGroundDecalSizeX      = 6,
@@ -17,6 +15,8 @@ return { turretantiheavy = {
   corpse                        = [[DEAD]],
 
   customParams                  = {
+    bait_level_default = 1,
+    bait_level_target_armor = 1,
 
     keeptooltip    = [[any string I want]],
 
@@ -27,27 +27,27 @@ return { turretantiheavy = {
     midposoffset   = [[0 0 0]],
     modelradius    = [[40]],
 
+    stats_show_death_explosion = 1,
+
     dontfireatradarcommand = '0',
   },
 
-  damageModifier                = 0.25,
+  damageModifier                = 0.333,
   explodeAs                     = [[ESTOR_BUILDING]],
   footprintX                    = 4,
   footprintZ                    = 4,
   iconType                      = [[fixedtachyon]],
-  idleAutoHeal                  = 5,
-  idleTime                      = 1800,
   losEmitHeight                 = 65,
   maxDamage                     = 6000,
   maxSlope                      = 18,
   maxWaterDepth                 = 0,
-  minCloakDistance              = 150,
+  metalCost                     = 2200,
   noChaseCategory               = [[FIXEDWING LAND SHIP SWIM GUNSHIP SUB HOVER]],
   objectName                    = [[arm_annihilator.s3o]],
   onoffable                     = true,
   script                        = [[turretantiheavy.lua]],
   selfdestructas                = [[ESTOR_BUILDING]],
-  sightDistance                 = 780,
+  sightDistance                 = 1280,
   useBuildingGroundDecal        = true,
   yardMap                       = [[oooo oooo oooo oooo]],
 
@@ -83,7 +83,6 @@ return { turretantiheavy = {
       damage                  = {
         default = 4000.1,
         planes  = 4000.1,
-        subs    = 200.1,
       },
 
       explosionGenerator      = [[custom:ataalaser]],

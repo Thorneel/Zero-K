@@ -11,7 +11,6 @@ function gadget:GetInfo()
 	}
 end
 
-include("LuaRules/Configs/customcmds.h.lua")
 local allyTeamByTeam = {}
 local teamList = Spring.GetTeamList()
 for i = 1, #teamList do
@@ -22,12 +21,17 @@ end
 local CMD_ATTACK = CMD.ATTACK
 local CMD_INSERT = CMD.INSERT
 
-local allyTargetUnits = {
-	[UnitDefNames["jumpsumo"].id] = true,
-	[UnitDefNames["turretimpulse"].id] = true,
-	[UnitDefNames["jumpblackhole"].id] = true,
-	[UnitDefNames["amphlaunch"].id] = true,
-}
+local tobool = Spring.Utilities.tobool
+
+local allyTargetUnits = {}
+
+for unitDefID = 1, #UnitDefs do
+	local ud = UnitDefs[unitDefID]
+
+	if tobool(ud.customParams.can_target_allies) then
+		allyTargetUnits[unitDefID] = true
+	end
+end
 
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
@@ -74,6 +78,7 @@ else -- UNSYNCED
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
 
+local CMD_RAW_MOVE = Spring.Utilities.CMD.RAW_MOVE
 function gadget:DefaultCommand(targetType, targetID)
 	if (targetType == 'unit') and targetID and Spring.GetUnitNeutral(targetID) then
 		if (Spring.GetUnitRulesParam(targetID, "avoidAttackingNeutral") == 1) or (Spring.GetUnitRulesParam(targetID, "avoidRightClickAttack") == 1) then

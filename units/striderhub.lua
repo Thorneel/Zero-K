@@ -1,10 +1,6 @@
 return { striderhub = {
-  unitname                      = [[striderhub]],
   name                          = [[Strider Hub]],
   description                   = [[Constructs Striders]],
-  acceleration                  = 0,
-  brakeRate                     = 1.5,
-  buildCostMetal                = Shared.FACTORY_COST,
   buildDistance                 = 300,
   builder                       = true,
   buildingGroundDecalDecaySpeed = 30,
@@ -38,6 +34,10 @@ return { striderhub = {
   corpse                        = [[DEAD]],
 
   customParams                  = {
+    neededlink     = 50,
+    pylonrange     = 50,
+    keeptooltip    = [[any string I want]],
+
     aimposoffset      = [[0 0 0]],
     midposoffset      = [[0 -10 0]],
     modelradius       = [[35]],
@@ -46,6 +46,7 @@ return { striderhub = {
     factorytab        = 1,
     shared_energy_gen = 1,
     like_structure    = 1,
+    select_show_eco   = 1,
   },
 
   explodeAs                     = [[ESTOR_BUILDINGEX]],
@@ -53,14 +54,12 @@ return { striderhub = {
   footprintX                    = 4,
   footprintZ                    = 4,
   iconType                      = [[t3hub]],
-  idleAutoHeal                  = 5,
-  idleTime                      = 1800,
   levelGround                   = false,
   maneuverleashlength           = [[380]],
   maxDamage                     = 2000,
   maxSlope                      = 15,
   maxVelocity                   = 0,
-  minCloakDistance              = 150,
+  metalCost                     = Shared.FACTORY_COST,
   movementClass                 = [[KBOT4]],
   noAutoFire                    = false,
   objectName                    = [[striderhub.s3o]],
@@ -68,7 +67,6 @@ return { striderhub = {
   selfDestructAs                = [[ESTOR_BUILDINGEX]],
   showNanoSpray                 = false,
   sightDistance                 = 380,
-  turnRate                      = 1,
   upright                       = true,
   useBuildingGroundDecal        = true,
   workerTime                    = 10,

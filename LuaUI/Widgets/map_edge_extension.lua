@@ -237,12 +237,19 @@ local function SetupShaderTable()
   }
 end
 
-
+local offset = (Spring.GetGameRulesParam("waterlevel") or 0)
 local function GetGroundHeight(x, z)
-	return spGetGroundHeight(x,z)
+	return spGetGroundHeight(x,z) - offset
 end
 
 local function IsIsland()
+	Spring.Echo("IsIsland", WG.GetIslandOverride, WG.GetIslandOverride())
+	if WG.GetIslandOverride then
+		local override, value = WG.GetIslandOverride()
+		if override then
+			return value
+		end
+	end
 	local sampleDist = 512
 	for i=1,Game.mapSizeX,sampleDist do
 		-- top edge
@@ -358,7 +365,6 @@ local function DrawOMap(useMirrorShader)
 end
 
 local function Initialize()
-	
 	if not drawingEnabled then
 		return
 	end
@@ -417,7 +423,12 @@ function widget:Initialize()
 	Initialize()
 end
 
+local firstUpdate = true
 function widget:Update()
+	if firstUpdate then
+		firstUpdate = false
+		return
+	end
 	Initialize()
 end
 

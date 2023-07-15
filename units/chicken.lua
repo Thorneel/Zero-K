@@ -1,21 +1,20 @@
 return { chicken = {
-  unitname            = [[chicken]],
   name                = [[Chicken]],
   description         = [[Swarmer]],
   acceleration        = 1.08,
   activateWhenBuilt   = true,
   brakeRate           = 1.23,
-  buildCostEnergy     = 0,
-  buildCostMetal      = 0,
   builder             = false,
   buildPic            = [[chicken.png]],
-  buildTime           = 25,
   canGuard            = true,
   canMove             = true,
   canPatrol           = true,
-  category            = [[LAND SINK]],
+  category            = [[LAND SINK SMALL]],
 
   customParams        = {
+    outline_x = 70,
+    outline_y = 70,
+    outline_yoff = 15,
   },
 
   explodeAs           = [[NOWEAPON]],
@@ -28,7 +27,9 @@ return { chicken = {
   maxDamage           = 270,
   maxSlope            = 36,
   maxVelocity         = 2.9,
-  minCloakDistance    = 75,
+  metalCost           = 0,
+  energyCost          = 0,
+  buildTime           = 25,
   movementClass       = [[AKBOT2]],
   noAutoFire          = false,
   noChaseCategory     = [[SHIP FLOAT SWIM TERRAFORM FIXEDWING SATELLITE GUNSHIP]],
@@ -83,7 +84,6 @@ return { chicken = {
       damage                  = {
         default = 80,
         planes  = 80,
-        subs    = 80,
       },
 
       explosionGenerator      = [[custom:NONE]],
