@@ -84,6 +84,7 @@ return { cloakriot = {
       burnblow                = true,
       burst                   = 3,
       burstrate               = 0.1,
+      cegTag                  = [[emg_trail]],
       craterBoost             = 0.15,
       craterMult              = 0.3,
 
@@ -112,6 +113,8 @@ return { cloakriot = {
       reloadtime              = 0.5,
       rgbColor                = [[1 0.95 0.4]],
       separation              = 1.5,
+      size                    = 3.5,
+      sizeDecay               = 0.1,
       soundHit                = [[weapon/cannon/emg_hit]],
       soundStart              = [[weapon/heavy_emg]],
       stages                  = 10,
